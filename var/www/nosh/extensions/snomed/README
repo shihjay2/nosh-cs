@@ -1,0 +1,20 @@
+Instructions for including SNOMED CT databases into NOSH ChartingSystem
+-----------------------------------------------------------------------
+
+1.  Because SNOMED-CT is licensed, it cannot be automatically bundled into the NOSH installation package.
+
+2.  Go to http://www.ihtsdo.org/licensing/ to determine if you live/practice in a country that is a member of IHTSDO.
+If so, you can download a free .zip file of the SNOMED data from your respective country.  If not, contact IHTSDO for
+further instructions on how to obtain the SNOMED data.
+
+3.  For the United States, go to http://www.nlm.nih.gov/research/umls/licensedcontent/snomedctfiles.html to download the
+data.  You'll need to register to the UMLS website (if you're not already registered) to be able to download the file.
+This may take up to 3 business days.  This is a HUGE file.   Jot down the last 8 digits of the zip file as this will be 
+your date that you'll enter in the install script for step 5.
+
+4.  Unzip the file and place the contents of the directory RF2Release (in the zip file) to the
+/var/www/nosh/extensions/snomed directory of your Ubuntu server where NOSH is installed.
+
+5.  Type in sudo bash /var/www/nosh/extensions/snomed/snomed_install.sh and follow the prompts.
+
+6.  Log in to NOSH as admin.  Go to Setup->Extensions->SNOMED-CT and enable the extension!

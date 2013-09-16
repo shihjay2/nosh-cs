@@ -1,0 +1,5 @@
+Template: noshemr/documents_directory
+Type: string
+Description: Enter a name for the NOSH ChartingSystem documents directory to create (/dir/dir1/dir3), leave blank to skip this step.
+ Do not enter any spaces in the directory name..
+

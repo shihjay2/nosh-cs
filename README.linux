@@ -1,0 +1,35 @@
+NOSH ChartingSystem Installation Instructions for Linux
+---------------------------------------------------------------------------------------------
+Preparation:
+You'll need to have the following programs installed on your system prior to installation
+of NOSH ChartingSystem
+
+1. Apache web server (needs to be running)
+2. MySQL database.  Make sure you remember the root password.  This will be asked during the
+NOSH ChartingSystem installation. (needs to be running)
+3. PHP 5.2 and higher
+4. The following PHP modules installed and enabled: 
+mysql, imap, mcrypt, imagick, gd, cli, curl, soap, pear
+5. PERL
+6. Imagemagick
+7. PDF ToolKit (pdftk)
+
+---------------------------------------------------------------------------------------------
+Install the package:
+
+1. Unzip the installation file in a directory of your choice.  Go to the "nosh-cs" directory.
+2. Open a terminal window and go to the "nosh-cs" directory.
+3. Type "sh install.sh" to run the installation script.
+4. Follow the instructions on the prompt.
+5. Go to your web browser and type, "http://localhost/nosh" to begin the second stage of
+installation.
+6. Wait for installation to complete.
+7. Login to NOSH ChartingSystem as admin and configure your users and clinic parameters.
+It's important to do this first before any other users use NOSH ChartingSystem; otherwise, 
+some features such as scheduling will not work correctly!
+
+---------------------------------------------------------------------------------------------
+Uninstall the package:
+1. Open a terminal window and go to the "nosh-cs" directory where you ran the installation
+script.
+2. Type "sh uninstall.sh" to run the uninstallation script.

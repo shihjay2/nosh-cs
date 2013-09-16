@@ -1,0 +1,352 @@
+nosh-cs (1.7.1-0ubuntu1) precise; urgency=low
+
+  * New Feature - Patient forms.
+  * New Feature - Ability to create patient form templates by provider/assistant.
+  * New Feature - Ability to incorporate patient form responses into encounter elements.
+  * Fixed - Scans folder losing permissions.  Set default to full permissions for all users.
+  * Fixed - Inability for users to log in with the same username when account was previously inactivated.
+  * Fixed - Updating prescriptions from rCopia with messages not working correctly.
+  * Fixed - Updating age of patient was not working correctly when editing demographics.
+  * Fixed - Adding new referral provider was not being chosen after saving entry.
+
+ -- Michael Shihjay Chen <shihjay2@gmail.com>  Mon, 16 Sep 2013 11:07:09 -0700
+
+nosh-cs (1.7.0-0ubuntu3) precise; urgency=low
+
+  * Fixed - Errors with loading SNOMED extension script.
+
+ -- Michael Shihjay Chen <shihjay2@gmail.com>  Mon, 09 Sep 2013 22:09:53 -0700
+
+nosh-cs (1.7.0-0ubuntu2) precise; urgency=low
+
+  * Update - Assistant now has ability to enter supplement purcahses.
+  * Update - Reminder system has debugging abilities.
+
+ -- Michael Shihjay Chen <shihjay2@gmail.com>  Thu, 05 Sep 2013 13:01:34 -0700
+
+nosh-cs (1.7.0-0ubuntu1) precise; urgency=low
+
+  * New Feature - Schedule views and date last viewed saved automatically.
+  * New Feature - Lot number field in supplements inventory.
+  * New Feature - Patient instructions from Vivacare (register for free).
+  * New Feature - Ability for provider to select time increments in schedule in dashboard (default 20).
+  * New Feature - SNOMED CT database integration.
+  * New Feature - Configuration of templates and CPT codes for provider and assistant users.
+  * New Feature - Ability to customize Box 31 and 32 of HCFA-1500 printout based on insurance provider.
+  * New Feature - Export C-CDA files from encounters.
+  * Update - Scheduled appointments are in the time zone of the server (not client browser).
+  * Update - Minimum number of characters before autocomplete for patient is reduced to 1.
+  * Update - UI for Admin setup views improved.
+  * Update - rCopia sync is now coded in NOSH instead of Mirth to reduce connection errors.
+  * Update - Changed CAPTCHA method for registration so that it is more compatible to touchscreen devices.
+  * Update - Updated NOSH capture of incoming faxes from RingCentral and MetroFax.
+  * Update - Ability for provider and assistant user to configure CPT and orders templates from encounter and chart.
+  * Update - Ability to select for Group Health Plan, FECA, and ChampVA as insurance types.
+  * Update - UI improvements in theme changer and referrals dialog.
+  * Fixed - Removed purchased supplements from HCFA-1500 claims.
+  * Fixed - Counting for Referrals incorrect in Documents dialog.
+  * Fixed - Inability to enter payments for encounters under Encounters Submitted grid in Financials.
+  * Fixed - Autocomplete not showing correctly under MTM dialogs.
+  * Fixed - Autocomplete not showing correctly under order dialogs.
+  * Fixed - Buttons on eye exam in PE were not working correctly.
+  * Fixed - Prevent bills that have no insurance assigned from being resubmitted, causing HCFA-1500 not to print.
+  * Fixed - Inability for billing user to access Financial page from dashboard.
+  * Fixed - Error with purging of extensions log.
+  * Fixed - Preview of encounter gives off error if CPT codes are saved before billing is saved.
+  * Fixed - Supplements inadvertenly creating empty bill even if Purchase button was not clicked.
+  * Fixed - Draft messages not being saved properly.
+  * Fixed - Fax capture is acquiring duplicate entries.
+  * Fixed - Printing chart was including old versions of encounters when addendum is made.
+
+ -- Michael Shihjay Chen <shihjay2@gmail.com>  Thu, 05 Sep 2013 05:30:59 -0700
+
+nosh-cs (1.6.9-0ubuntu8) precise; urgency=low
+
+  * New Feature - CDC immunization recommendations incorporated into Prevention dialog.
+  * Fixed - Orders not being copied to new addendums properly.
+
+ -- Michael Shihjay Chen <shihjay2@gmail.com>  Thu, 01 Aug 2013 10:24:30 -0700
+
+nosh-cs (1.6.9-0ubuntu7) precise; urgency=low
+
+  * Fixed - Printing patient instructions not working consistently.  Autosave enabled. 
+
+ -- Michael Shihjay Chen <shihjay2@gmail.com>  Wed, 31 Jul 2013 19:18:33 -0700
+
+nosh-cs (1.6.9-0ubuntu6) precise; urgency=low
+
+  * Fixed - Warning not provided if no provider is indicated for orders. 
+
+ -- Michael Shihjay Chen <shihjay2@gmail.com>  Wed, 31 Jul 2013 11:38:06 -0700
+
+nosh-cs (1.6.9-0ubuntu5) precise; urgency=low
+
+  * New Feature - Encounter tabs automatically save if switching to new tabs.
+  * New Feature - Ability to click All Normal for each organ system in entirety for physical exam.
+  * Fixed - CPT dialog not properly checking for empty ICD9 pointers.
+  * Fixed - Printing invoices, HCFA 1500 forms, and patient instructions more reliable with first click.
+
+ -- Michael Shihjay Chen <shihjay2@gmail.com>  Tue, 30 Jul 2013 11:02:35 -0700
+
+nosh-cs (1.6.9-0ubuntu4) precise; urgency=low
+
+  * New Feature - Number of documents indicated on grid headers.
+  * Updated - New modifier 52 for billing.
+  * Updated - Jquery code for checkbox attributes.
+  * Updated - New button for deep tendon reflexes exam.
+
+ -- Michael Shihjay Chen <shihjay2@gmail.com>  Sat, 27 Jul 2013 22:36:54 -0700
+
+nosh-cs (1.6.9-0ubuntu3) precise; urgency=low
+
+  * Fixed - Duplicate text input values after entering physical exam tab.
+  * Fixed - Formatting error for practice logo on print outs.
+  * Fixed - Sending medications of faxes not being sent properly.
+  * Fixed - Missing signature on referral page.
+  * Fixed - Errors on encounter preview and printing.
+  * Fixed - Formatting errors for printing reports.
+  * Fixed - Print orders summary button not activating the first time for provider user.
+
+ -- Michael Shihjay Chen <shihjay2@gmail.com>  Fri, 26 Jul 2013 17:43:54 -0700
+
+nosh-cs (1.6.9-0ubuntu2) precise; urgency=low
+
+  * New Feature - Ability for assistant user to enter procedures.
+
+ -- Michael Shihjay Chen <shihjay2@gmail.com>  Wed, 24 Jul 2013 16:52:23 -0700
+
+nosh-cs (1.6.9-0ubuntu1) precise; urgency=low
+
+  * New Feature - Ability to crop and scale practice logo.
+
+ -- Michael Shihjay Chen <shihjay2@gmail.com>  Wed, 24 Jul 2013 08:47:19 -0700
+
+nosh-cs (1.6.8-0ubuntu2) precise; urgency=low
+
+  * New Feature - Ability to change themes.
+  * Updated - Orders UI reworked to be more intuitive.
+  * Updated - Ability to assistant to designate provider for orders.
+  * Updated - Ability to resend orders without clicking Edit first.
+  * Fixed - Workaround for IOS devices (Safari browser) aggresively caching AJAX requests.
+  * Fixed - Reminder method did not clear out when selected to none.
+  * Fixed - Appointment reminders error when no reminder method.
+  * Fixed - Printing invoice error from encounters.
+  * Fixed - Respirations not appearing on past vitals under encounters.
+  * Fixed - Labs tab not loading correctly.
+  * Fixed - Ability to determine visit types and provider exceptions went missing under Admin.
+
+ -- Michael Shihjay Chen <shihjay2@gmail.com>  Wed, 17 Jul 2013 11:20:12 -0700
+
+nosh-cs (1.6.8-0ubuntu1) precise; urgency=low
+
+  * New Feature - Ability to add additional message to e-mailed appointment reminders.
+  * New Feature - Ability to export demographics to CSV file from Office page.
+  * New Feature - Ability to add guardian information to demographics.
+  * New Feature - Supplements can be purchased and billing tracked through Messages.
+  * Updated - Additional selections for marital status.
+  * Updated - Patient portal schedule will not show specific details of repeating events for provider.
+  * Updated - Reconfigured insurance dialog boxes to be easily understood.
+  * Updated - Login error messages are better understood.
+  * Updated - Saving supplements inventory does not require expiration date.
+  * Updated - Prune extensions entries in log > 30 days.
+  * Fixed - CSV export of immunizations did not work.
+  * Fixed - Display problems on some Webkit browsers; related to fullCalendar plugin.
+  * Fixed - Error messages on send intraoffice messages to patients.
+  * Fixed - Backup was not deleting files more than 30 days old.
+  * Fixed - Text message reminders having too many characters.
+  * Fixed - Supplements inventory not transferring CPT charge correctly.
+  * Fixed - Supplements search not displaying properly when dosage does not include a whitespace.
+  * Fixed - Billing not incorporating units correctly in calculation.
+  * Fixed - GI template was difficult to visualize.
+  * Fixed - Male GU tmeplate was difficult to visualize.
+  * Fixed - Accordion heights for PE too long on Musculoskeletal.
+  * Fixed - Orders giving off errors if no signature is set.
+  * Fixed - Medications list not updating after rCopia update button is pressed.
+  * Fixed - Recurring events not being saved or displayed correctly.
+  * Fixed - Billing user unable to print out invoices.
+
+ -- Michael Shihjay Chen <shihjay2@gmail.com>  Sun, 16 Jun 2013 23:24:52 -0700
+
+nosh-cs (1.6.7-0ubuntu2) precise; urgency=low
+
+  * New Feature - Demographics dialog opens automatically when adding a new patient.
+  * New Feature - Ability for provider to see other provider's schedules.
+  * Fixed - Inability to associate encounter with appointment by assistant.
+
+ -- Michael Shihjay Chen <shihjay2@gmail.com>  Thu, 13 Jun 2013 14:49:23 -0700
+
+nosh-cs (1.6.7-0ubuntu1) precise; urgency=low
+
+  * New Feature - Supplements inventory.
+  * New Feature - Added diagnosis pointers in billing details.
+  * New Feature - Previous prescribed auto search function for medications and supplements.
+  * New Feature - Added additional grids in patient portal (immunizations, allergies, supplements).
+  * New Feature - Ability to print schedule without corruption of elements.
+  * Updated - Confirm if encounter is associated with appointment.
+  * Updated - Allow patient to schedule appointment irregardless if it is at the beginning of the hour.
+  * Updated - ICD9 database.
+  * Updated - Increased number of entries for duration of visit types on schedule.
+  * Updated - CSS of chart menu.
+  * Updated - Additional defaults for Billing Service under payment type.
+  * Updated - CPT import is up-to-date for AMA text files.
+  * Updated - Patient portal now only allows printing of patient instructions when clicking on encounter.
+  * Fixed - Fixed AJAX timing on tooltips for ROS.
+  * Fixed - Fixed AJAX timing on tooltips for PE.
+  * Fixed - Assistant error on load for Orders.
+  * Fixed - ICD9 database scraper not obtaining all codes.
+  * Fixed - Visit type not getting most up-to-date duration if any changes are made.
+  * Fixed - Assistant error on load for MTM module.
+
+ -- Michael Shihjay Chen <shihjay2@gmail.com>  Wed, 05 Jun 2013 16:34:01 -0700
+
+nosh-cs (1.6.6-0ubuntu4) precise; urgency=low
+
+  * Fixed - Javascript error on installation. 
+
+ -- Michael Shihjay Chen <shihjay2@gmail.com>  Fri, 24 May 2013 19:37:03 -0700
+
+nosh-cs (1.6.6-0ubuntu3) precise; urgency=low
+
+  * Fixed - Orders, referrals, and RX header format issues. 
+
+ -- Michael Shihjay Chen <shihjay2@gmail.com>  Wed, 08 May 2013 15:12:43 -0700
+
+nosh-cs (1.6.6-0ubuntu2) precise; urgency=low
+
+  * Fixed - Installation errors. 
+
+ -- Michael Shihjay Chen <shihjay2@gmail.com>  Wed, 10 Apr 2013 22:52:21 -0700
+
+nosh-cs (1.6.6-0ubuntu1) precise; urgency=low
+
+  * Fixed - Fixed PDF header not formatting correctly without a practice logo.
+  * Updated - Search bar header updated.
+
+ -- Michael Shihjay Chen <shihjay2@gmail.com>  Wed, 10 Apr 2013 16:40:46 -0700
+
+nosh-cs (1.6.5-0ubuntu2) precise; urgency=low
+
+  * Fixed - Issue with patient not being able to create a new message. 
+
+ -- Michael Shihjay Chen <shihjay2@gmail.com>  Tue, 02 Apr 2013 09:47:29 -0700
+
+nosh-cs (1.6.5-0ubuntu1) precise; urgency=low
+
+  * Fixed - rCopia extension 2-way sync issues with updating medications.
+  * Updated - Medicare Medication Therapy Management extension additions.
+  * Updated - Printing to PDF modifications.
+  * Cleaned up fax module code.
+
+ -- Michael Shihjay Chen <shihjay2@gmail.com>  Thu, 28 Mar 2013 11:25:11 -0700
+
+nosh-cs (1.6.4-0ubuntu1) precise; urgency=low
+
+  * Fixed - Viewing encounters in modal view for biller.
+  * Fixed - rCopia extension 2-way sync.
+  * Updated - Medicare Medication Therapy Management extension additions. 
+
+ -- Michael Shihjay Chen <shihjay2@gmail.com>  Tue, 19 Mar 2013 17:08:32 -0700
+
+nosh-cs (1.6.3-0ubuntu1) precise; urgency=low
+
+  * Fixed - Inadverdent reloading of ajax tabs in encounters.
+  * Updated - mPDF to version 5.6.
+  * Updated - Letters converted to new template engine.
+  * New Feature - Medicare Medication Therapy Management extension.
+  * New Feature - Ability to add practice logo.
+
+ -- Michael Shihjay Chen <shihjay2@gmail.com>  Tue, 12 Mar 2013 03:26:50 -0700
+
+nosh-cs (1.6-0ubuntu2) precise; urgency=low
+
+  * Fixed - Update version error. 
+
+ -- Michael Shihjay Chen <shihjay2@gmail.com>  Mon, 04 Mar 2013 05:24:17 -0800
+
+nosh-cs (1.6-0ubuntu1) precise; urgency=low
+
+  * Fixed - Installation of medication tables incomplete.
+  * Fixed - Growl window was yellow color, difficult to read.
+  * Updated - jQuery UI 1.10.1.
+  * New Feature - Ability to restore lost passwords to account.
+  * New Feature - Provider and assistant can create registration code for patients. 
+
+ -- Michael Shihjay Chen <shihjay2@gmail.com>  Fri, 01 Mar 2013 17:10:52 -0800
+
+nosh-cs (1.5-0ubuntu6) precise; urgency=low
+
+  * Fixed - Installation version was not set.
+  * New Feature - Provider information editor in dashboard. 
+
+ -- Michael Shihjay Chen <shihjay2@gmail.com>  Tue, 26 Feb 2013 22:41:28 -0800
+
+nosh-cs (1.5-0ubuntu5) precise; urgency=low
+
+  * Fixed - Extensions selection not working correctly.
+  * Fixed - Tooltip for ICD search blocking autocompete values.
+  * Fixed - Installation errors following CPT table selection.
+
+ -- Michael Shihjay Chen <shihjay2@gmail.com>  Tue, 26 Feb 2013 15:15:33 -0800
+
+nosh-cs (1.5-0ubuntu4) precise; urgency=low
+
+  * Fixed - Office view pointing to depreciated time picker plugin.
+
+ -- Michael Shihjay Chen <shihjay2@gmail.com>  Sun, 24 Feb 2013 11:42:49 -0800
+
+nosh-cs (1.5-0ubuntu3) precise; urgency=low
+
+  * Fixed - Messaging click on cell for inbox was not working correctly.
+  * Fixed - Print encounters preview not working correctly.
+  * Fixed - Print documents viewer not removing temporary files.
+  * Fixed - Billing user graphical user interface problems.
+  * Fixed - Medication database was not being referred correctly in search.
+
+ -- Michael Shihjay Chen <shihjay2@gmail.com>  Sat, 23 Feb 2013 21:29:59 -0800
+
+nosh-cs (1.5-0ubuntu2) precise; urgency=low
+
+  * Fixed - Schedule time pickers incorrect.
+
+ -- Michael Shihjay Chen <shihjay2@gmail.com>  Thu, 21 Feb 2013 20:10:10 -0800
+
+nosh-cs (1.5-0ubuntu1) precise; urgency=low
+
+  * Fixed - Extensions php error and ajax request error.
+  * Fixed - Billing history not being retrieved.
+  * Fixed - ROS CV template not showing up correctly.
+  * Fixed - Duplicate entries with autocomplete.
+  * Update - Updated ICD-9 database to 2013.
+  * Update - Updated medication database to 2013.
+  * Update - jQuery updated to v1.9.1.
+  * Update - jqQgrid updated to v4.4.4.
+  * Update - jQuery UI updated to v1.10.1.
+  * Update - Use of jQuery UI toottips instead of BeautyTips (depreciated).
+  * Update - Configured CSS to be more tablet friendly.
+  * New Feature - DrFirst RCopia extension.
+  * New Feature - Updox extension.
+  * New Feature - Installation script for Updox (optional)
+  * New Feature - Ability to create addendums.
+  * New Feature - Configured to be tablet friendly.
+
+ -- Michael Shihjay Chen <shihjay2@gmail.com>  Thu, 21 Feb 2013 18:07:29 -0800
+
+nosh-cs (1.4-0ubuntu2) precise; urgency=low
+
+  * Fixed - Updated postinst script to increase upload document size.
+  * Fixed - Getting scanned documents error.
+  * Fixed - ROS male all-normal button error.
+  * Fixed - ROS templates not loading correctly for adults.
+  * Fixed - Dashboard, draft messages and encounters not displaying properly with updated version of PHP.
+  * New Feature - Ability for patients to enter and update demographic/insurance info on patient portal.
+  * New Feature - Batch HCFA-1500 printing.
+  * New Feature - Ability to jump directly to encounter from dashboard drafts list.
+  * New Feature - Installation script for MirthConnect (optional)
+
+ -- Michael Shihjay Chen <shihjay2@gmail.com>  Wed, 16 Jan 2013 09:53:43 -0800
+
+nosh-cs (1.4-0ubuntu1) precise; urgency=low
+
+  * Fixed - Installation error of cron.d script.
+
+ -- Michael Shihjay Chen <shihjay2@gmail.com>  Fri, 28 Dec 2012 11:14:24 -0800
