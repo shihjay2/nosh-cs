@@ -296,6 +296,110 @@
 			$("#oh_fh_old").val(data.oh_fh);
 		}
 	});
+	$.ajax({
+		type: "POST",
+		url: "<?php echo site_url('assistant/encounters/pf_template_select_list/PMH');?>",
+		dataType: "json",
+		success: function(data){
+			$('#oh_pmh_pf_template').addOption(data.options);
+			$('#oh_pmh_pf_template').sortOptions();
+			$('#oh_pmh_pf_template').val("");
+		}
+	});
+	$('#oh_pmh_pf_template').change(function(){
+		var a = $(this).val();
+		$.ajax({
+			type: "POST",
+			url: "<?php echo site_url('assistant/encounters/get_pf_template');?>" + "/" + a,
+			success: function(data){
+				var old = $("#oh_pmh").val();
+				if (old != '') {
+					var b = old + '\n\n' + data;
+				} else {
+					var b = data;
+				}
+				$("#oh_pmh").val(b);
+			}
+		});
+	});
+	$.ajax({
+		type: "POST",
+		url: "<?php echo site_url('assistant/encounters/pf_template_select_list/PSH');?>",
+		dataType: "json",
+		success: function(data){
+			$('#oh_psh_pf_template').addOption(data.options);
+			$('#oh_psh_pf_template').sortOptions();
+			$('#oh_psh_pf_template').val("");
+		}
+	});
+	$('#oh_psh_pf_template').change(function(){
+		var a = $(this).val();
+		$.ajax({
+			type: "POST",
+			url: "<?php echo site_url('assistant/encounters/get_pf_template');?>" + "/" + a,
+			success: function(data){
+				var old = $("#oh_psh").val();
+				if (old != '') {
+					var b = old + '\n\n' + data;
+				} else {
+					var b = data;
+				}
+				$("#oh_psh").val(b);
+			}
+		});
+	});
+	$.ajax({
+		type: "POST",
+		url: "<?php echo site_url('assistant/encounters/pf_template_select_list/FH');?>",
+		dataType: "json",
+		success: function(data){
+			$('#oh_fh_pf_template').addOption(data.options);
+			$('#oh_fh_pf_template').sortOptions();
+			$('#oh_fh_pf_template').val("");
+		}
+	});
+	$('#oh_fh_pf_template').change(function(){
+		var a = $(this).val();
+		$.ajax({
+			type: "POST",
+			url: "<?php echo site_url('assistant/encounters/get_pf_template');?>" + "/" + a,
+			success: function(data){
+				var old = $("#oh_fh").val();
+				if (old != '') {
+					var b = old + '\n\n' + data;
+				} else {
+					var b = data;
+				}
+				$("#oh_fh").val(b);
+			}
+		});
+	});
+	$.ajax({
+		type: "POST",
+		url: "<?php echo site_url('assistant/encounters/pf_template_select_list/SH');?>",
+		dataType: "json",
+		success: function(data){
+			$('#oh_sh_pf_template').addOption(data.options);
+			$('#oh_sh_pf_template').sortOptions();
+			$('#oh_sh_pf_template').val("");
+		}
+	});
+	$('#oh_sh_pf_template').change(function(){
+		var a = $(this).val();
+		$.ajax({
+			type: "POST",
+			url: "<?php echo site_url('assistant/encounters/get_pf_template');?>" + "/" + a,
+			success: function(data){
+				var old = $("#oh_sh").val();
+				if (old != '') {
+					var b = old + '\n\n' + data;
+				} else {
+					var b = data;
+				}
+				$("#oh_sh").val(b);
+			}
+		});
+	});
 	function split( val ) {
 		return val.split( /\n\s*/ );
 	}

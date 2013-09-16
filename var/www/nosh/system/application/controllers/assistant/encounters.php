@@ -5671,6 +5671,7 @@ class Encounters extends Application
 		$query = $this->db->get('forms');
 		$data['options'] = array();
 		if ($query->num_rows() > 0) {
+			$data['options'][''] = "*Select completed forms below.";
 			foreach ($query->result_array() as $row) {
 				$data['options'][$row['forms_id']] = $row['forms_title'] . ", completed on " . date('m/d/Y', human_to_unix($row['forms_date']));
 			}
