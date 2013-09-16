@@ -1,3 +1,9 @@
+nosh-cs (1.7.1-0ubuntu2) precise; urgency=low
+
+  * New Feature - Ability for assistant to transfer patient forms.
+
+ -- Michael Shihjay Chen <shihjay2@gmail.com>  Mon, 16 Sep 2013 14:54:54 -0700
+
 nosh-cs (1.7.1-0ubuntu1) precise; urgency=low
 
   * New Feature - Patient forms.
