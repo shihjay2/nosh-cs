@@ -58,8 +58,9 @@ $(document).ready(function() {
 								$(".patient_form_buttonset input").button('refresh');
 							}
 						});
+					} else {
+						$('#form_dialog').dialog('option', 'title', "Fill out the " + json_object.html[2].value + " Form:");
 					}
-					
 					$("#form_dialog").dialog('open');
 				}
 			});

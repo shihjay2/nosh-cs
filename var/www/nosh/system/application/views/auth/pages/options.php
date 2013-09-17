@@ -985,7 +985,10 @@
 								var l = 1;
 								for (var k = 2; k < Object.size(json_object.html[i].html); k++) {
 									if (l > 1) {
-										$("#patient_forms_template_div_options").append('Option:<br><input type="text" id="configuration_patient_forms_option_' + l + '" style="width:290px" class="text ui-widget-content ui-corner-all patient_forms_option"/><br>');
+										$("#patient_forms_template_div_options").append('<div>Option:<br><input type="text" id="configuration_patient_forms_option_' + l + '" style="width:290px" class="text ui-widget-content ui-corner-all patient_forms_option"/><button type="button" id="configuration_patient_forms_option_' + l +'_remove" class="patient_forms_remove_option">Remove</button><br></div>');
+										$(".patient_forms_remove_option").button({icons: {primary: "ui-icon-minus"}}).on("click",function() {
+											$(this).parent().remove();
+										});
 									}
 										$("#configuration_patient_forms_option_" + l).val(json_object.html[i].html[k].caption);
 									l++;

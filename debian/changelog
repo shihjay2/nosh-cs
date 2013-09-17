@@ -1,3 +1,10 @@
+nosh-cs (1.7.1-0ubuntu4) precise; urgency=low
+
+  * Fixed - Remove button not appearing for editing form elements with options.
+  * Fixed - No title for form header on patient form.
+
+ -- Michael Shihjay Chen <shihjay2@gmail.com>  Tue, 17 Sep 2013 13:07:41 -0700
+
 nosh-cs (1.7.1-0ubuntu3) precise; urgency=low
 
   * Fixed - Fixed install routine if scans directory did not exist. 
