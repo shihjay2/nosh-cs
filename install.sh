@@ -144,7 +144,9 @@ if [ -d $TMPDIR ]; then
 	log_only "The NOSH ChartingSystem documents directory has been referenced from your previous installation."
 	chown -R $WEB_GROUP.$WEB_USER $NOSH_DIR
 	chmod -R 755 $NOSH_DIR
-	chmod -R 777 "$NOSH_DIR"scans
+	if [ -d "$NOSH_DIR"scans ]; then
+		chmod -R 777 "$NOSH_DIR"scans
+	fi
 	log_only "The NOSH ChartingSystem documents directory is secured."
 	rm -rf $TMPDIR
 	log_only "Temporary files have been removed"
