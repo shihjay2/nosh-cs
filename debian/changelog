@@ -1,3 +1,9 @@
+nosh-cs (1.7.1-0ubuntu5) precise; urgency=low
+
+  * Fixed - Elements not removed in preview when remove button is pressed.
+
+ -- Michael Shihjay Chen <shihjay2@gmail.com>  Wed, 18 Sep 2013 09:27:27 -0700
+
 nosh-cs (1.7.1-0ubuntu4) precise; urgency=low
 
   * Fixed - Remove button not appearing for editing form elements with options.

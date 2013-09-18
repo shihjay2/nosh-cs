@@ -754,81 +754,77 @@
 	$("#patient_forms_element_save").button().click(function(){
 		var json_flat = $("#configuration_patient_forms_json").val();
 		var json_object = JSON.parse(json_flat);
+		var json_array = [json_object];
 		var div_id = $("#patient_forms_div_id").val();
 		if (div_id != '') {
-			for (var i = 0; i < Object.size(json_object.html); i++) {
-				var a = json_object.html[i].id;
+			for (var i = 0; i < json_array[0]['html'].length; i++) {
+				var a = json_array[0]['html'][i].id;
 				if (a == div_id) {
-					json_object.html[i].html[0].html = $("#configuration_patient_forms_label").val();
+					json_array[0]['html'][i]['html'][0]['html'] = $("#configuration_patient_forms_label").val();
+					var f = json_array[0]['html'][i]['html'].length-2;
+					json_array[0]['html'][i]['html'].splice(2,f);
 					if ($("#configuration_patient_forms_fieldtype").val() == "radio" || $("#configuration_patient_forms_fieldtype").val() == "checkbox") {
 						var h = 2;
 						var g = h-2;
 						$(".patient_forms_option").each(function(){
-							if (json_object.html[i].html[h]) {
-								delete json_object.html[i].html[h];
-								json_object.html[i].html[h] = new Object();
-							} else {
-								json_object.html[i].html[h] = new Object();
-							}
-							json_object.html[i].html[h].type = $("#configuration_patient_forms_fieldtype").val();
-							json_object.html[i].html[h].id = $("#patient_forms_div_id").val() + "_" + $("#configuration_patient_forms_fieldtype").val() + "_" + g;
-							json_object.html[i].html[h].name = $("#patient_forms_div_id").val();
-							json_object.html[i].html[h].value = $("#configuration_patient_forms_label").val() + ": " + $(this).val();
-							json_object.html[i].html[h].caption = $(this).val();
+							json_array[0]['html'][i]['html'][h] = {};
+							json_array[0]['html'][i]['html'][h]['type']= $("#configuration_patient_forms_fieldtype").val();
+							json_array[0]['html'][i]['html'][h]['id']= $("#patient_forms_div_id").val() + "_" + $("#configuration_patient_forms_fieldtype").val() + "_" + g;
+							json_array[0]['html'][i]['html'][h]['name'] = $("#patient_forms_div_id").val();
+							json_array[0]['html'][i]['html'][h]['value']= $("#configuration_patient_forms_label").val() + ": " + $(this).val();
+							json_array[0]['html'][i]['html'][h]['caption'] = $(this).val();
 							h++;
 							g++;
 						});
-						json_object.html[i].class = "patient_form_div patient_form_buttonset";
+						json_array[0]['html'][i]['class'] = "patient_form_div patient_form_buttonset";
 					} else {
-						json_object.html[i].html[2].type = $("#configuration_patient_forms_fieldtype").val();
-						json_object.html[i].html[2].id = $("#patient_forms_div_id").val() + "_" + $("#configuration_patient_forms_fieldtype").val();
-						json_object.html[i].html[2].name = $("#patient_forms_div_id").val();
+						json_array[0]['html'][i]['html'][2] = {};
+						json_array[0]['html'][i]['html'][2]['type'] = $("#configuration_patient_forms_fieldtype").val();
+						json_array[0]['html'][i]['html'][2]['id'] = $("#patient_forms_div_id").val() + "_" + $("#configuration_patient_forms_fieldtype").val();
+						json_array[0]['html'][i]['html'][2]['name'] = $("#patient_forms_div_id").val();
 						if ($("#configuration_patient_forms_fieldtype").val() == "select") {
 							if ($("#configuration_patient_forms_option_1").val() != "") {
-								if (json_object.html[i].html[2]['options']) {
-									delete json_object.html[i].html[2]['options'];
-									json_object.html[i].html[2].options = new Object();
-								}
+								json_array[0]['html'][i]['html'][2]['options'] = {};
 								$(".patient_forms_option").each(function(){
 									var value = $(this).val();
 									var key = $("#configuration_patient_forms_label").val() + ": " + $(this).val();
-									json_object.html[i].html[2]['options'][key] = value;
+									json_array[0]['html'][i]['html'][2]['options'][key] = value;
 								});
-								json_object.html[i].class = "patient_form_div";
+								json_array[0]['html'][i]['class'] = "patient_form_div";
 							}
 						} else {
-							json_object.html[i].class = "patient_form_div patient_form_text";
+							json_array[0]['html'][i]['class'] = "patient_form_div patient_form_text";
 						}
 					}
 				}
 			}
 		} else {
-			var j = Object.size(json_object.html);
+			var j = json_array[0]['html'].length;
 			var l = j-3;
 			if ($("#configuration_patient_forms_fieldtype").val() == 'text') {
 				var k = "patient_form_div patient_form_text";
-				json_object.html[j] = {"type":"div","class":"patient_form_div patient_form_text","id":"patient_form_div"+l,"html":[{"type":"span","id":"patient_form_div"+l+"_label","html":$("#configuration_patient_forms_label").val()},{"type":"br"},{"type":$("#configuration_patient_forms_fieldtype").val(),"id":"patient_form_div"+l+"_"+$("#configuration_patient_forms_fieldtype").val(),"name":"patient_form_div"+l,"value":""}]};
+				json_array[0]['html'][j] = {"type":"div","class":"patient_form_div patient_form_text","id":"patient_form_div"+l,"html":[{"type":"span","id":"patient_form_div"+l+"_label","html":$("#configuration_patient_forms_label").val()},{"type":"br"},{"type":$("#configuration_patient_forms_fieldtype").val(),"id":"patient_form_div"+l+"_"+$("#configuration_patient_forms_fieldtype").val(),"name":"patient_form_div"+l,"value":""}]};
 			}
 			if ($("#configuration_patient_forms_fieldtype").val() == 'radio' || $("#configuration_patient_forms_fieldtype").val() == 'checkbox') {
 				var m = 2;
 				var n = m-2;
-				json_object.html[j] = {"type":"div","class":"patient_form_div patient_form_buttonset","id":"patient_form_div"+l,"html":[{"type":"span","id":"patient_form_div"+l+"_label","html":$("#configuration_patient_forms_label").val()},{"type":"br"}]};
+				json_array[0]['html'][j] = {"type":"div","class":"patient_form_div patient_form_buttonset","id":"patient_form_div"+l,"html":[{"type":"span","id":"patient_form_div"+l+"_label","html":$("#configuration_patient_forms_label").val()},{"type":"br"}]};
 				$(".patient_forms_option").each(function(){
-					json_object.html[j].html[m] = {"type":$("#configuration_patient_forms_fieldtype").val(),"id":"patient_form_div"+l+"_"+$("#configuration_patient_forms_fieldtype").val()+"_"+n,"name":"patient_form_div"+l,"value":$("#configuration_patient_forms_label").val()+": "+$(this).val(),"caption":$(this).val()};
+					json_array[0]['html'][j]['html'][m] = {"type":$("#configuration_patient_forms_fieldtype").val(),"id":"patient_form_div"+l+"_"+$("#configuration_patient_forms_fieldtype").val()+"_"+n,"name":"patient_form_div"+l,"value":$("#configuration_patient_forms_label").val()+": "+$(this).val(),"caption":$(this).val()};
 					m++;
 					n++;
 				});
 			}
 			if ($("#configuration_patient_forms_fieldtype").val() == 'select') {
-				json_object.html[j] = {"type":"div","class":"patient_form_div","id":"patient_form_div"+l,"html":[{"type":"span","id":"patient_form_div"+l+"_label","html":$("#configuration_patient_forms_label").val()},{"type":"br"},{"type":$("#configuration_patient_forms_fieldtype").val(),"id":"patient_form_div"+l+"_"+ $("#configuration_patient_forms_fieldtype").val(),"name":"patient_form_div"+l,"options":{}}]};
+				json_array[0]['html'][j] = {"type":"div","class":"patient_form_div","id":"patient_form_div"+l,"html":[{"type":"span","id":"patient_form_div"+l+"_label","html":$("#configuration_patient_forms_label").val()},{"type":"br"},{"type":$("#configuration_patient_forms_fieldtype").val(),"id":"patient_form_div"+l+"_"+ $("#configuration_patient_forms_fieldtype").val(),"name":"patient_form_div"+l,"options":{}}]};
 				$(".patient_forms_option").each(function(){
 					var value = $(this).val();
 					var key = $("#configuration_patient_forms_label").val() + ": " + $(this).val();
-					json_object.html[j].html[2].options[key] = value;
+					json_array[0]['html'][j]['html'][2]['options'][key] = value;
 				});
 			}
 		}
-		var json_flat1 = JSON.stringify(json_object);
+		var json_flat1 = JSON.stringify(json_array[0]);
 		$("#configuration_patient_forms_json").val(json_flat1);
 		preview_form();
 		$("#patient_forms_template_div").clearDiv();
