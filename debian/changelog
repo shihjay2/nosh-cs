@@ -1,3 +1,9 @@
+nosh-cs (1.7.1-0ubuntu6) precise; urgency=low
+
+  * Fixed - Special instructions for supplements not showing up on messages or encounters.
+
+ -- Michael Shihjay Chen <shihjay2@gmail.com>  Thu, 19 Sep 2013 08:47:20 -0700
+
 nosh-cs (1.7.1-0ubuntu5) precise; urgency=low
 
   * Fixed - Elements not removed in preview when remove button is pressed.

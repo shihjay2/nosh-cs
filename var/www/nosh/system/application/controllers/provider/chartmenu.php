@@ -2626,10 +2626,17 @@ class Chartmenu extends Application
 					'message' => 'Supplement added!',
 					'medtext' => $this->input->post('sup_supplement') . ' ' . $this->input->post('sup_dosage')
 				);
-				if ($this->input->post('sup_dosage_unit') == "") {
-					$result['medtext'] .= ', ' . $this->input->post('sup_sig') . ' ' . $this->input->post('sup_route') . ' ' . $this->input->post('sup_frequency') . ' for ' . $this->input->post('sup_reason');
+				if ($this->input->post('sup_dosage_unit') != "") {
+					$result['medtext'] .= ' ' . $this->input->post('sup_dosage_unit');
+				}
+				if ($this->input->post('sup_sig') != "") {
+					if ($this->input->post('sup_instructions') != "") {
+						$result['medtext'] .= ', ' . $this->input->post('sup_sig') . ' ' . $this->input->post('sup_route') . ' ' . $this->input->post('sup_frequency') . ', ' . $this->input->post('sup_instructions') . ' for ' . $this->input->post('sup_reason');
+					} else {
+						$result['medtext'] .= ', ' . $this->input->post('sup_sig') . ' ' . $this->input->post('sup_route') . ' ' . $this->input->post('sup_frequency') . ' for ' . $this->input->post('sup_reason');
+					}
 				} else {
-					$result['medtext'] .= ' ' . $this->input->post('sup_dosage_unit') . ', ' . $this->input->post('sup_sig') . ' ' . $this->input->post('sup_route') . ' ' . $this->input->post('sup_frequency') . ' for ' . $this->input->post('sup_reason');
+					$result['medtext'] .= ', ' . $this->input->post('sup_instructions') . ' for ' . $this->input->post('sup_reason');
 				}
 			} else {
 				$result['message'] = "Error adding supplement!";
@@ -2641,10 +2648,17 @@ class Chartmenu extends Application
 				'message' => 'Supplement updated!',
 				'medtext' => $this->input->post('sup_supplement') . ' ' . $this->input->post('sup_dosage')
 			);
-			if ($this->input->post('sup_dosage_unit') == "") {
-				$result['medtext'] .= ', ' . $this->input->post('sup_sig') . ' ' . $this->input->post('sup_route') . ' ' . $this->input->post('sup_frequency') . ' for ' . $this->input->post('sup_reason');
+			if ($this->input->post('sup_dosage_unit') != "") {
+				$result['medtext'] .= ' ' . $this->input->post('sup_dosage_unit');
+			}
+			if ($this->input->post('sup_sig') != "") {
+				if ($this->input->post('sup_instructions') != "") {
+					$result['medtext'] .= ', ' . $this->input->post('sup_sig') . ' ' . $this->input->post('sup_route') . ' ' . $this->input->post('sup_frequency') . ', ' . $this->input->post('sup_instructions') . ' for ' . $this->input->post('sup_reason');
+				} else {
+					$result['medtext'] .= ', ' . $this->input->post('sup_sig') . ' ' . $this->input->post('sup_route') . ' ' . $this->input->post('sup_frequency') . ' for ' . $this->input->post('sup_reason');
+				}
 			} else {
-				$result['medtext'] .= ' ' . $this->input->post('sup_dosage_unit') . ', ' . $this->input->post('sup_sig') . ' ' . $this->input->post('sup_route') . ' ' . $this->input->post('sup_frequency') . ' for ' . $this->input->post('sup_reason');
+				$result['medtext'] .= ', ' . $this->input->post('sup_instructions') . ' for ' . $this->input->post('sup_reason');
 			}
 		}
 		if($this->input->post('amount') != "") {
