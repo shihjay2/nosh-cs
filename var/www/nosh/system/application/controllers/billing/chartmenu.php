@@ -4682,7 +4682,7 @@ class Chartmenu extends Application
 			$referring_provider = $encounterInfo->referring_provider;
 			$bill_Box17 = $this->string_format($referring_provider, 26);
 		} else {
-			$bill_Box17 = $this->string_format($provider, 26);
+			$bill_Box17 = $this->string_format("", 26);
 		}
 		if ($result2['insurance_box_31'] == 'n') {
 			$bill_Box31 = $this->string_format($provider, 21);
@@ -4702,7 +4702,7 @@ class Chartmenu extends Application
 		$query4 = $this->db->get('providers');
 		$result4 = $query4->row();
 		$npi = $result4->npi;
-		$bill_Box17A = $this->string_format($npi, 17);
+		$bill_Box17A = $this->string_format("", 17);
 		$bill_Box25 = $practiceInfo->tax_id;
 		$bill_Box25 = $this->string_format($bill_Box25, 15);
 		$bill_Box26 = $this->string_format($pid, 14);	

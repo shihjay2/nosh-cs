@@ -1,6 +1,12 @@
+nosh-cs (1.7.1-0ubuntu8) precise; urgency=low
+
+  * Fixed - Blank out Box 17 and 17A in HCFA (temporary) due to billing issues for some providers.
+
+ -- Michael Shihjay Chen <shihjay2@gmail.com>  Fri, 04 Oct 2013 10:17:20 -0700
+ 
 nosh-cs (1.7.1-0ubuntu7) precise; urgency=low
 
-  * Fixed - Bills not automatically saving when new CPT codes are added in the encouters.
+  * Fixed - Bills not automatically saving when new CPT codes are added in the encounters.
 
  -- Michael Shihjay Chen <shihjay2@gmail.com>  Fri, 04 Oct 2013 09:27:20 -0700
 
