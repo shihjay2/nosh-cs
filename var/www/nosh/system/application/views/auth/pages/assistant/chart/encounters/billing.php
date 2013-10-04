@@ -174,6 +174,7 @@
 									$("#billing_form").clearForm();
 									$("#cpt_billing_dialog").dialog('close');
 									jQuery("#cpt_list").trigger("reloadGrid");
+									billing_autosave('now');
 								}
 							}
 						});
@@ -379,7 +380,8 @@
 				data: "billing_core_id=" + item,
 				success: function(data){
 					$.jGrowl(data);
-					jQuery("#cpt_list").trigger("reloadGrid");			
+					jQuery("#cpt_list").trigger("reloadGrid");
+					billing_autosave('now');
 				}
 			});
 		} else {
@@ -614,14 +616,14 @@
 			}
 		});
 	});
-	function billing_autosave() {
+	function billing_autosave(a) {
 		var old9a = $("#insurance_id_1_old").val();
 		var new9a = $("#insurance_id_1").val();
 		var old9b = $("#insurance_id_2_old").val();
 		var new9b = $("#insurance_id_2").val();
 		var old9c = $("#billing_bill_complex_old").val();
 		var new9c = $("#billing_bill_complex").val();
-		if (old9a != new9a || old9b != new9b || old9c != new9c) {
+		if (old9a != new9a || old9b != new9b || old9c != new9c || a == 'now') {
 			var ins1 = $("#insurance_id_1").val();
 			var ins2 = $("#insurance_id_2").val();
 			var bc = $("#billing_bill_complex").val();
