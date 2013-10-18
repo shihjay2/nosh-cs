@@ -9753,11 +9753,13 @@ class Chartmenu extends Application
 				}
 				$billing_count++;
 			}
-			$billingInfo = $this->encounters_model->getBilling($eid)->row_array();
-			if ($billingInfo['bill_complex'] != '') {
-				$data['billing'] .= '<br><strong>Medical Complexity: </strong>';
-				$data['billing'] .= nl2br($billingInfo['bill_complex']);
-				$data['billing'] .= '<br /><br />';
+			if ($this->encounters_model->getBilling($eid)->num_rows() > 0) {
+				$billingInfo = $this->encounters_model->getBilling($eid)->row_array();
+				if ($billingInfo['bill_complex'] != '') {
+					$data['billing'] .= '<br><strong>Medical Complexity: </strong>';
+					$data['billing'] .= nl2br($billingInfo['bill_complex']);
+					$data['billing'] .= '<br /><br />';
+				}
 			}
 			$data['billing'] .= '</p>';
 		} else {

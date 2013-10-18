@@ -1361,7 +1361,7 @@ class Install extends Controller {
 		$displayname = 'Administrator';
 		
 		// Tags
-		tags_definition = array(
+		$tags_definition = array(
 			'tags_id' => array('type' => 'INT', 'constraint' => 40, 'auto_increment' => TRUE),
 			'tag' => array('type' => 'VARCHAR', 'constraint' => 255)
 		);
