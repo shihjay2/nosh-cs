@@ -1,3 +1,9 @@
+nosh-cs (1.7.1-0ubuntu10) precise; urgency=low
+
+  * Fixed - Signatures and logos not always showing up on PDF's.
+
+ -- Michael Shihjay Chen <shihjay2@gmail.com>  Fri, 18 Oct 2013 13:32:35 -0700
+
 nosh-cs (1.7.1-0ubuntu9) precise; urgency=low
 
   * Fixed - Error in installation script, blank page.

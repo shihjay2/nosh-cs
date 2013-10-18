@@ -109,8 +109,8 @@ class Chartmenu extends Application
 		$data['practiceInfo'] .= $practice['city'] . ', ' . $practice['state'] . ' ' . $practice['zip'] . '<br />';
 		$data['practiceInfo'] .= 'Phone: ' . $practice['phone'] . ', Fax: ' . $practice['fax'] . '<br />';
 		if ($practice['practice_logo'] != '') {
-			$logo = str_replace("/var/www/nosh/","", $practice['practice_logo']);
-			$data['practiceLogo'] = "<img src='" . base_url() . $logo . "' border='0'>";
+			$logo = str_replace("/var/www/","http://localhost/", $practice['practice_logo']);
+			$data['practiceLogo'] = "<img src='" . $logo . "' border='0'>";
 		} else {
 			$data['practiceLogo'] = '<br><br><br><br><br>';
 		}
@@ -1878,8 +1878,8 @@ class Chartmenu extends Application
 		$data['practiceInfo'] .= 'Phone: ' . $practice['phone'] . ', Fax: ' . $practice['fax'] . '<br />';
 		$data['patientInfo'] = $this->demographics_model->get($pid)->row();
 		if ($practice['practice_logo'] != '') {
-			$logo = str_replace("/var/www/nosh/","", $practice['practice_logo']);
-			$data['practiceLogo'] = "<img src='" . base_url() . $logo . "' border='0'>";
+			$logo = str_replace("/var/www/","http://localhost/", $practice['practice_logo']);
+			$data['practiceLogo'] = "<img src='" . $logo . "' border='0'>";
 		} else {
 			$data['practiceLogo'] = '<br><br><br><br><br>';
 		}
@@ -1905,14 +1905,14 @@ class Chartmenu extends Application
 		} else {
 			$data['allergyInfo'] .= 'No known allergies.';
 		}
-		$user_id = $this->session->userdata('user_id');
+		$user_id = $data['rx']->id;
 		$this->db->select('signature');
 		$this->db->where('id', $user_id);
 		$signature_query = $this->db->get('providers');
 		if ($signature_query->num_rows() > 0) {
 			$signature = $this->db->get('providers')->row_array();
-			$signature1 = str_replace("/var/www/nosh/","", $signature['signature']);
-			$data['signature'] = "<img src='" . base_url() . $signature1 . "' border='0'><br>";
+			$signature1 = str_replace("/var/www/","http://localhost/", $signature['signature']);
+			$data['signature'] = "<img src='" . $signature1 . "' border='0'><br>";
 		} else {
 			$data['signature'] = '&nbsp;<br>&nbsp;<br>&nbsp;<br>&nbsp;<br>&nbsp;<br>';
 		}
@@ -3956,8 +3956,8 @@ class Chartmenu extends Application
 		$signature_query = $this->db->get('providers');
 		if ($signature_query->num_rows() > 0) {
 			$signature = $this->db->get('providers')->row_array();
-			$signature1 = str_replace("/var/www/nosh/","", $signature['signature']);
-			$data['displayname'] = "<img src='" . base_url() . $signature1 . "' border='0'><br>" . $this->session->userdata('displayname');
+			$signature1 = str_replace("/var/www/","http://localhost/", $signature['signature']);
+			$data['displayname'] = "<img src='" . $signature1 . "' border='0'><br>" . $this->session->userdata('displayname');
 		} else {
 			$data['displayname'] = '<br><br><br><br><br><br><br>' . $this->session->userdata('displayname');
 		}
@@ -5030,8 +5030,8 @@ class Chartmenu extends Application
 		$data['practiceInfo'] .= $practice['city'] . ', ' . $practice['state'] . ' ' . $practice['zip'] . '<br />';
 		$data['practiceInfo'] .= 'Phone: ' . $practice['phone'] . ', Fax: ' . $practice['fax'] . '<br />';
 		if ($practice['practice_logo'] != '') {
-			$logo = str_replace("/var/www/nosh/","", $practice['practice_logo']);
-			$data['practiceLogo'] = "<img src='" . base_url() . $logo . "' border='0'>";
+			$logo = str_replace("/var/www/","http://localhost/", $practice['practice_logo']);
+			$data['practiceLogo'] = "<img src='" . $logo . "' border='0'>";
 		} else {
 			$data['practiceLogo'] = '<br><br><br><br><br>';
 		}
@@ -5052,8 +5052,8 @@ class Chartmenu extends Application
 		$signature_query = $this->db->get('providers');
 		if ($signature_query->num_rows() > 0) {
 			$signature = $this->db->get('providers')->row_array();
-			$signature1 = str_replace("/var/www/nosh/","", $signature['signature']);
-			$data['signature'] = "<img src='" . base_url() . $signature1 . "' border='0'>";
+			$signature1 = str_replace("/var/www/","http://localhost/", $signature['signature']);
+			$data['signature'] = "<img src='" . $signature1 . "' border='0'>";
 		} else {
 			$data['signature'] = '&nbsp;<br>&nbsp;<br>&nbsp;<br>&nbsp;<br>&nbsp;<br>';
 		}
@@ -5762,8 +5762,8 @@ class Chartmenu extends Application
 		$data['practiceInfo2'] = $practice['city'] . ', ' . $practice['state'] . ' ' . $practice['zip'];
 		$data['practiceInfo3'] = 'Phone: ' . $practice['phone'] . ', Fax: ' . $practice['fax'];
 		if ($practice['practice_logo'] != '') {
-			$logo = str_replace("/var/www/nosh/","", $practice['practice_logo']);
-			$data['practiceLogo'] = "<img src='" . base_url() . $logo . "' border='0'>";
+			$logo = str_replace("/var/www/","http://localhost/", $practice['practice_logo']);
+			$data['practiceLogo'] = "<img src='" . $logo . "' border='0'>";
 		} else {
 			$data['practiceLogo'] = '<br><br><br><br><br>';
 		}
@@ -5781,8 +5781,8 @@ class Chartmenu extends Application
 		$signature_query = $this->db->get('providers');
 		if ($signature_query->num_rows() > 0) {
 			$signature = $this->db->get('providers')->row_array();
-			$signature1 = str_replace("/var/www/nosh/","", $signature['signature']);
-			$data['providerSignature'] = "<img src='" . base_url() . $signature1 . "' border='0'><br>" . $this->session->userdata('displayname');
+			$signature1 = str_replace("/var/www/","http://localhost/", $signature['signature']);
+			$data['providerSignature'] = "<img src='" . $signature1 . "' border='0'><br>" . $this->session->userdata('displayname');
 		} else {
 			$data['providerSignature'] = '<br><br><br><br><br><br><br>' . $this->session->userdata('displayname');
 		}
@@ -5800,8 +5800,8 @@ class Chartmenu extends Application
 		$data['practiceInfo2'] = $practice['city'] . ', ' . $practice['state'] . ' ' . $practice['zip'];
 		$data['practiceInfo3'] = 'Phone: ' . $practice['phone'] . ', Fax: ' . $practice['fax'];
 		if ($practice['practice_logo'] != '') {
-			$logo = str_replace("/var/www/nosh/","", $practice['practice_logo']);
-			$data['practiceLogo'] = "<img src='" . base_url() . $logo . "' border='0'>";
+			$logo = str_replace("/var/www/","http://localhost/", $practice['practice_logo']);
+			$data['practiceLogo'] = "<img src='" . $logo . "' border='0'>";
 		} else {
 			$data['practiceLogo'] = '<br><br><br><br><br>';
 		}
@@ -5838,8 +5838,8 @@ class Chartmenu extends Application
 		$data['practiceInfo2'] = $practice['city'] . ', ' . $practice['state'] . ' ' . $practice['zip'];
 		$data['practiceInfo3'] = 'Phone: ' . $practice['phone'] . ', Fax: ' . $practice['fax'];
 		if ($practice['practice_logo'] != '') {
-			$logo = str_replace("/var/www/nosh/","", $practice['practice_logo']);
-			$data['practiceLogo'] = "<img src='" . base_url() . $logo . "' border='0'>";
+			$logo = str_replace("/var/www/","http://localhost/", $practice['practice_logo']);
+			$data['practiceLogo'] = "<img src='" . $logo . "' border='0'>";
 		} else {
 			$data['practiceLogo'] = '<br><br><br><br><br>';
 		}
@@ -6002,8 +6002,8 @@ class Chartmenu extends Application
 		$data['practiceInfo2'] = $practice['city'] . ', ' . $practice['state'] . ' ' . $practice['zip'];
 		$data['practiceInfo3'] = 'Phone: ' . $practice['phone'] . ', Fax: ' . $practice['fax'];
 		if ($practice['practice_logo'] != '') {
-			$logo = str_replace("/var/www/nosh/","", $practice['practice_logo']);
-			$data['practiceLogo'] = "<img src='" . base_url() . $logo . "' border='0'>";
+			$logo = str_replace("/var/www/","http://localhost/", $practice['practice_logo']);
+			$data['practiceLogo'] = "<img src='" . $logo . "' border='0'>";
 		} else {
 			$data['practiceLogo'] = '<br><br><br><br><br>';
 		}
@@ -6032,8 +6032,8 @@ class Chartmenu extends Application
 		$signature_query = $this->db->get('providers');
 		if ($signature_query->num_rows() > 0) {
 			$signature = $this->db->get('providers')->row_array();
-			$signature1 = str_replace("/var/www/nosh/","", $signature['signature']);
-			$data['providerSignature'] = "<img src='" . base_url() . $signature1 . "' border='0'><br>" . $this->session->userdata('displayname');
+			$signature1 = str_replace("/var/www/","http://localhost/", $signature['signature']);
+			$data['providerSignature'] = "<img src='" . $signature1 . "' border='0'><br>" . $this->session->userdata('displayname');
 		} else {
 			$data['providerSignature'] = '<br><br><br><br><br><br><br>' . $this->session->userdata('displayname');
 		}
@@ -6139,8 +6139,8 @@ class Chartmenu extends Application
 		$signature_query = $this->db->get('providers');
 		if ($signature_query->num_rows() > 0) {
 			$signature = $this->db->get('providers')->row_array();
-			$signature1 = str_replace("/var/www/nosh/","", $signature['signature']);
-			$sig = "<img src='" . base_url() . $signature1 . "' border='0'><br>" . $this->session->userdata('displayname');
+			$signature1 = str_replace("/var/www/","http://localhost/", $signature['signature']);
+			$sig = "<img src='" . $signature1 . "' border='0'><br>" . $this->session->userdata('displayname');
 		} else {
 			$sig = '<br><br><br><br><br><br><br>' . $this->session->userdata('displayname');
 		}

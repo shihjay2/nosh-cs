@@ -95,7 +95,6 @@
 					<td><?php if ($rx->rxl_daw != '') {echo $rx->rxl_daw . '<br>';}?></td>
 					<td>
 						<?php echo $signature;?>
-						<!-->&nbsp;<br>&nbsp;<br>&nbsp;<br>&nbsp;<br>&nbsp;<br>-->
 						<p style="font-size:2pt;">THIS IS AN ORIGINAL PRESCRIPTION-THIS IS AN ORIGINAL PRESCRIPTION-THIS IS AN ORIGINAL PRESCRIPTION-THIS IS AN ORIGINAL PRESCRIPTION-THIS IS AN ORIGINAL PRESCRIPTION-THIS IS AN ORIGINAL PRESCRIPTION</p>
 						<?php echo $rx->rxl_provider;?><br>
 						<?php if ($rx->rxl_dea != '') {echo 'DEA Number: ' . $rx->rxl_dea . '<br>';}?>
