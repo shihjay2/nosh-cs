@@ -1,3 +1,9 @@
+nosh-cs (1.7.2-0ubuntu2) precise; urgency=low
+
+  * Fixed - Installation error where ssh folder is not empty.
+
+ -- Michael Shihjay Chen <shihjay2@gmail.com>  Wed, 27 Nov 2013 15:16:10 -0800
+
 nosh-cs (1.7.2-0ubuntu1) precise; urgency=low
 
   * New Feature - Tagging features available for Messages, Telephone Messages, and Encounters.

@@ -46,6 +46,7 @@ case "$1" in
 		log_only "Updating NOSH ChartingSystem"
 		rm -rf $NOSHFAX
 		rm -rf $NOSHREMINDER
+		rm -rf /var/www/nosh/extensions/ssh
 		if [ -d "$NOSH" ]; then
 			if [ -e "$CONFIGDATABASE" ]; then
 				cp -fr $CONFIGDATABASE $CONFIGDATABASEBACKUP
