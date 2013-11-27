@@ -24,11 +24,12 @@ class Office extends Application
 	
 	function vaccine_inventory()
 	{
+		$practice_id = $this->session->userdata('practice_id');
 		$page = $this->input->post('page');
 		$limit = $this->input->post('rows');
 		$sidx = $this->input->post('sidx');
 		$sord = $this->input->post('sord');
-		$query = $this->db->query("SELECT * FROM vaccine_inventory WHERE quantity>0");
+		$query = $this->db->query("SELECT * FROM vaccine_inventory WHERE quantity>0 AND practice_id=$practice_id");
 		$count = $query->num_rows(); 
 		if($count > 0) { 
 			$total_pages = ceil($count/$limit); 
@@ -38,7 +39,7 @@ class Office extends Application
 		if ($page > $total_pages) $page=$total_pages;
 		$start = $limit*$page - $limit;
 		if($start < 0) $start = 0;
-		$query1 = $this->db->query("SELECT * FROM vaccine_inventory WHERE quantity>0 ORDER BY $sidx $sord LIMIT $start , $limit");
+		$query1 = $this->db->query("SELECT * FROM vaccine_inventory WHERE quantity>0 AND practice_id=$practice_id ORDER BY $sidx $sord LIMIT $start , $limit");
 		$response['page'] = $page;
 		$response['total'] = $total_pages;
 		$response['records'] = $count;
@@ -50,11 +51,12 @@ class Office extends Application
 	
 	function vaccine_inventory_inactive()
 	{
+		$practice_id = $this->session->userdata('practice_id');
 		$page = $this->input->post('page');
 		$limit = $this->input->post('rows');
 		$sidx = $this->input->post('sidx');
 		$sord = $this->input->post('sord');
-		$query = $this->db->query("SELECT * FROM vaccine_inventory WHERE quantity=0");
+		$query = $this->db->query("SELECT * FROM vaccine_inventory WHERE quantity=0 AND practice_id=$practice_id");
 		$count = $query->num_rows(); 
 		if($count > 0) { 
 			$total_pages = ceil($count/$limit); 
@@ -64,7 +66,7 @@ class Office extends Application
 		if ($page > $total_pages) $page=$total_pages;
 		$start = $limit*$page - $limit;
 		if($start < 0) $start = 0;
-		$query1 = $this->db->query("SELECT * FROM vaccine_inventory WHERE quantity=0 ORDER BY $sidx $sord LIMIT $start , $limit");
+		$query1 = $this->db->query("SELECT * FROM vaccine_inventory WHERE quantity=0 AND practice_id=$practice_id ORDER BY $sidx $sord LIMIT $start , $limit");
 		$response['page'] = $page;
 		$response['total'] = $total_pages;
 		$response['records'] = $count;
@@ -90,7 +92,8 @@ class Office extends Application
 			'quantity' => $this->input->post('quantity'),
 			'cpt' => $this->input->post('cpt'),
 			'imm_expiration' => $expiration,
-			'date_purchase'=> $purchase
+			'date_purchase'=> $purchase,
+			'practice_id' => $this->session->userdata('practice_id')
 		);
 		if($this->input->post('vaccine_id') == '') {
 			$add = $this->office_model->addVaccineInventory($data);
@@ -147,11 +150,12 @@ class Office extends Application
 	
 	function supplement_inventory()
 	{
+		$practice_id = $this->session->userdata('practice_id');
 		$page = $this->input->post('page');
 		$limit = $this->input->post('rows');
 		$sidx = $this->input->post('sidx');
 		$sord = $this->input->post('sord');
-		$query = $this->db->query("SELECT * FROM supplement_inventory WHERE quantity>0");
+		$query = $this->db->query("SELECT * FROM supplement_inventory WHERE quantity>0 AND practice_id=$practice_id");
 		$count = $query->num_rows(); 
 		if($count > 0) { 
 			$total_pages = ceil($count/$limit); 
@@ -161,7 +165,7 @@ class Office extends Application
 		if ($page > $total_pages) $page=$total_pages;
 		$start = $limit*$page - $limit;
 		if($start < 0) $start = 0;
-		$query1 = $this->db->query("SELECT * FROM supplement_inventory WHERE quantity>0 ORDER BY $sidx $sord LIMIT $start , $limit");
+		$query1 = $this->db->query("SELECT * FROM supplement_inventory WHERE quantity>0 AND practice_id=$practice_id ORDER BY $sidx $sord LIMIT $start , $limit");
 		$response['page'] = $page;
 		$response['total'] = $total_pages;
 		$response['records'] = $count;
@@ -173,11 +177,12 @@ class Office extends Application
 	
 	function supplement_inventory_inactive()
 	{
+		$practice_id = $this->session->userdata('practice_id');
 		$page = $this->input->post('page');
 		$limit = $this->input->post('rows');
 		$sidx = $this->input->post('sidx');
 		$sord = $this->input->post('sord');
-		$query = $this->db->query("SELECT * FROM supplement_inventory WHERE quantity=0");
+		$query = $this->db->query("SELECT * FROM supplement_inventory WHERE quantity=0 AND practice_id=$practice_id");
 		$count = $query->num_rows(); 
 		if($count > 0) { 
 			$total_pages = ceil($count/$limit); 
@@ -187,7 +192,7 @@ class Office extends Application
 		if ($page > $total_pages) $page=$total_pages;
 		$start = $limit*$page - $limit;
 		if($start < 0) $start = 0;
-		$query1 = $this->db->query("SELECT * FROM supplement_inventory WHERE quantity=0 ORDER BY $sidx $sord LIMIT $start , $limit");
+		$query1 = $this->db->query("SELECT * FROM supplement_inventory WHERE quantity=0 AND practice_id=$practice_id ORDER BY $sidx $sord LIMIT $start , $limit");
 		$response['page'] = $page;
 		$response['total'] = $total_pages;
 		$response['records'] = $count;
@@ -212,14 +217,15 @@ class Office extends Application
 			'charge' => $this->input->post('charge'),
 			'sup_expiration' => $expiration,
 			'date_purchase'=> $purchase,
-			'sup_lot' => $this->input->post('sup_lot')
+			'sup_lot' => $this->input->post('sup_lot'),
+			'practice_id' => $this->session->userdata('practice_id')
 		);
 		if($this->input->post('cpt') != '') {
 			$data['cpt'] = $this->input->post('cpt');
 		} else {
 			$this->db->like('cpt', 'sp');
 			$this->db->select('cpt');
-			$cpt_query = $this->db->get('cpt');
+			$cpt_query = $this->db->get('cpt_relate');
 			if ($cpt_query->num_rows() > 0) {
 				$cpt_array = $cpt_query->result_array();
 				rsort($cpt_array);
@@ -240,13 +246,13 @@ class Office extends Application
 		}
 		$data1['cpt_description'] = $this->input->post('sup_description');
 		$this->db->where('cpt', $data1['cpt']);
-		$cpt_query1 = $this->db->get('cpt');
+		$cpt_query1 = $this->db->get('cpt_relate');
 		if ($cpt_query1->num_rows() > 0) {
 			$this->db->where('cpt', $data1['cpt']);
-			$this->db->update('cpt', $data1);
+			$this->db->update('cpt_relate', $data1);
 			$this->audit_model->update();
 		} else {
-			$this->db->insert('cpt', $data1);
+			$this->db->insert('cpt_relate', $data1);
 			$this->audit_model->add();
 		}
 		if($this->input->post('supplement_id') == '') {
@@ -304,11 +310,12 @@ class Office extends Application
 	
 	function vaccine_temp()
 	{
+		$practice_id = $this->session->userdata('practice_id');
 		$page = $this->input->post('page');
 		$limit = $this->input->post('rows');
 		$sidx = $this->input->post('sidx');
 		$sord = $this->input->post('sord');
-		$query = $this->db->query("SELECT * FROM vaccine_temp");
+		$query = $this->db->query("SELECT * FROM vaccine_temp WHERE practice_id=$practice_id");
 		$count = $query->num_rows(); 
 		if($count > 0) { 
 			$total_pages = ceil($count/$limit); 
@@ -318,7 +325,7 @@ class Office extends Application
 		if ($page > $total_pages) $page=$total_pages;
 		$start = $limit*$page - $limit;
 		if($start < 0) $start = 0;
-		$query1 = $this->db->query("SELECT * FROM vaccine_temp ORDER BY $sidx $sord LIMIT $start , $limit");
+		$query1 = $this->db->query("SELECT * FROM vaccine_temp WHERE practice_id=$practice_id ORDER BY $sidx $sord LIMIT $start , $limit");
 		$response['page'] = $page;
 		$response['total'] = $total_pages;
 		$response['records'] = $count;
@@ -337,7 +344,8 @@ class Office extends Application
 		$data = array(
 			'temp' => $this->input->post('temp'),
 			'date'=> $date,
-			'action' => $this->input->post('action')
+			'action' => $this->input->post('action'),
+			'practice_id' => $this->session->userdata('practice_id')
 		);
 		if($this->input->post('temp_id') == '') {
 			$add = $this->office_model->addVaccineTemp($data);
@@ -369,6 +377,7 @@ class Office extends Application
 	
 	function super_query()
 	{
+		$practice_id = $this->session->userdata('practice_id');
 		$search_field = $this->input->post('search_field');
 		$search_op = $this->input->post('search_op');
 		$search_desc = $this->input->post('search_desc');
@@ -377,8 +386,8 @@ class Office extends Application
 		$search_no_insurance_only = $this->input->post('search_no_insurance_only');
 		$search_gender = $this->input->post('search_gender');
 		$query_text1 = "SELECT DISTINCT demographics.pid, demographics.lastname, demographics.firstname, demographics.DOB FROM demographics";
-		$query_text_join = "";
-		$query_text = " WHERE";
+		$query_text_join = " JOIN demographics_relate ON demographics.pid=demographics_relate.pid";
+		$query_text = " WHERE demographics_relate.practice_id=$practice_id";
 		for($i = 0; $i<count($search_field); $i++)
 		{
 			if(isset($search_field[$i])) {
@@ -396,7 +405,7 @@ class Office extends Application
 								$query_text .= " OR demographics.DOB BETWEEN " . $this->db->escape($target1) . " AND " . $this->db->escape($target2);
 							}		
 						} else {
-							$query_text .= " demographics.DOB BETWEEN " . $this->db->escape($target1) . " AND " . $this->db->escape($target2);
+							$query_text .= " AND demographics.DOB BETWEEN " . $this->db->escape($target1) . " AND " . $this->db->escape($target2);
 						}
 					}
 					if($search_op[$i] == 'greater than') {
@@ -407,7 +416,7 @@ class Office extends Application
 								$query_text .= " OR demographics.DOB < " . $this->db->escape($target1);
 							}		
 						} else {
-							$query_text .= " demographics.DOB < " . $this->db->escape($target1);
+							$query_text .= " AND demographics.DOB < " . $this->db->escape($target1);
 						}
 					}
 					if($search_op[$i] == 'less than') {
@@ -418,7 +427,7 @@ class Office extends Application
 								$query_text .= " OR demographics.DOB > " . $this->db->escape($target2);
 							}		
 						} else {
-							$query_text .= " demographics.DOB > " . $this->db->escape($target2);
+							$query_text .= " AND demographics.DOB > " . $this->db->escape($target2);
 						}
 					}
 				}
@@ -432,7 +441,7 @@ class Office extends Application
 								$query_text .= " AND insurance.insurance_order = 'Primary' AND insurance.insurance_plan_active = 'Yes' OR insurance.insurance_plan_name = " . $this->db->escape($search_desc[$i]);
 							}		
 						} else {
-							$query_text .= " insurance.insurance_order = 'Primary' AND insurance.insurance_plan_active = 'Yes' AND insurance.insurance_plan_name = " . $this->db->escape($search_desc[$i]);
+							$query_text .= " AND insurance.insurance_order = 'Primary' AND insurance.insurance_plan_active = 'Yes' AND insurance.insurance_plan_name = " . $this->db->escape($search_desc[$i]);
 						}
 					}
 					if($search_op[$i] == 'contains') {
@@ -443,7 +452,7 @@ class Office extends Application
 								$query_text .= " AND insurance.insurance_order = 'Primary' AND insurance.insurance_plan_active = 'Yes' OR insurance.insurance_plan_name LIKE '%" . $this->db->escape_like_str($search_desc[$i]) . "%'";
 							}		
 						} else {
-							$query_text .= " insurance.insurance_order = 'Primary' AND insurance.insurance_plan_active = 'Yes' AND insurance.insurance_plan_name LIKE '%" . $this->db->escape_like_str($search_desc[$i]) . "%'";
+							$query_text .= " AND insurance.insurance_order = 'Primary' AND insurance.insurance_plan_active = 'Yes' AND insurance.insurance_plan_name LIKE '%" . $this->db->escape_like_str($search_desc[$i]) . "%'";
 						}
 					}
 				}
@@ -457,7 +466,7 @@ class Office extends Application
 								$query_text .= " OR issues.issue = " . $this->db->escape($search_desc[$i]);
 							}		
 						} else {
-							$query_text .= " issues.issue = " . $this->db->escape($search_desc[$i]);
+							$query_text .= " AND issues.issue = " . $this->db->escape($search_desc[$i]);
 						}
 					}
 					if($search_op[$i] == 'contains') {
@@ -468,7 +477,7 @@ class Office extends Application
 								$query_text .= " OR issues.issue LIKE '%" . $this->db->escape_like_str($search_desc[$i]) . "%'";
 							}		
 						} else {
-							$query_text .= " issues.issue LIKE '%" . $this->db->escape_like_str($search_desc[$i]) . "%'";
+							$query_text .= " AND issues.issue LIKE '%" . $this->db->escape_like_str($search_desc[$i]) . "%'";
 						}
 					}
 					if($search_op[$i] == 'not equal') {
@@ -479,9 +488,10 @@ class Office extends Application
 								$query_text .= " OR issues.issue != " . $this->db->escape($search_desc[$i]);
 							}		
 						} else {
-							$query_text .= " issues.issue != " . $this->db->escape($search_desc[$i]);
+							$query_text .= " AND issues.issue != " . $this->db->escape($search_desc[$i]);
 						}
 					}
+					$query_text .= " AND issues.issue_date_inactive='0000-00-00 00:00:00'";
 				}
 				if($search_field[$i] == 'billing') {
 					$query_text_join .= " JOIN billing_core ON billing_core.pid=demographics.pid";
@@ -493,7 +503,7 @@ class Office extends Application
 								$query_text .= " OR billing_core.cpt = " . $this->db->escape($search_desc[$i]);
 							}		
 						} else {
-							$query_text .= " billing_core.cpt = " . $this->db->escape($search_desc[$i]);
+							$query_text .= " AND billing_core.cpt = " . $this->db->escape($search_desc[$i]);
 						}
 					}
 					if($search_op[$i] == 'not equal') {
@@ -504,7 +514,7 @@ class Office extends Application
 								$query_text .= " OR billing_core.cpt != " . $this->db->escape($search_desc[$i]);
 							}		
 						} else {
-							$query_text .= " billing_core.cpt != " . $this->db->escape($search_desc[$i]);
+							$query_text .= " AND billing_core.cpt != " . $this->db->escape($search_desc[$i]);
 						}
 					}
 				}
@@ -518,7 +528,7 @@ class Office extends Application
 								$query_text .= " OR rx_list.rxl_medication = " . $this->db->escape($search_desc[$i]);
 							}		
 						} else {
-							$query_text .= " rx_list.rxl_medication = " . $this->db->escape($search_desc[$i]);
+							$query_text .= " AND rx_list.rxl_medication = " . $this->db->escape($search_desc[$i]);
 						}
 					}
 					if($search_op[$i] == 'contains') {
@@ -529,7 +539,7 @@ class Office extends Application
 								$query_text .= " OR rx_list.rxl_medication LIKE '%" . $this->db->escape_like_str($search_desc[$i]) . "%'";
 							}		
 						} else {
-							$query_text .= " rx_list.rxl_medication LIKE '%" . $this->db->escape_like_str($search_desc[$i]) . "%'";
+							$query_text .= " AND rx_list.rxl_medication LIKE '%" . $this->db->escape_like_str($search_desc[$i]) . "%'";
 						}
 					}
 					if($search_op[$i] == 'not equal') {
@@ -540,9 +550,10 @@ class Office extends Application
 								$query_text .= " OR rx_list.rxl_medication != " . $this->db->escape($search_desc[$i]);
 							}		
 						} else {
-							$query_text .= " rx_list.rxl_medication != " . $this->db->escape($search_desc[$i]);
+							$query_text .= " AND rx_list.rxl_medication != " . $this->db->escape($search_desc[$i]);
 						}
 					}
+					$query_text .= " AND rx_list.rxl_date_inactive='0000-00-00 00:00:00' AND rx_list.rxl_date_old='0000-00-00 00:00:00'";
 				}
 				if($search_field[$i] == 'imm_immunization') {
 					$query_text_join .= " JOIN immunizations ON immunizations.pid=demographics.pid";
@@ -554,7 +565,7 @@ class Office extends Application
 								$query_text .= " OR immunizations.imm_immunization = " . $this->db->escape($search_desc[$i]);
 							}		
 						} else {
-							$query_text .= " immunizations.imm_immunization = " . $this->db->escape($search_desc[$i]);
+							$query_text .= " AND immunizations.imm_immunization = " . $this->db->escape($search_desc[$i]);
 						}
 					}
 					if($search_op[$i] == 'contains') {
@@ -565,7 +576,7 @@ class Office extends Application
 								$query_text .= " OR immunizations.imm_immunization LIKE '%" . $this->db->escape_like_str($search_desc[$i]) . "%'";
 							}		
 						} else {
-							$query_text .= " immunizations.imm_immunization LIKE '%" . $this->db->escape_like_str($search_desc[$i]) . "%'";
+							$query_text .= " AND immunizations.imm_immunization LIKE '%" . $this->db->escape_like_str($search_desc[$i]) . "%'";
 						}
 					}
 					if($search_op[$i] == 'not equal') {
@@ -576,33 +587,58 @@ class Office extends Application
 								$query_text .= " OR immunizations.imm_immunization != " . $this->db->escape($search_desc[$i]);
 							}		
 						} else {
-							$query_text .= " immunizations.imm_immunization != " . $this->db->escape($search_desc[$i]);
+							$query_text .= " AND immunizations.imm_immunization != " . $this->db->escape($search_desc[$i]);
 						}
 					}
+				}
+				if($search_field[$i] == 'sup_supplement') {
+					$query_text_join .= " JOIN sup_list ON sup_list.pid=demographics.pid";
+					if($search_op[$i] == 'equal') {
+						if($search_join[$i] != "start") {
+							if($search_join[$i] == 'AND') {
+								$query_text .= " AND sup_list.sup_supplement = " . $this->db->escape($search_desc[$i]);
+							} else {
+								$query_text .= " OR sup_list.sup_supplement = " . $this->db->escape($search_desc[$i]);
+							}		
+						} else {
+							$query_text .= " AND sup_list.sup_supplement = " . $this->db->escape($search_desc[$i]);
+						}
+					}
+					if($search_op[$i] == 'contains') {
+						if($search_join[$i] != "start") {
+							if($search_join[$i] == 'AND') {
+								$query_text .= " AND sup_list.sup_supplement LIKE '%" . $this->db->escape_like_str($search_desc[$i]) . "%'";
+							} else {
+								$query_text .= " OR sup_list.sup_supplement LIKE '%" . $this->db->escape_like_str($search_desc[$i]) . "%'";
+							}		
+						} else {
+							$query_text .= " AND sup_list.sup_supplement LIKE '%" . $this->db->escape_like_str($search_desc[$i]) . "%'";
+						}
+					}
+					if($search_op[$i] == 'not equal') {
+						if($search_join[$i] != "start") {
+							if($search_join[$i] == 'AND') {
+								$query_text .= " AND sup_list.sup_supplement != " . $this->db->escape($search_desc[$i]);
+							} else {
+								$query_text .= " OR sup_list.sup_supplement != " . $this->db->escape($search_desc[$i]);
+							}		
+						} else {
+							$query_text .= " AND sup_list.sup_supplement != " . $this->db->escape($search_desc[$i]);
+						}
+					}
+					$query_text .= " AND sup_list.sup_date_inactive='0000-00-00 00:00:00'";
 				}
 			}
 		}
 		if($search_active_only == "Yes") {
-			if($query_text === " WHERE"){
-				$query_text .= " demographics.active = '1'";
-			} else {
-				$query_text .= " AND demographics.active = '1'";
-			}
+			$query_text .= " AND demographics.active = '1'";
 		}
 		if($search_no_insurance_only == "Yes") {
 			$query_text_join .= " LEFT JOIN insurance ON insurance.pid=demographics.pid";
-			if($query_text === " WHERE"){
-				$query_text .= " insurance.pid IS NULL";
-			} else {
-				$query_text .= " AND insurance.pid IS NULL";
-			}
+			$query_text .= " AND insurance.pid IS NULL";
 		}
 		if($search_gender == "m" || $search_gender == "f") {
-			if($query_text === " WHERE"){
-				$query_text .= " demographics.sex = '" . $search_gender . "'";
-			} else {
-				$query_text .= " AND demographics.sex = '" . $search_gender. "'";
-			}			
+			$query_text .= " AND demographics.sex = '" . $search_gender. "'";
 		}
 		$query_full_text = $query_text1 . $query_text_join . $query_text;
 		$page = $this->input->post('page');
@@ -633,26 +669,43 @@ class Office extends Application
 	
 	function age_percentage()
 	{
+		$practice_id = $this->session->userdata('practice_id');
 		$current_date = now();
-		$this->db->where('active', '1');
-		$total = $this->db->get('demographics')->num_rows();
+		$this->db->select('*');
+		$this->db->from('demographics');
+		$this->db->join('demographics_relate', 'demographics_relate.pid = demographics.pid');
+		$this->db->where('demographics.active', '1');
+		$this->db->where('demographics_relate.practice_id', $practice_id);
+		$total = $this->db->get()->num_rows();
 		
 		$a = $current_date - 568024668;
 		$a1 = date('Y-m-d H:i:s', $a);
-		$this->db->where('DOB >=', $a1);
-		$this->db->where('active', '1');
-		$num1 = $this->db->get('demographics')->num_rows();
+		$this->db->select('*');
+		$this->db->from('demographics');
+		$this->db->join('demographics_relate', 'demographics_relate.pid = demographics.pid');
+		$this->db->where('demographics.DOB >=', $a1);
+		$this->db->where('demographics.active', '1');
+		$this->db->where('demographics_relate.practice_id', $practice_id);
+		$num1 = $this->db->get()->num_rows();
 		
 		$b = $current_date - 2051200190;
 		$b1 = date('Y-m-d H:i:s', $b);
-		$this->db->where('DOB <', $a1);
-		$this->db->where('DOB >=', $b1);
-		$this->db->where('active', '1');
-		$num2 = $this->db->get('demographics')->num_rows();
+		$this->db->select('*');
+		$this->db->from('demographics');
+		$this->db->join('demographics_relate', 'demographics_relate.pid = demographics.pid');
+		$this->db->where('demographics.DOB <', $a1);
+		$this->db->where('demographics.DOB >=', $b1);
+		$this->db->where('demographics.active', '1');
+		$this->db->where('demographics_relate.practice_id', $practice_id);
+		$num2 = $this->db->get()->num_rows();
 		
-		$this->db->where('DOB <', $b1);
-		$this->db->where('active', '1');
-		$num3 = $this->db->get('demographics')->num_rows();
+		$this->db->select('*');
+		$this->db->from('demographics');
+		$this->db->join('demographics_relate', 'demographics_relate.pid = demographics.pid');
+		$this->db->where('demographics.DOB <', $b1);
+		$this->db->where('demographics.active', '1');
+		$this->db->where('demographics_relate.practice_id', $practice_id);
+		$num3 = $this->db->get()->num_rows();
 		
 		$result['group1'] = round($num1/$total*100) . "% of patients";
 		$result['group2'] = round($num2/$total*100) . "% of patients";
@@ -663,10 +716,11 @@ class Office extends Application
 	
 	function export_demographics($type)
 	{
+		$practice_id = $this->session->userdata('practice_id');
 		$this->load->dbutil();
 		$this->load->helper('download');
 		if ($type == "all") {
-			$query = $this->db->query("SELECT * FROM demographics");
+			$query = $this->db->query("SELECT * FROM demographics JOIN demographics_relate ON demographics.pid=demographics_relate.pid  WHERE demographics_relate.practice_id=$practice_id");
 		} else {
 			$query = $this->db->query("SELECT * FROM demographics WHERE active='1'");
 		}
@@ -676,7 +730,6 @@ class Office extends Application
 		$name = $date1 . '_demographics.txt';
 		force_download($name, $result);
 	}
-
 } 
 /* End of file: office.php */
 /* Location: application/controllers/provider/office.php */

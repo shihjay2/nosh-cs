@@ -10,7 +10,7 @@ $(document).ready(function() {
 		colModel:[
 			{name:'id',index:'id',width:1,hidden:true},
 			{name:'username',index:'username',width:400,editable:true,editrules:{required:true},formoptions:{elmsuffix:"(*)"}},
-			{name:'password',index:'password',width:1,editable:true,hidden:true,editrules:{edithidden:true, required:true},edittype:'password',formoptions:{elmsuffix:"(*)"}},
+			{name:'password',index:'password',width:1,editable:false,hidden:true},
 			{name:'firstname',index:'firstname',width:1,editable:true,hidden:true,editrules:{edithidden:true, required:true},formoptions:{elmsuffix:"(*)"}},
 			{name:'middle',index:'middle',width:1,editable:true,hidden:true,editrules:{edithidden:true}},
 			{name:'lastname',index:'lastname',width:1,editable:true,hidden:true,editrules:{edithidden:true, required:true},formoptions:{elmsuffix:"(*)"}},
@@ -97,11 +97,13 @@ $(document).ready(function() {
 	 	jsonReader: { repeatitems : false, id: "0" }
 	}).navGrid('#provider_list_pager',{edit:false,add:false,del:false
 	});
-	
 	$("#add_provider").click(function(){
-		jQuery("#provider_list").editGridRow("new",{closeAfterAdd:true,width:'400',bottominfo:'Fields marked in (*) are required.'});	
+		jQuery("#provider_list").editGridRow("new",{closeAfterAdd:true,width:'400',bottominfo:'Fields marked in (*) are required.',afterComplete: function(response, postdata){
+			var res = $.parseJSON(response.responseText);
+			$("#user_id").val(res.id);
+			$("#reset_password_dialog").dialog('open');
+		}});
 	});
-	
 	$("#edit_provider").click(function(){
 		var item = jQuery("#provider_list").getGridParam('selrow');
 		if(item){ 
@@ -110,7 +112,6 @@ $(document).ready(function() {
 			$.jGrowl("Please select provider to edit!");
 		}
 	});
-	
 	$("#disable_provider").click(function(){
 		var item = jQuery("#provider_list").getGridParam('selrow');
 		if(item){
@@ -127,6 +128,13 @@ $(document).ready(function() {
 			$.jGrowl("Please select provider to inactivate!");
 		}
 	});
+	$("#reset_password_provider").click(function(){
+		var item = jQuery("#provider_list").getGridParam('selrow');
+		if(item){
+			$("#user_id").val(item);
+			$("#reset_password_dialog").dialog('open');
+		}
+	});
 	
 	jQuery("#assistant_list").jqGrid({
 		url:"<?php echo site_url('admin/users/users_list_assistant');?>",
@@ -137,7 +145,7 @@ $(document).ready(function() {
 		colModel:[
 			{name:'id',index:'id',width:1,hidden:true},
 			{name:'username',index:'username',width:400,editable:true,editrules:{required:true},formoptions:{elmsuffix:"(*)"}},
-			{name:'password',index:'password',width:1,editable:true,hidden:true,editrules:{edithidden:true, required:true},edittype:'password',formoptions:{elmsuffix:"(*)"}},
+			{name:'password',index:'password',width:1,editable:false,hidden:true},
 			{name:'firstname',index:'firstname',width:1,editable:true,hidden:true,editrules:{edithidden:true, required:true},formoptions:{elmsuffix:"(*)"}},
 			{name:'middle',index:'middle',width:1,editable:true,hidden:true,editrules:{edithidden:true}},
 			{name:'lastname',index:'lastname',width:1,editable:true,hidden:true,editrules:{edithidden:true, required:true},formoptions:{elmsuffix:"(*)"}},
@@ -157,11 +165,13 @@ $(document).ready(function() {
 	 	jsonReader: { repeatitems : false, id: "0" }
 	}).navGrid('#assistant_list_pager',{edit:false,add:false,del:false
 	});
-	
 	$("#add_assistant").click(function(){
-		jQuery("#assistant_list").editGridRow("new",{closeAfterAdd:true,width:'400',bottominfo:'Fields marked in (*) are required.'});	
+		jQuery("#assistant_list").editGridRow("new",{closeAfterAdd:true,width:'400',bottominfo:'Fields marked in (*) are required.',afterComplete: function(response, postdata){
+			var res = $.parseJSON(response.responseText);
+			$("#user_id").val(res.id);
+			$("#reset_password_dialog").dialog('open');
+		}});
 	});
-	
 	$("#edit_assistant").click(function(){
 		var item = jQuery("#assistant_list").getGridParam('selrow');
 		if(item){ 
@@ -170,7 +180,6 @@ $(document).ready(function() {
 			$.jGrowl("Please select assistant to edit!");
 		}
 	});
-	
 	$("#disable_assistant").click(function(){
 		var item = jQuery("#assistant_list").getGridParam('selrow');
 		if(item){
@@ -187,6 +196,13 @@ $(document).ready(function() {
 			$.jGrowl("Please select assistant to inactivate!");
 		}
 	});
+	$("#reset_password_assistant").click(function(){
+		var item = jQuery("#assistant_list").getGridParam('selrow');
+		if(item){
+			$("#user_id").val(item);
+			$("#reset_password_dialog").dialog('open');
+		}
+	});
 	
 	jQuery("#billing_list").jqGrid({
 		url:"<?php echo site_url('admin/users/users_list_billing');?>",
@@ -197,7 +213,7 @@ $(document).ready(function() {
 		colModel:[
 			{name:'id',index:'id',width:1,hidden:true},
 			{name:'username',index:'username',width:400,editable:true,editrules:{required:true},formoptions:{elmsuffix:"(*)"}},
-			{name:'password',index:'password',width:1,editable:true,hidden:true,editrules:{edithidden:true, required:true},edittype:'password',formoptions:{elmsuffix:"(*)"}},
+			{name:'password',index:'password',width:1,editable:false,hidden:true},
 			{name:'firstname',index:'firstname',width:1,editable:true,hidden:true,editrules:{edithidden:true, required:true},formoptions:{elmsuffix:"(*)"}},
 			{name:'middle',index:'middle',width:1,editable:true,hidden:true,editrules:{edithidden:true}},
 			{name:'lastname',index:'lastname',width:1,editable:true,hidden:true,editrules:{edithidden:true, required:true},formoptions:{elmsuffix:"(*)"}},
@@ -217,11 +233,13 @@ $(document).ready(function() {
 	 	jsonReader: { repeatitems : false, id: "0" }
 	}).navGrid('#billing_list_pager',{edit:false,add:false,del:false
 	});
-	
 	$("#add_billing").click(function(){
-		jQuery("#billing_list").editGridRow("new",{closeAfterAdd:true,width:'400',bottominfo:'Fields marked in (*) are required.'});	
+		jQuery("#billing_list").editGridRow("new",{closeAfterAdd:true,width:'400',bottominfo:'Fields marked in (*) are required.',afterComplete: function(response, postdata){
+			var res = $.parseJSON(response.responseText);
+			$("#user_id").val(res.id);
+			$("#reset_password_dialog").dialog('open');
+		}});
 	});
-	
 	$("#edit_billing").click(function(){
 		var item = jQuery("#billing_list").getGridParam('selrow');
 		if(item){ 
@@ -230,7 +248,6 @@ $(document).ready(function() {
 			$.jGrowl("Please select biller to edit!");
 		}
 	});
-	
 	$("#disable_billing").click(function(){
 		var item = jQuery("#billing_list").getGridParam('selrow');
 		if(item){
@@ -247,6 +264,13 @@ $(document).ready(function() {
 			$.jGrowl("Please select biller to inactivate!");
 		}
 	});
+	$("#reset_password_billing").click(function(){
+		var item = jQuery("#billing_list").getGridParam('selrow');
+		if(item){
+			$("#user_id").val(item);
+			$("#reset_password_dialog").dialog('open');
+		}
+	});
 	
 	jQuery("#patient_list").jqGrid({
 		url:"<?php echo site_url('admin/users/users_list_patient');?>",
@@ -257,7 +281,7 @@ $(document).ready(function() {
 		colModel:[
 			{name:'id',index:'id',width:1,hidden:true},
 			{name:'username',index:'username',width:400,editable:true,editrules:{required:true},formoptions:{elmsuffix:"(*)"}},
-			{name:'password',index:'password',width:1,editable:true,hidden:true,editrules:{edithidden:true, required:true},edittype:'password',formoptions:{elmsuffix:"(*)"}},
+			{name:'password',index:'password',width:1,editable:false,hidden:true},
 			{name:'firstname',index:'firstname',width:1,editable:true,hidden:true,editrules:{edithidden:true, required:true},formoptions:{elmsuffix:"(*)"}},
 			{name:'middle',index:'middle',width:1,editable:true,hidden:true,editrules:{edithidden:true}},
 			{name:'lastname',index:'lastname',width:1,editable:true,hidden:true,editrules:{edithidden:true, required:true},formoptions:{elmsuffix:"(*)"}},
@@ -307,11 +331,13 @@ $(document).ready(function() {
 	 	jsonReader: { repeatitems : false, id: "0" }
 	}).navGrid('#patient_list_pager',{edit:false,add:false,del:false
 	});
-	
 	$("#add_patient").click(function(){
-		jQuery("#patient_list").editGridRow("new",{closeAfterAdd:true,width:'400',bottominfo:'Fields marked in (*) are required.'});	
+		jQuery("#patient_list").editGridRow("new",{closeAfterAdd:true,width:'400',bottominfo:'Fields marked in (*) are required.',afterComplete: function(response, postdata){
+			var res = $.parseJSON(response.responseText);
+			$("#user_id").val(res.id);
+			$("#reset_password_dialog").dialog('open');
+		}});
 	});
-	
 	$("#edit_patient").click(function(){
 		var item = jQuery("#patient_list").getGridParam('selrow');
 		if(item){ 
@@ -320,7 +346,6 @@ $(document).ready(function() {
 			$.jGrowl("Please select patient to edit!");
 		}
 	});
-	
 	$("#disable_patient").click(function(){
 		var item = jQuery("#patient_list").getGridParam('selrow');
 		if(item){
@@ -335,6 +360,49 @@ $(document).ready(function() {
 			});
 		} else {
 			$.jGrowl("Please select patient to inactivate!");
+		}
+	});
+	$("#reset_password_patient").click(function(){
+		var item = jQuery("#patient_list").getGridParam('selrow');
+		if(item){
+			$("#user_id").val(item);
+			$("#reset_password_dialog").dialog('open');
+		}
+	});
+	$("#reset_password_dialog").dialog({ 
+		bgiframe: true, 
+		autoOpen: false, 
+		height: 200, 
+		width: 300, 
+		draggable: false,
+		resizable: false,
+		open: function(event, ui) {
+			$("#reset_password_password").focus();
+		},
+		buttons: {
+			'Save': function() {
+				var password = $("#reset_password_password");
+				var bValid = true;
+				bValid = bValid && checkEmpty(password,"Password");
+				if (bValid) {
+					$.ajax({
+						type: "POST",
+						url: "<?php echo site_url('admin/users/reset_password');?>",
+						data: "id="+ $("#user_id").val() + "&password=" + $("#reset_password_password").val(),
+						success: function(data){
+							$.jGrowl(data);
+							$("#reset_password_dialog").dialog('close');
+						}
+					});
+				}
+			},
+			Cancel: function() {
+				$("#reset_password_dialog").dialog('close');
+			}
+		},
+		close: function(event, ui) {
+			$("#reset_password_password").val('');
+			$("#user_id").val('');
 		}
 	});
 });
@@ -354,24 +422,32 @@ $(document).ready(function() {
 					<div id="provider_list_pager" class="scroll" style="text-align:center;"></div><br>
 					<input type="button" id="add_provider" value="Add Provider" class="ui-button ui-state-default ui-corner-all"/>
 					<input type="button" id="edit_provider" value="Edit Provider" class="ui-button ui-state-default ui-corner-all"/>
-					<input type="button" id="disable_provider" value="Inactivate Provider" class="ui-button ui-state-default ui-corner-all"/><br><br>
+					<input type="button" id="disable_provider" value="Inactivate Provider" class="ui-button ui-state-default ui-corner-all"/>
+					<input type="button" id="reset_password_provider" value="Reset Password" class="ui-button ui-state-default ui-corner-all"/><br><br>
 					<table id="assistant_list" class="scroll" cellpadding="0" cellspacing="0"></table>
 					<div id="assistant_list_pager" class="scroll" style="text-align:center;"></div><br>
 					<input type="button" id="add_assistant" value="Add Assistant" class="ui-button ui-state-default ui-corner-all"/>
 					<input type="button" id="edit_assistant" value="Edit Assistant" class="ui-button ui-state-default ui-corner-all"/>
-					<input type="button" id="disable_assistant" value="Inactivate Assistant" class="ui-button ui-state-default ui-corner-all"/><br><br>
+					<input type="button" id="disable_assistant" value="Inactivate Assistant" class="ui-button ui-state-default ui-corner-all"/>
+					<input type="button" id="reset_password_assistant" value="Reset Password" class="ui-button ui-state-default ui-corner-all"/><br><br>
 					<table id="billing_list" class="scroll" cellpadding="0" cellspacing="0"></table>
 					<div id="billing_list_pager" class="scroll" style="text-align:center;"></div><br>
 					<input type="button" id="add_billing" value="Add Biller" class="ui-button ui-state-default ui-corner-all"/>
 					<input type="button" id="edit_billing" value="Edit Biller" class="ui-button ui-state-default ui-corner-all"/>
-					<input type="button" id="disable_billing" value="Inactivate Biller" class="ui-button ui-state-default ui-corner-all"/><br><br>
+					<input type="button" id="disable_billing" value="Inactivate Biller" class="ui-button ui-state-default ui-corner-all"/>
+					<input type="button" id="reset_password_billing" value="Reset Password" class="ui-button ui-state-default ui-corner-all"/><br><br>
 					<table id="patient_list" class="scroll" cellpadding="0" cellspacing="0"></table>
 					<div id="patient_list_pager" class="scroll" style="text-align:center;"></div><br>
 					<input type="button" id="add_patient" value="Add Patient" class="ui-button ui-state-default ui-corner-all"/>
 					<input type="button" id="edit_patient" value="Edit Patient" class="ui-button ui-state-default ui-corner-all"/>
-					<input type="button" id="disable_patient" value="Inactivate Patient" class="ui-button ui-state-default ui-corner-all"/><br><br>
+					<input type="button" id="disable_patient" value="Inactivate Patient" class="ui-button ui-state-default ui-corner-all"/>
+					<input type="button" id="reset_password_patient" value="Reset Password" class="ui-button ui-state-default ui-corner-all"/><br><br>
 				</div>
 			</div>
 		</div>
 	</div>
+</div>
+<div id="reset_password_dialog" title="Reset Password">
+	<input type="hidden" id="user_id"/>
+	New Password:<br><input type="password" id="reset_password_password" style="width:164px" class="text ui-widget-content ui-corner-all"/>
 </div>

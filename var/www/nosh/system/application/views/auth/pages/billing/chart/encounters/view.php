@@ -9,14 +9,14 @@ $(document).ready(function() {
 		modal: true
 	});
 	$("#heading2").load('<?php echo site_url("search/loadpage");?>');
-	$('#leftcol').load('<?php echo site_url("provider/chartmenu/menu");?>');
+	$('#leftcol').load('<?php echo site_url("billing/chartmenu/menu");?>');
 	$(document).idleTimeout({
 		inactivity: 3600000,
 		noconfirm: 10000,
-		alive_url: '<?php echo site_url("provider/encounters/view");?>',
-		redirect_url: '<?php echo site_url("start");?>',
+		alive_url: '<?php echo site_url("billing/encounters/view");?>',
+		redirect_url: '<?php echo site_url("logout");?>',
 		logout_url: '<?php echo site_url("logout");?>',
-		sessionAlive: 300000
+		sessionAlive: false
 	});
 	$("#preview_dialog").dialog({ 
 		bgiframe: true, 

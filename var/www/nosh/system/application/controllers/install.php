@@ -121,7 +121,8 @@ class Install extends Controller {
 			'pid' => array('type' => 'BIGINT', 'constraint' => 20),
 			'action' => array('type' => 'VARCHAR', 'constraint' => 255),
 			'query' => array('type' => 'LONGTEXT'),
-			'timestamp' => array('type' => 'TIMESTAMP')
+			'timestamp' => array('type' => 'TIMESTAMP'),
+			'practice_id' => array('type' => 'INT', 'constraint' => 11)
 		);
 		$this->dbforge->add_field($audit_definition);
 		$this->dbforge->add_key('audit_id', TRUE);
@@ -134,7 +135,8 @@ class Install extends Controller {
 			'pid' => array('type' => 'BIGINT', 'constraint' => 20),
 			'action' => array('type' => 'VARCHAR', 'constraint' => 255),
 			'description' => array('type' => 'LONGTEXT'),
-			'timestamp' => array('type' => 'TIMESTAMP')
+			'timestamp' => array('type' => 'TIMESTAMP'),
+			'practice_id' => array('type' => 'INT', 'constraint' => 11)
 		);
 		$this->dbforge->add_field($extensions_definition);
 		$this->dbforge->add_key('extensions_id', TRUE);
@@ -152,7 +154,8 @@ class Install extends Controller {
 			'mtm_outcome' => array('type' => 'LONGTEXT'),
 			'mtm_related_conditions' => array('type' => 'LONGTEXT'),
 			'mtm_duration' => array('type' => 'VARCHAR', 'constraint' => 255),
-			'mtm_date_completed' => array('type' => 'DATE')
+			'mtm_date_completed' => array('type' => 'DATE'),
+			'practice_id' => array('type' => 'INT', 'constraint' => 11)
 		);
 		$this->dbforge->add_field($mtm_definition);
 		$this->dbforge->add_key('mtm_id', TRUE);
@@ -174,7 +177,8 @@ class Install extends Controller {
 			'identifier' => array('type' => 'VARCHAR', 'constraint' => 255),
 			'active' => array('type' => 'INT', 'constraint' => 11),
 			'secret_question' => array('type' => 'VARCHAR', 'constraint' => 255),
-			'secret_answer' => array('type' => 'VARCHAR', 'constraint' => 255)
+			'secret_answer' => array('type' => 'VARCHAR', 'constraint' => 255),
+			'practice_id' => array('type' => 'INT', 'constraint' => 11)
 		);
 		$this->dbforge->add_field($users_definition);
 		$this->dbforge->add_key('id', TRUE);
@@ -220,6 +224,8 @@ class Install extends Controller {
 			'sat_c' => array('type' => 'VARCHAR', 'constraint' => 10),
 			'rcopia_username' => array('type' => 'VARCHAR', 'constraint' => 100),
 			'schedule_increment' => array('type' => 'VARCHAR', 'constraint' => 100, 'default' => '20'),
+			'practice_id' => array('type' => 'INT', 'constraint' => 11),
+			'peacehealth_id' => array('type' => 'VARCHAR', 'constraint' => 100)
 		);
 		$this->dbforge->add_field($providers_definition);
 		$this->dbforge->add_key('id', TRUE);
@@ -292,7 +298,9 @@ class Install extends Controller {
 			'additional_message' => array('type' => 'LONGTEXT'),
 			'snomed_extension' => array('type' => 'VARCHAR', 'constraint' => 4),
 			'vivacare' => array('type' => 'VARCHAR', 'constraint' => 255),
-			'sales_tax' => array('type' => 'VARCHAR', 'constraint' => 10, 'default' => '')
+			'sales_tax' => array('type' => 'VARCHAR', 'constraint' => 10, 'default' => ''),
+			'practicehandle' => array('type' => 'VARCHAR', 'constraint' => 255),
+			'peacehealth_id' => array('type' => 'VARCHAR', 'constraint' => 100)
 		);
 		$this->dbforge->add_field($practiceinfo_definition);
 		$this->dbforge->add_key('practice_id', TRUE);
@@ -328,7 +336,9 @@ class Install extends Controller {
 			'insurance_plan_mpa_url' => array('type' => 'VARCHAR', 'constraint' => 255),
 			'ordering_id' => array('type' => 'VARCHAR', 'constraint' => 255),
 			'insurance_box_31' => array('type' => 'VARCHAR', 'constraint' => 4),
-			'insurance_box_32a' => array('type' => 'VARCHAR', 'constraint' => 4)
+			'insurance_box_32a' => array('type' => 'VARCHAR', 'constraint' => 4),
+			'npi' => array('type' => 'VARCHAR', 'constraint' => 255),
+			'electronic_order' => array('type' => 'VARCHAR', 'constraint' => 255)
 		);
 		$this->dbforge->add_field($addressbook_definition);
 		$this->dbforge->add_key('address_id', TRUE);
@@ -347,7 +357,10 @@ class Install extends Controller {
 			'patient_name' => array('type' => 'VARCHAR', 'constraint' => 255),
 			'status' => array('type' => 'VARCHAR', 'constraint' => 255),
 			't_messages_id' => array('type' => 'INT', 'constraint' => 11),
-			'mailbox' => array('type' => 'INT', 'constraint' => 11)
+			'mailbox' => array('type' => 'INT', 'constraint' => 11),
+			'practice_id' => array('type' => 'INT', 'constraint' => 11),
+			'read' => array('type' => 'VARCHAR', 'constraint' => 4),
+			'documents_id' => array('type' => 'INT', 'constraint' => 11)
 		);
 		$this->dbforge->add_field($messaging_definition);
 		$this->dbforge->add_key('message_id', TRUE);
@@ -360,7 +373,8 @@ class Install extends Controller {
 			'filePath' => array('type' => 'VARCHAR', 'constraint' => 255),
 			'fileFrom' => array('type' => 'VARCHAR', 'constraint' => 255),
 			'fileDateTime' => array('type' => 'DATETIME'),
-			'filePages' => array('type' => 'INT', 'constraint' => 11)
+			'filePages' => array('type' => 'INT', 'constraint' => 11),
+			'practice_id' => array('type' => 'INT', 'constraint' => 11)
 		);
 		$this->dbforge->add_field($received_definition);
 		$this->dbforge->add_key('received_id', TRUE);
@@ -383,7 +397,8 @@ class Install extends Controller {
 			'ready_to_send' => array('type' => 'TINYINT', 'constraint' => 4, 'default' => '0'),
 			'command' => array('type' => 'LONGTEXT'),
 			'last_attempt' => array('type' => 'DATETIME'),
-			'senddate'=> array('type' => 'DATETIME')
+			'senddate'=> array('type' => 'DATETIME'),
+			'practice_id' => array('type' => 'INT', 'constraint' => 11)
 		);
 		$this->dbforge->add_field($sendfax_definition);
 		$this->dbforge->add_key('job_id', TRUE);
@@ -454,7 +469,8 @@ class Install extends Controller {
 			'visit_type' => array('type' => 'VARCHAR', 'constraint' => 255),
 			'duration' => array('type' => 'INT', 'constraint' => 11),
 			'classname' => array('type' => 'VARCHAR', 'constraint' => 20),
-			'active' => array('type' => 'VARCHAR', 'constraint' => 4)
+			'active' => array('type' => 'VARCHAR', 'constraint' => 4),
+			'practice_id' => array('type' => 'INT', 'constraint' => 11)
 		);
 		$this->dbforge->add_field($calendar_definition);
 		$this->dbforge->add_key('calendar_id', TRUE);
@@ -463,7 +479,6 @@ class Install extends Controller {
 		// Demographics
 		$demographics_definition = array(
 			'pid' => array('type' => 'BIGINT', 'constraint' => 20, 'auto_increment' => TRUE),
-			'id' => array('type' => 'BIGINT', 'constraint' => 20),
 			'lastname' => array('type' => 'VARCHAR', 'constraint' => 100),
 			'firstname' => array('type' => 'VARCHAR', 'constraint' => 100),
 			'middle' => array('type' => 'VARCHAR', 'constraint' => 100),
@@ -504,8 +519,6 @@ class Install extends Controller {
 			'pregnant' => array('type' => 'VARCHAR', 'constraint' => 255),
 			'caregiver' => array('type' => 'VARCHAR', 'constraint' => 255),
 			'referred_by' => array('type' => 'VARCHAR', 'constraint' => 255),
-			'billing_notes' => array('type' => 'LONGTEXT'),
-			'imm_notes' => array('type' => 'LONGTEXT'),
 			'rcopia_sync' => array('type' => 'VARCHAR', 'constraint' => 4),
 			'rcopia_update_medications' => array('type' => 'VARCHAR', 'constraint' => 4),
 			'rcopia_update_medications_date' => array('type' => 'VARCHAR', 'constraint' => 20),
@@ -562,7 +575,9 @@ class Install extends Controller {
 			'addendum_eid' => array('type' => 'BIGINT', 'constraint' => 20),
 			'user_id' => array('type' => 'INT', 'constraint' => 11),
 			'encounter_role' => array('type' => 'VARCHAR', 'constraint' => 255),
-			'referring_provider' => array('type' => 'VARCHAR', 'constraint' => 255)
+			'referring_provider' => array('type' => 'VARCHAR', 'constraint' => 255),
+			'practice_id' => array('type' => 'INT', 'constraint' => 11),
+			'referring_provider_npi' => array('type' => 'VARCHAR', 'constraint' => 255)
 		);
 		$this->dbforge->add_field($encounters_definition);
 		$this->dbforge->add_key('eid', TRUE);
@@ -834,7 +849,8 @@ class Install extends Controller {
 			'orders_radiology_icd' => array('type' => 'VARCHAR', 'constraint' => 255),
 			'orders_cp_icd' => array('type' => 'VARCHAR', 'constraint' => 255),
 			'orders_labs_obtained' => array('type' => 'VARCHAR', 'constraint' => 255),
-			'orders_completed' => array('type' => 'TINYINT', 'constraint' => 4)
+			'orders_completed' => array('type' => 'TINYINT', 'constraint' => 4),
+			'id' => array('type' => 'BIGINT', 'constraint' => 20)
 		);
 		$this->dbforge->add_field($orders_definition);
 		$this->dbforge->add_key('orders_id', TRUE);
@@ -994,7 +1010,8 @@ class Install extends Controller {
 			'alert_date_active' => array('type' => 'DATETIME'),
 			'alert_date_complete' => array('type' => 'DATETIME'),
 			'alert_reason_not_complete' => array('type' => 'VARCHAR', 'constraint' => 255),
-			'alert_provider' => array('type' => 'BIGINT', 'constraint' => 20)
+			'alert_provider' => array('type' => 'BIGINT', 'constraint' => 20),
+			'practice_id' => array('type' => 'INT', 'constraint' => 11)
 		);
 		$this->dbforge->add_field($alerts_definition);
 		$this->dbforge->add_key('alert_id', TRUE);
@@ -1011,7 +1028,8 @@ class Install extends Controller {
 			't_messages_date' => array('type' => 'TIMESTAMP'),
 			't_messages_dos' => array('type' => 'DATETIME'),
 			't_messages_subject' => array('type' => 'VARCHAR', 'constraint' => 255),
-			't_messages_message' => array('type' => 'LONGTEXT')
+			't_messages_message' => array('type' => 'LONGTEXT'),
+			'practice_id' => array('type' => 'INT', 'constraint' => 11)
 		);
 		$this->dbforge->add_field($t_messages_definition);
 		$this->dbforge->add_key('t_messages_id', TRUE);
@@ -1217,7 +1235,8 @@ class Install extends Controller {
 			'billing_group' => array('type' => 'VARCHAR', 'constraint' => 1),
 			'payment' => array('type' => 'VARCHAR', 'constraint' => 6),
 			'reason' => array('type' => 'VARCHAR', 'constraint' => 255),
-			'payment_type' => array('type' => 'VARCHAR', 'constraint' => 255)
+			'payment_type' => array('type' => 'VARCHAR', 'constraint' => 255),
+			'practice_id' => array('type' => 'INT', 'constraint' => 11)
 		);
 		$this->dbforge->add_field($billing_core_definition);
 		$this->dbforge->add_key('billing_core_id', TRUE);
@@ -1234,7 +1253,8 @@ class Install extends Controller {
 			't_messages_id' => array('type' => 'INT', 'constraint' => 11),
 			'documents_id' => array('type' => 'INT', 'constraint' => 11),
 			'other_hippa_id' => array('type' => 'INT', 'constraint' => 11),
-			'hippa_role' => array('type' => 'VARCHAR', 'constraint' => 100)
+			'hippa_role' => array('type' => 'VARCHAR', 'constraint' => 100),
+			'practice_id' => array('type' => 'INT', 'constraint' => 11)
 		);
 		$this->dbforge->add_field($hippa_definition);
 		$this->dbforge->add_key('hippa_id', TRUE);
@@ -1248,7 +1268,8 @@ class Install extends Controller {
 			'procedure_description' => array('type' => 'LONGTEXT'),
 			'procedure_complications' => array('type' => 'LONGTEXT'),
 			'cpt' => array('type' => 'VARCHAR', 'constraint' => 255),
-			'procedure_ebl' => array('type' => 'VARCHAR', 'constraint' => 100)
+			'procedure_ebl' => array('type' => 'VARCHAR', 'constraint' => 100),
+			'practice_id' => array('type' => 'INT', 'constraint' => 11)
 		);
 		$this->dbforge->add_field($procedurelist_definition);
 		$this->dbforge->add_key('procedurelist_id', TRUE);
@@ -1261,7 +1282,8 @@ class Install extends Controller {
 			'orders_category' => array('type' => 'VARCHAR', 'constraint' => 255),
 			'cpt' => array('type' => 'VARCHAR', 'constraint' => 255),
 			'orders_description' => array('type' => 'LONGTEXT'),
-			'snomed' => array('type' => 'VARCHAR', 'constraint' => 255)
+			'snomed' => array('type' => 'VARCHAR', 'constraint' => 255),
+			'practice_id' => array('type' => 'INT', 'constraint' => 11)
 		);
 		$this->dbforge->add_field($orderslist_definition);
 		$this->dbforge->add_key('orderslist_id', TRUE);
@@ -1272,7 +1294,8 @@ class Install extends Controller {
 			'temp_id' => array('type' => 'INT', 'constraint' => 11, 'auto_increment' => TRUE),
 			'date' => array('type' => 'DATETIME'),
 			'temp' => array('type' => 'VARCHAR', 'constraint' => 100),
-			'action' => array('type' => 'LONGTEXT')
+			'action' => array('type' => 'LONGTEXT'),
+			'practice_id' => array('type' => 'INT', 'constraint' => 11)
 		);
 		$this->dbforge->add_field($vaccine_temp_definition);
 		$this->dbforge->add_key('temp_id', TRUE);
@@ -1289,7 +1312,8 @@ class Install extends Controller {
 			'imm_brand' => array('type' => 'VARCHAR', 'constraint' => 255),
 			'imm_cvxcode' => array('type' => 'VARCHAR', 'constraint' => 255),
 			'cpt' => array('type' => 'VARCHAR', 'constraint' => 255),
-			'quantity' => array('type' => 'INT', 'constraint' => 11)
+			'quantity' => array('type' => 'INT', 'constraint' => 11),
+			'practice_id' => array('type' => 'INT', 'constraint' => 11)
 		);
 		$this->dbforge->add_field($vaccine_inventory_definition);
 		$this->dbforge->add_key('vaccine_id', TRUE);
@@ -1306,7 +1330,8 @@ class Install extends Controller {
 			'cpt' => array('type' => 'VARCHAR', 'constraint' => 255),
 			'charge' => array('type' => 'VARCHAR', 'constraint' => 255),
 			'quantity' => array('type' => 'INT', 'constraint' => 11),
-			'sup_lot' => array('type' => 'VARCHAR', 'constraint' => 255)
+			'sup_lot' => array('type' => 'VARCHAR', 'constraint' => 255),
+			'practice_id' => array('type' => 'INT', 'constraint' => 11)
 		);
 		$this->dbforge->add_field($supplement_inventory_definition);
 		$this->dbforge->add_key('supplement_id', TRUE);
@@ -1318,7 +1343,8 @@ class Install extends Controller {
 			'fileName' => array('type' => 'VARCHAR', 'constraint' => 255),
 			'filePath' => array('type' => 'VARCHAR', 'constraint' => 255),
 			'fileDateTime' => array('type' => 'DATETIME'),
-			'filePages' => array('type' => 'INT', 'constraint' => 11)
+			'filePages' => array('type' => 'INT', 'constraint' => 11),
+			'practice_id' => array('type' => 'INT', 'constraint' => 11)
 		);
 		$this->dbforge->add_field($scans_definition);
 		$this->dbforge->add_key('scans_id', TRUE);
@@ -1331,7 +1357,14 @@ class Install extends Controller {
 			'test_name' => array('type' => 'VARCHAR', 'constraint' => 255),
 			'test_datetime' => array('type' => 'DATETIME'),
 			'test_result' => array('type' => 'LONGTEXT'),
-			'test_units' => array('type' => 'VARCHAR', 'constraint' => 100)
+			'test_units' => array('type' => 'VARCHAR', 'constraint' => 100),
+			'test_reference' => array('type' => 'LONGTEXT'),
+			'test_flags' => array('type' => 'VARCHAR', 'constraint' => 100),
+			'test_provider_id' => array('type' => 'BIGINT', 'constraint' => 20),
+			'test_unassigned' => array('type' => 'LONGTEXT'),
+			'test_from' => array('type' => 'LONGTEXT'),
+			'test_type' => array('type' => 'VARCHAR', 'constraint' => 255),
+			'practice_id' => array('type' => 'INT', 'constraint' => 11)
 		);
 		$this->dbforge->add_field($tests_definition);
 		$this->dbforge->add_key('tests_id', TRUE);
@@ -1347,7 +1380,8 @@ class Install extends Controller {
 			'category' => array('type' => 'VARCHAR', 'constraint' => 100),
 			'sex' => array('type' => 'VARCHAR', 'constraint' => 100),
 			'group' => array('type' => 'VARCHAR', 'constraint' => 100),
-			'array' => array('type' => 'LONGTEXT')
+			'array' => array('type' => 'LONGTEXT'),
+			'practice_id' => array('type' => 'INT', 'constraint' => 11)
 		);
 		$this->dbforge->add_field($template_definition);
 		$this->dbforge->add_key('template_id', TRUE);
@@ -1381,7 +1415,8 @@ class Install extends Controller {
 			'hippa_id' => array('type' => 'INT', 'constraint' => 11),
 			'appt_id' => array('type' => 'INT', 'constraint' => 11),
 			'tests_id' => array('type' => 'INT', 'constraint' => 11),
-			'mtm_id' => array('type' => 'INT', 'constraint' => 40)
+			'mtm_id' => array('type' => 'INT', 'constraint' => 40),
+			'practice_id' => array('type' => 'INT', 'constraint' => 11)
 		);
 		$this->dbforge->add_field($tags_relate_definition);
 		$this->dbforge->add_key('tags_relate_id', TRUE);
@@ -1403,6 +1438,66 @@ class Install extends Controller {
 		$this->dbforge->add_key('forms_id', TRUE);
 		$this->dbforge->create_table('forms', TRUE);
 		
+		// Relational table for demographics
+		$demographics_relate_definition = array(
+			'demographics_relate_id' => array('type' => 'INT', 'constraint' => 40, 'auto_increment' => TRUE),
+			'pid' => array('type' => 'INT', 'constraint' => 11),
+			'practice_id' => array('type' => 'INT', 'constraint' => 11),
+			'id' => array('type' => 'BIGINT', 'constraint' => 20)
+		);
+		$this->dbforge->add_field($demographics_relate_definition);
+		$this->dbforge->add_key('demographics_relate_id', TRUE);
+		$this->dbforge->create_table('demographics_relate', TRUE);
+		
+		$demographics_notes_definition = array(
+			'demographics_notes_id' => array('type' => 'INT', 'constraint' => 40, 'auto_increment' => TRUE),
+			'pid' => array('type' => 'INT', 'constraint' => 11),
+			'practice_id' => array('type' => 'INT', 'constraint' => 11),
+			'billing_notes' => array('type' => 'LONGTEXT'),
+			'imm_notes' => array('type' => 'LONGTEXT')
+		);
+		$this->dbforge->add_field($demographics_notes_definition);
+		$this->dbforge->add_key('demographics_notes_id', TRUE);
+		$this->dbforge->create_table('demographics_notes', TRUE);
+		
+		$orderslist1_definition = array(
+			'orderslist1_id' => array('type' => 'INT', 'constraint' => 11, 'auto_increment' => TRUE),
+			'orders_code' => array('type' => 'BIGINT', 'constraint' => 20),
+			'orders_category' => array('type' => 'VARCHAR', 'constraint' => 255),
+			'orders_vendor' => array('type' => 'VARCHAR', 'constraint' => 255),
+			'cpt' => array('type' => 'VARCHAR', 'constraint' => 255),
+			'orders_description' => array('type' => 'LONGTEXT'),
+			'result_code' => array('type' => 'BIGINT', 'constraint' => 20),
+			'result_name' => array('type' => 'VARCHAR', 'constraint' => 255),
+			'units' => array('type' => 'VARCHAR', 'constraint' => 255)
+		);
+		$this->dbforge->add_field($orderslist1_definition);
+		$this->dbforge->add_key('orderslist1_id', TRUE);
+		$this->dbforge->create_table('orderslist1', TRUE);
+		$orderslist1_sql_file = "/var/www/nosh/import/orderslist1.sql";
+		include(APPPATH.'config/database'.EXT);
+		$orderslist1_command = "mysql -u " . $db['default']['username']. " -p". $db['default']['password'] . " nosh < " . $orderslist1_sql_file;
+		system($orderslist1_command);
+		//$orderslist1_csv = "/var/www/nosh/import/peacehealth.csv";
+		//if (($orderslist1_handle = fopen($orderslist1_csv, "r")) !== FALSE) {
+			//while (($orderslist1 = fgetcsv($orderslist1_handle, 0, ";")) !== FALSE) {
+				//if ($orderslist1[0] != '') {
+					//$orderslist1_data = array (
+						//'orders_code' => $orderslist1[0],
+						//'orders_category' => 'Laboratory',
+						//'orders_vendor' => 'PeaceHealth',
+						//'cpt' => ltrim($orderslist1[8]),
+						//'orders_description' => $orderslist1[1],
+						//'result_code' => $orderslist1[2],
+						//'result_name' => $orderslist1[3],
+						//'units' => $orderslist1[9]
+					//);
+					//$this->db->insert('orderslist1', $orderslist1_data);
+				//}
+			//}
+			//fclose($orderslist1_csv);
+		//}
+		
 		// Insert Administrator
 		$data1 = array(
 			'username' => $username,
@@ -1410,7 +1505,8 @@ class Install extends Controller {
 			'email' => $email,
 			'group_id' => $group_id,
 			'displayname' => $displayname,
-			'active' => '1'
+			'active' => '1',
+			'practice_id' => '1'
 		);
 		$this->db->insert('users', $data1);
 		
@@ -1435,7 +1531,7 @@ class Install extends Controller {
 			'smtp_user' => $smtp_user,
 			'smtp_pass' => $smtp_pass,
 			'vivacare' => '',
-			'version' => '1.7.1'
+			'version' => '1.7.2'
 		);
 		$this->db->insert('practiceinfo', $data2);
 		$scans_directory = $documents_dir1 . 'scans';
@@ -2005,7 +2101,6 @@ class Install extends Controller {
 			'cpt_id' => array('type' => 'INT', 'constraint' => 11, 'auto_increment' => TRUE),
 			'cpt' => array('type' => 'VARCHAR', 'constraint' => 255),
 			'cpt_description' => array('type' => 'LONGTEXT'),
-			'cpt_charge' => array('type' => 'VARCHAR', 'constraint' => 255),
 			'cpt_common' => array('type' => 'TINYINT', 'constraint' => 4)
 		);
 		$this->dbforge->add_field($cpt_definition);
@@ -2015,6 +2110,18 @@ class Install extends Controller {
 		include(APPPATH.'config/database'.EXT);
 		$cpt_command = "mysql -u " . $db['default']['username']. " -p". $db['default']['password'] . " nosh < " . $cpt_file;
 		system($cpt_command);
+		$cpt_relate_definition = array(
+			'cpt_relate_id' => array('type' => 'INT', 'constraint' => 40, 'auto_increment' => TRUE),
+			'practice_id' => array('type' => 'INT', 'constraint' => 11),
+			'cpt' => array('type' => 'VARCHAR', 'constraint' => 255),
+			'cpt_description' => array('type' => 'LONGTEXT'),
+			'cpt_charge' => array('type' => 'VARCHAR', 'constraint' => 255),
+			'favorite' => array('type' => 'TINYINT', 'constraint' => 4),
+			'unit' => array('type' => 'INT', 'constraint' => 1)
+		);
+		$this->dbforge->add_field($cpt_relate_definition);
+		$this->dbforge->add_key('cpt_relate_id', TRUE);
+		$this->dbforge->create_table('cpt_relate', TRUE);
 	}
 	
 	function do_install4a()
@@ -2182,7 +2289,8 @@ class Install extends Controller {
 				'username' => $row['username'],
 				'user_id' => $row['id'],
 				'group_id' => $row['group_id'],
-				'logged_in' => TRUE
+				'logged_in' => TRUE,
+				'practice_id' => '1'
 				);
 			$this->session->set_userdata($data);
 			$this->auth->_generate();

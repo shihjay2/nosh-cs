@@ -11,6 +11,8 @@ class Fax_model extends Model {
 
 	function fax_type()
 	{
+		$practice_id = $this->session->userdata('practice_id');
+		$this->db->where('practice_id', $practice_id);
 		$query = $this->db->get('practiceinfo');
 		$result = $query->row_array();
 		return $result['fax_type'];
@@ -53,7 +55,9 @@ class Fax_model extends Model {
 	
 	function getSendList($sendlist_id)
 	{
+		$practice_id = $this->session->userdata('practice_id');
 		$this->db->where('sendlist_id', $sendlist_id);
+		$this->db->where('practice_id', $practice_id);
 		return $this->db->get('recipients');
 	}
 
@@ -66,7 +70,8 @@ class Fax_model extends Model {
 
 	function getPages($job_id)
 	{
-		return $this->db->query("SELECT * FROM pages WHERE job_id=$job_id");
+		$this->db->where('job_id', $job_id);
+		return $this->db->get('pages');
 	}
 	
 	function getPages1($job_id, $sidx, $sord, $start, $limit)

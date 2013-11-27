@@ -28,7 +28,8 @@
 <link type="text/css" href="<?php echo base_url().'css/chosen.css';?>" rel="Stylesheet" />
 <link type="text/css" href="<?php echo base_url().'css/jquery.Jcrop.css';?>" rel="Stylesheet" />
 <link type="text/css" href="<?php echo base_url().'css/jquery.realperson.css';?>" rel="Stylesheet" />
-<link type="text/css" href="<?php echo base_url().'css/jquery.tagsinput.css';?>" rel="Stylesheet" />
+<link type="text/css" href="<?php echo base_url().'css/tagit.css';?>" rel="Stylesheet" />
+<!--<link type="text/css" href="<?php echo base_url().'css/jquery.tagsinput.css';?>" rel="Stylesheet" />-->
 <!--<link type="text/css" href="<?php echo base_url().'css/jquery-pdfdoc.css';?>" rel="Stylesheet" />-->
 <script type="text/javascript" src="<?php echo base_url().'js/jquery-migrate-1.1.0.js';?>"></script>
 <script type="text/javascript" src="<?php echo base_url().'js/jquery.ajaxQueue.js';?>"></script>
@@ -62,7 +63,8 @@
 <script type="text/javascript" src="<?php echo base_url().'js/jquery.color.js';?>"></script>
 <script type="text/javascript" src="<?php echo base_url().'js/jquery.Jcrop.min.js';?>"></script>
 <script type="text/javascript" src="<?php echo base_url().'js/jquery.realperson.js';?>"></script>
-<script type="text/javascript" src="<?php echo base_url().'js/jquery.tagsinput.js';?>"></script>
+<!--<script type="text/javascript" src="<?php echo base_url().'js/jquery.tagsinput.js';?>"></script>-->
+<script type="text/javascript" src="<?php echo base_url().'js/tagit-themeroller.js';?>"></script>
 <script type="text/javascript" src="<?php echo base_url().'js/jquery.jstree.js';?>"></script>
 <script type="text/javascript" src="<?php echo base_url().'js/jquery.populate.js';?>"></script>
 <!--<script type="text/javascript" src="<?php echo base_url().'js/pdf.js';?>"></script>-->
@@ -958,6 +960,9 @@ $(document).ready(function(){
 	$("#box").addClass("ui-tabs ui-widget ui-widget-content ui-corner-all");
 	$("#options_load").load('<?php echo site_url("start/options_load");?>');
 });
+$(document).on("click", ".ui-jqgrid-titlebar", function() {
+	$(".ui-jqgrid-titlebar-close", this).click();
+});
 </script>
 <?php if (isset($extraHeadContent)) {echo $extraHeadContent;}?>
 </head>
@@ -971,7 +976,7 @@ $(document).ready(function(){
 				<?php if(user_group('admin')) { echo anchor('admin/setup', 'Setup'); } ?>
 				<?php if(user_group('admin')) { echo anchor('admin/users', 'Users'); } ?>
 				<?php if(user_group('admin')) { echo anchor('admin/schedule', 'Schedule'); } ?>
-				<?php if(user_group('admin')) { echo anchor('admin/template', 'Templates'); } ?>
+				<?php if(user_group('admin')) { echo anchor('admin/logs', 'Logs'); } ?>
 				<?php if(user_group('assistant')) { echo anchor('assistant/messaging', 'Messages'); } ?>
 				<?php if(user_group('assistant')) { echo anchor('assistant/schedule', 'Schedule'); } ?>
 				<?php if(user_group('assistant')) { echo anchor('assistant/billing', 'Financial'); } ?>

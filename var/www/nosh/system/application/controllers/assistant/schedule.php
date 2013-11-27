@@ -8,6 +8,7 @@ class Schedule extends Application
 		parent::Application();
 		$this->load->database();
 		$this->load->library('session');
+		$this->load->library('email');
 		$this->auth->restrict('assistant');
 		$this->load->model('practiceinfo_model');
 		$this->load->model('schedule_model');
@@ -18,7 +19,7 @@ class Schedule extends Application
 
 	function index()
 	{
-		$query = $this->practiceinfo_model->getProviders();
+		$query = $this->practiceinfo_model->getProviders($this->session->userdata('practice_id'));
 		
 		$data['providers'] = '<option value="">Choose...</option>';
 		if ($query->num_rows() > 0) {
@@ -38,7 +39,7 @@ class Schedule extends Application
 	
 	function schedule_view()
 	{
-		$query1 = $this->practiceinfo_model->get();
+		$query1 = $this->practiceinfo_model->get($this->session->userdata('practice_id'));
 		$schedule = $query1->row();
 		if ($schedule->weekends == 'yes') {
 			$data['weekends'] = 'true';
@@ -51,6 +52,7 @@ class Schedule extends Application
 		
 		$this->db->select('visit_type');
 		$this->db->where('active', 'y');
+		$this->db->where('practice_id', $this->session->userdata('practice_id'));
 		$query2 = $this->db->get('calendar');
 		$data['visit_type_select'] = '<option value = "">None</option>';
 		if ($query2->num_rows() > 0) {
@@ -244,6 +246,7 @@ class Schedule extends Application
 			if ($row['visit_type'] != '') {
 				$this->db->select('classname');
 				$this->db->where('visit_type', $row['visit_type']);
+				$this->db->where('practice_id', $this->session->userdata('practice_id'));
 				$query1 = $this->db->get('calendar');
 				$row1 = $query1->row_array();
 				$classname = $row1['classname'];
@@ -349,7 +352,7 @@ class Schedule extends Application
 			}
 		}
 		
-		$query3 = $this->practiceinfo_model->get();
+		$query3 = $this->practiceinfo_model->get($this->session->userdata('practice_id'));
 		if ($query3->num_rows() > 0) {
 			foreach ($query3->result_array() as $row3) {
 				$sun_o = $row3['sun_o'];
@@ -477,6 +480,7 @@ class Schedule extends Application
 			$this->db->select('duration');
 			$this->db->where('visit_type', $visit_type);
 			$this->db->where('active','y');
+			$this->db->where('practice_id', $this->session->userdata('practice_id'));
 			$query = $this->db->get('calendar');
 			$row = $query->row_array();
 			$end = $start + $row['duration'];
@@ -549,8 +553,9 @@ class Schedule extends Application
 			);
 			if ($id == '') {
 				$data['timestamp'] = null;
-				$this->schedule_model->add_event($data);
+				$appt_id = $this->schedule_model->add_event($data);
 				$this->audit_model->add();
+				$this->schedule_notification($appt_id);
 			} else {
 				$id_check1 = strpbrk($id, 'NR');
 				if ($id_check1 == TRUE) {
@@ -562,6 +567,7 @@ class Schedule extends Application
 				} else {
 					$this->schedule_model->update_event($id, $data);
 					$this->audit_model->update();
+					$this->schedule_notification($id);
 				}
 			}
 		}
@@ -622,6 +628,7 @@ class Schedule extends Application
 			if ($row['visit_type'] != '') {
 				$this->db->select('classname');
 				$this->db->where('visit_type', $row['visit_type']);
+				$this->db->where('practice_id', $this->session->userdata('practice_id'));
 				$query1 = $this->db->get('calendar');
 				$row1 = $query1->row_array();
 				$classname = $row1['classname'];
@@ -650,6 +657,46 @@ class Schedule extends Application
 		
 		echo json_encode($events);
 		exit(0);
+	}
+	
+	function schedule_notification($appt_id)
+	{
+		$this->db->where('appt_id', $appt_id);
+		$row1 = $this->db->get('schedule')->row_array();
+		$this->db->where('pid', $row1['pid']);
+		$row = $this->db->get('demographics')->row_array();
+		$this->db->where('practice_id', $this->session->userdata('practice_id'));
+		$row2 = $this->db->get('practiceinfo')->row_array();
+		$this->db->where('id', $row1['provider_id']);
+		$row0 = $this->db->get('users')->row_array();
+		$displayname = $row0['displayname'];
+		$to = $row['reminder_to'];
+		$phone = $row2['phone'];
+		$startdate = date("F j, Y, g:i a", $row1['start']);
+		if ($to != '') {
+			if ($row['reminder_method'] == 'Cellular Phone') {
+				$message = 'Reminder - medical appt with ' . $displayname . ' on ' . $startdate . '.';
+				$message .= ' To cancel/reschedule, call ' . $phone . '.';
+			} else {
+				$message = 'This message is a courtesy reminder of your medical appointment with ' . $displayname . ' on ' . $startdate . '.';
+				$message .= ' If you need to cancel or reschedule your appointment, please contact us at ' . $phone . ' or reply to this e-mail at ' . $row2['email'] . '.';
+				$message .= $row2['additional_message'];
+			}
+			$config['protocol']='smtp';
+			$config['smtp_host']='ssl://smtp.googlemail.com';
+			$config['smtp_port']='465';
+			$config['smtp_timeout']='30';
+			$config['smtp_user']=$row2['smtp_user'];
+			$config['smtp_pass']=$row2['smtp_pass'];
+			$config['charset']='utf-8';
+			$config['newline']="\r\n";
+			$this->email->initialize($config);
+			$this->email->from($row2['email'], $row2['practice_name']);
+			$this->email->to($to);
+			$this->email->subject('Appointment Reminder');
+			$this->email->message($message);
+			$this->email->send();
+		}
 	}
 } 
 /* End of file: schedule.php */

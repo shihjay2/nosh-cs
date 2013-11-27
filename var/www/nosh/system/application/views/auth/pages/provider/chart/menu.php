@@ -95,6 +95,9 @@
 				<table cellspacing="0" cellpadding="3">
 					<tbody>
 						<tr>
+							<td colspan="3">Select existing patient to copy contact information:<br><input type="text" id="menu_autocomplete_patient" style="width:560px" class="text ui-widget-content ui-corner-all"/></td>
+						</tr>
+						<tr>
 							<td colspan="3">Address:<br><input type="text" name="address" id="menu_address" style="width:560px" class="text ui-widget-content ui-corner-all"/></td>
 						</tr>
 						<tr>
@@ -282,6 +285,7 @@
 	<div id="messages_pager" class="scroll" style="text-align:center;"></div><br>
 </div>
 <div id="messages_main_dialog" title="Message">
+	<ul id="t_messages_tags"></ul>
 	<div id="edit_message_fieldset" style="display: none">
 		<form name="edit_message_form" id="edit_message_form">
 			<input type="hidden" name="t_messages_id" id="t_messages_id"/>
@@ -308,7 +312,7 @@
 						<td valign="top">
 							<button type="button" id="message_telephone">Phone</button><br>
 							<button type="button" id="message_rx">RX</button><br>
-							<button type="button" id="message_sup">Supplement</button><br>
+							<button type="button" id="message_sup">Supplements</button><br>
 							<button type="button" id="message_lab">Lab</button><br>
 							<button type="button" id="message_rad">Imaging</button><br>
 							<button type="button" id="message_cp">Cardiopulmonary</button><br>
@@ -561,6 +565,7 @@
 </div>
 <div id="documents_list_dialog" title="Documents">
 	<button type="button" id="menu_new_letter">New Letter</button>
+	<button type="button" id="menu_tests">Test Results</button>
 	<hr class="ui-state-default"/>
 	<table id="labs" class="scroll" cellpadding="0" cellspacing="0"></table>
 	<div id="pager8" class="scroll" style="text-align:center;"></div> 
@@ -588,6 +593,7 @@
 	<br>
 </div>
 <div id="documents_edit_dialog" title="Edit Documents">
+	<ul id="documents_tags"></ul>
 	<form id="documents_edit_form">
 		<input type="hidden" name="documents_id" id="menu_documents_id"/>
 		<table>
@@ -616,10 +622,19 @@
 	</form>
 </div>
 <div id="documents_view_dialog" title="Documents Viewer">
+	<ul id="documents_view_tags"></ul>
 	<input type="hidden" id="view_document_id"/>
 	<input type="hidden" id="document_filepath"/>
 	<button type="button" id="save_document">Save</button><br>
 	<div id="embedURL"></div>
+</div>
+<div id="tests_dialog" title="Test Results">
+	Search: <input type="text" size="50" id="search_all_tests" class="text ui-widget-content ui-corner-all" onkeydown="doSearch1(arguments[0]||event)"/><br><br> 
+	<table id="tests_list" class="scroll" cellpadding="0" cellspacing="0"></table>
+	<div id="tests_list_pager" class="scroll" style="text-align:center;"></div><br>
+	<button type="button" id="chart_results">Chart Selected Results</button>
+	<div id="chart_loading" style="display: block;float: right;"><img src="<?php echo base_url().'images/indicator.gif';?>"> Loading graph...</div><br><br>
+	<div id="tests_container" style="width: 750px; height: 550px; margin: 0 auto"></div>
 </div>
 <div id="prevention_list_dialog" title="Prevention Recommendations">
 	<div id="prevention_load"><img src="<?php echo base_url().'images/indicator.gif';?>"> Loading...</div>
@@ -666,7 +681,24 @@
 			}
 		}
 	});
-	$("#demographics_accordion").accordion();
+	$("#demographics_accordion").accordion({
+		activate: function (event, ui) {
+			var id = ui.newPanel[0].id;
+			$("#" + id + " .text").first().focus();
+		}
+	});
+	$("#demographics_accordion .ui-accordion-content").each(function(){
+		$(this).find(".text").last().on('keydown', function(e) {
+			if (e.which == 9) {
+				if (!e.shiftKey) {
+					var active = $("#demographics_accordion").accordion("option", "active");
+					if (active < 3) {
+						$("#demographics_accordion").accordion("option", "active", active + 1);
+					}
+				}
+			}
+		});
+	});
 	$("#guardian_import").button().click(function(){
 		$('#menu_guardian_address').val($('#menu_address').val());
 		$('#menu_guardian_city').val($('#menu_city').val());
@@ -877,6 +909,36 @@
 		},
 		close: function(event, ui) {
 			$("#edit_menu_insurance_main_form").clearForm();
+		}
+	});
+	$("#menu_autocomplete_patient").autocomplete({
+		source: function (req, add){
+			$.ajax({
+				url: "<?php echo site_url('search/demographics_copy');?>",
+				dataType: "json",
+				type: "POST",
+				data: req,
+				success: function(data){
+					if(data.response =='true'){
+						add(data.message);
+					}				
+				}
+			});
+		},
+		minLength: 1,
+		select: function( event, ui ) {
+			$("#menu_address").val(ui.item.address);
+			$("#menu_city").val(ui.item.city);
+			$("#menu_state").val(ui.item.state);
+			$("#menu_zip").val(ui.item.zip);
+			$("#menu_phone_home").val(ui.item.phone_home);
+			$("#menu_phone_work").val(ui.item.phone_work);
+			$("#menu_phone_cell").val(ui.item.phone_cell);
+			$("#menu_email").val(ui.item.email);
+			$("#menu_emergency_contact").val(ui.item.emergency_contact);
+			$("#menu_emergency_phone").val(ui.item.emergency_phone);
+			$("#menu_reminder_method").val(ui.item.reminder_method);
+			$("#menu_cell_carrier").val(ui.item.cell_carrier);
 		}
 	});
 	$("#menu_address").autocomplete({
@@ -1687,22 +1749,25 @@
 			 	onSelectRow: function(id) {
 			 		var item = jQuery("#messages").getGridParam('selrow');
 		 			var signed = jQuery("#messages").getCell(id,'t_messages_signed');
-		 			$("#messages_main_dialog").dialog('open');
-					if (signed == 'No') {
+		 			if (signed == 'No') {
 						jQuery("#messages").GridToForm(id,"#edit_message_form");
 						$("#message_view").html('');
 						var date = $('#t_messages_dos').val();
 						var edit_date = editDate(date);
 						$('#t_messages_dos').val(edit_date);
 						$("#edit_message_fieldset").show('fast');
+						t_messages_tags();
 					}
 					if (signed == 'Yes') {
 						$("#edit_message_fieldset").hide('fast');
 						var row = jQuery("#messages").getRowData(id);
 						var text = '<br><strong>Date:</strong>  ' + row['t_messages_dos'] + '<br><br><strong>Subject:</strong>  ' + row['t_messages_subject'] + '<br><br><strong>Message:</strong> ' + row['t_messages_message']; 
 						$("#message_view").html(text);
+						$("#t_messages_id").val(row['t_messages_id']);
+						t_messages_tags();
 					}
-			 	},
+					$("#messages_main_dialog").dialog('open');
+				},
 			 	jsonReader: { repeatitems : false, id: "0" }
 			}).navGrid('#messages_pager',{search:false,edit:false,add:false,del:false});
 		},
@@ -1783,6 +1848,7 @@
 				jQuery("#messages").trigger("reloadGrid");
 				$("#edit_message_fieldset").show('fast');
 				$("#message_view").html('');
+				t_messages_tags();
 				$("#messages_main_dialog").dialog('open');
 			}
 		});
@@ -3438,6 +3504,7 @@
 								//$('#embedURL').PDFDoc( { source : data.html } );
 								$("#embedURL").html(data.html);
 								$("#document_filepath").val(data.filepath);
+								documents_view_tags();
 								$("#documents_view_dialog").dialog('open');
 							}
 						});
@@ -3455,6 +3522,7 @@
 						var date = $('#menu_documents_date').val();
 						var edit_date = editDate(date);
 						$('#menu_documents_date').val(edit_date);
+						documents_tags();
 						$('#documents_edit_dialog').dialog('open');
 						$("#menu_documents_from").focus();
 					} else {
@@ -3520,6 +3588,7 @@
 								//$('#embedURL').PDFDoc( { source : data.html } );
 								$("#embedURL").html(data.html);
 								$("#document_filepath").val(data.filepath);
+								documents_view_tags();
 								$("#documents_view_dialog").dialog('open');
 							}
 						});
@@ -3537,6 +3606,7 @@
 						var date = $('#menu_documents_date').val();
 						var edit_date = editDate(date);
 						$('#menu_documents_date').val(edit_date);
+						documents_tags();
 						$('#documents_edit_dialog').dialog('open');
 						$("#menu_documents_from").focus();
 					} else {
@@ -3602,6 +3672,7 @@
 								//$('#embedURL').PDFDoc( { source : data.html } );
 								$("#embedURL").html(data.html);
 								$("#document_filepath").val(data.filepath);
+								documents_view_tags();
 								$("#documents_view_dialog").dialog('open');
 							}
 						});
@@ -3619,6 +3690,7 @@
 						var date = $('#menu_documents_date').val();
 						var edit_date = editDate(date);
 						$('#menu_documents_date').val(edit_date);
+						documents_view_tags();
 						$('#documents_edit_dialog').dialog('open');
 						$("#menu_documents_from").focus();
 					} else {
@@ -3684,6 +3756,7 @@
 								//$('#embedURL').PDFDoc( { source : data.html } );
 								$("#embedURL").html(data.html);
 								$("#document_filepath").val(data.filepath);
+								documents_view_tags();
 								$("#documents_view_dialog").dialog('open');
 							}
 						});
@@ -3701,6 +3774,7 @@
 						var date = $('#menu_documents_date').val();
 						var edit_date = editDate(date);
 						$('#menu_documents_date').val(edit_date);
+						documents_tags();
 						$('#documents_edit_dialog').dialog('open');
 						$("#menu_documents_from").focus();
 					} else {
@@ -3766,6 +3840,7 @@
 								//$('#embedURL').PDFDoc( { source : data.html } );
 								$("#embedURL").html(data.html);
 								$("#document_filepath").val(data.filepath);
+								documents_view_tags();
 								$("#documents_view_dialog").dialog('open');
 							}
 						});
@@ -3783,6 +3858,7 @@
 						var date = $('#menu_documents_date').val();
 						var edit_date = editDate(date);
 						$('#menu_documents_date').val(edit_date);
+						documents_tags();
 						$('#documents_edit_dialog').dialog('open');
 						$("#menu_documents_from").focus();
 		 			} else {
@@ -3848,6 +3924,7 @@
 								//$('#embedURL').PDFDoc( { source : data.html } );
 								$("#embedURL").html(data.html);
 								$("#document_filepath").val(data.filepath);
+								documents_view_tags();
 								$("#documents_view_dialog").dialog('open');
 							}
 						});
@@ -3865,6 +3942,7 @@
 						var date = $('#menu_documents_date').val();
 						var edit_date = editDate(date);
 						$('#menu_documents_date').val(edit_date);
+						documents_tags();
 						$('#documents_edit_dialog').dialog('open');
 						$("#menu_documents_from").focus();
 					} else {
@@ -3930,6 +4008,7 @@
 								//$('#embedURL').PDFDoc( { source : data.html } );
 								$("#embedURL").html(data.html);
 								$("#document_filepath").val(data.filepath);
+								documents_view_tags();
 								$("#documents_view_dialog").dialog('open');
 							}
 						});
@@ -3947,6 +4026,7 @@
 						var date = $('#menu_documents_date').val();
 						var edit_date = editDate(date);
 						$('#menu_documents_date').val(edit_date);
+						documents_tags();
 						$('#documents_edit_dialog').dialog('open');
 						$("#menu_documents_from").focus();
 					} else {
@@ -4012,6 +4092,7 @@
 								//$('#embedURL').PDFDoc( { source : data.html } );
 								$("#embedURL").html(data.html);
 								$("#document_filepath").val(data.filepath);
+								documents_view_tags();
 								$("#documents_view_dialog").dialog('open');
 							}
 						});
@@ -4029,6 +4110,7 @@
 						var date = $('#menu_documents_date').val();
 						var edit_date = editDate(date);
 						$('#menu_documents_date').val(edit_date);
+						documents_tags();
 						$('#documents_edit_dialog').dialog('open');
 						$("#menu_documents_from").focus();
 					} else {
@@ -4204,6 +4286,199 @@
 	$("#menu_new_letter").click(function() {
 		$("#letter_dialog").dialog('open');
 	});
+	$("#menu_tests").button({
+		icons: {
+			primary: "ui-icon-image"
+		}
+	});
+	$("#menu_tests").click(function() {
+		$("#tests_dialog").dialog('open');
+	});
+	$("#tests_dialog").dialog({ 
+		bgiframe: true, 
+		autoOpen: false, 
+		height: 500, 
+		width: 800,
+		open: function(event, ui) {
+			$("#chart_loading").hide();
+			jQuery("#tests_list").jqGrid('GridUnload');
+			jQuery("#tests_list").jqGrid({
+				url:"<?php echo site_url('provider/chartmenu/tests/');?>",
+				datatype: "json",
+				mtype: "POST",
+				colNames:['ID','Date','Test','Result','Unit','Normal','Flags','Type'],
+				colModel:[
+					{name:'tests_id',index:'tests_id',width:1,hidden:true},
+					{name:'test_datetime',index:'test_datetime',width:100,formatter:'date',formatoptions:{srcformat:"ISO8601Long", newformat: "ISO8601Short"}},
+					{name:'test_name',index:'test_name',width:310},
+					{name:'test_result',index:'test_result',width:120},
+					{name:'test_units',index:'test_units',width:50},
+					{name:'test_reference',index:'test_reference',width:100},
+					{name:'test_flags',index:'test_flags',width:50,
+						cellattr: function (rowId, val, rawObject, cm, rdata) {
+							if (rawObject.test_flags == "L") {
+								var response = "Below low normal";
+							}
+							if (rawObject.test_flags == "H") {
+								var response = "Above high normal";
+							}
+							if (rawObject.test_flags == "LL") {
+								var response = "Below low panic limits";
+							}
+							if (rawObject.test_flags == "HH") {
+								var response = "Above high panic limits";
+							}
+							if (rawObject.test_flags == "<") {
+								var response = "Below absolute low-off instrument scale";
+							}
+							if (rawObject.test_flags == ">") {
+								var response = "Above absolute high-off instrument scale";
+							}
+							if (rawObject.test_flags == "N") {
+								var response = "Normal";
+							}
+							if (rawObject.test_flags == "A") {
+								var response = "Abnormal";
+							}
+							if (rawObject.test_flags == "AA") {
+								var response = "Very abnormal";
+							}
+							if (rawObject.test_flags == "U") {
+								var response = "Significant change up";
+							}
+							if (rawObject.test_flags == "D") {
+								var response = "Significant change down";
+							}
+							if (rawObject.test_flags == "B") {
+								var response = "Better";
+							}
+							if (rawObject.test_flags == "W") {
+								var response = "Worse";
+							}
+							if (rawObject.test_flags == "S") {
+								var response = "Susceptible";
+							}
+							if (rawObject.test_flags == "R") {
+								var response = "Resistant";
+							}
+							if (rawObject.test_flags == "I") {
+								var response = "Intermediate";
+							}
+							if (rawObject.test_flags == "MS") {
+								var response = "Moderately susceptible";
+							}
+							if (rawObject.test_flags == "VS") {
+								var response = "Very susceptible";
+							}
+							if (rawObject.test_flags == "") {
+								var response = "";
+							}
+							return 'title="' + response + '"';
+						}
+					},
+					{name:'test_type',index:'test_type',width:1,hidden:true}
+				],
+				rowNum:10,
+				rowList:[10,20,30],
+				pager: jQuery('#tests_list_pager'),
+				sortname: 'test_datetime',
+			 	viewrecords: true,
+			 	sortorder: "desc",
+			 	caption:"Test Results",
+			 	height: "100%",
+			 	gridview: true,
+			 	rowattr: function (rd) {
+					if (rd.test_flags == "HH" || rd.test_flags == "LL" || rd.test_flags == "H" || rd.test_flags == "L") {
+						return {"class": "myAltRowClass"};
+					}
+				},
+			 	jsonReader: { repeatitems : false, id: "0" }
+			}).navGrid('#tests_list_pager',{search:false,edit:false,add:false,del:false});
+			$("#chart_results").button().click(function() {
+				var item = jQuery("#tests_list").getGridParam('selrow');
+				if (item) {
+					$("#chart_loading").show();
+					var options = {
+						chart: {
+							renderTo: 'tests_container',
+							defaultSeriesType: 'line',
+							marginRight: 130,
+							marginBottom: 50,
+							width: 750
+						},
+						title: {
+							text: '',
+							x: -20
+						},
+						xAxis: {
+							title: {
+								text: ''
+							},
+							type: 'datetime'
+						},
+						yAxis: {
+							title: {
+								text: ''
+							},
+							plotLines: [{
+								value: 0,
+								width: 1,
+								color: '#808080'
+							}]
+						},
+						legend: {
+							layout: 'vertical',
+							align: 'right',
+							verticalAlign: 'top',
+							x: -10,
+							y: 100,
+							borderWidth: 0
+						},
+						series: [
+							{type: 'line', data: []}
+						],
+						credits: {
+							href: 'http://noshemr.wordpress.com',
+							text: 'NOSH ChartingSystem'
+						}
+					};
+					$.ajax({
+						type: "POST",
+						url: "<?php echo site_url('provider/chartmenu/chart_test');?>/" + item,
+						dataType: "json",
+						success: function(data){
+							options.title.text = data.title;
+							options.xAxis.title.text = data.xaxis;
+							options.yAxis.title.text = data.yaxis;
+							options.series[0].name = data.name;
+							newData = [];
+							for (i in data.patient) {
+								newData.push( [ new Date(data.patient[i][0]).getTime(), parseFloat(data.patient[i][1]) ] );
+							}
+							options.series[0].data = newData;
+							var chart = new Highcharts.Chart(options);
+							$("#chart_loading").hide();
+						}
+					});
+				} else {
+					$.jGrowl('Choose item to chart!');
+				}
+			});
+		},
+		close: function (event, ui) {
+			$("#tests_container").html('');
+		}
+	});
+	var timeoutHnd1;
+	function doSearch1(ev){ 
+		if(timeoutHnd1) 
+			clearTimeout(timeoutHnd1);
+			timeoutHnd1 = setTimeout(gridReload1,500);
+	}
+	function gridReload1(){ 
+		var mask = jQuery("#search_all_tests").val();
+		jQuery("#tests_list").setGridParam({url:"<?php echo site_url('provider/chartmenu/tests');?>/"+mask,page:1}).trigger("reloadGrid");
+	}
 	//Prevention
 	$("#prevention_list_dialog").dialog({ 
 		bgiframe: true, 
@@ -4267,5 +4542,131 @@
 			}
 		}
 	});
+	$("#t_messages_tags").tagit({
+		tagSource: function (req, add){
+			$.ajax({
+				url: "<?php echo site_url('search/search_tags');?>",
+				dataType: "json",
+				type: "POST",
+				data: req,
+				success: function(data){
+					if(data.response =='true'){
+						add(data.message);
+					}				
+				}
+			});
+		},
+		tagsChanged: function(a, b) {
+			if (b == "added") {
+				$.ajax({
+					type: "POST",
+					url: "<?php echo site_url('search/save_tag/t_messages_id') . '/';?>" + $("#t_messages_id").val(),
+					data: 'tag=' + a
+				});
+			}
+			if (b == "popped") {
+				$.ajax({
+					type: "POST",
+					url: "<?php echo site_url('search/remove_tag/t_messages_id') . '/';?>" + $("#t_messages_id").val(),
+					data: 'tag=' + a
+				});
+			}
+		}
+	});
+	function t_messages_tags() {
+		var id = $("#t_messages_id").val();
+		$.ajax({
+			type: "POST",
+			url: "<?php echo site_url('search/get_tags/t_messages_id');?>" + "/" + id,
+			dataType: "json",
+			success: function(data){
+				$("#t_messages_tags").tagit("fill",data);
+			}
+		});
+	}
+	$("#documents_tags").tagit({
+		tagSource: function (req, add){
+			$.ajax({
+				url: "<?php echo site_url('search/search_tags');?>",
+				dataType: "json",
+				type: "POST",
+				data: req,
+				success: function(data){
+					if(data.response =='true'){
+						add(data.message);
+					}				
+				}
+			});
+		},
+		tagsChanged: function(a, b) {
+			if (b == "added") {
+				$.ajax({
+					type: "POST",
+					url: "<?php echo site_url('search/save_tag/documents_id') . '/';?>" + $("#menu_documents_id").val(),
+					data: 'tag=' + a
+				});
+			}
+			if (b == "popped") {
+				$.ajax({
+					type: "POST",
+					url: "<?php echo site_url('search/remove_tag/documents_id') . '/';?>" + $("#menu_documents_id").val(),
+					data: 'tag=' + a
+				});
+			}
+		}
+	});
+	function documents_tags() {
+		var id = $("#menu_documents_id").val();
+		$.ajax({
+			type: "POST",
+			url: "<?php echo site_url('search/get_tags/documents_id');?>" + "/" + id,
+			dataType: "json",
+			success: function(data){
+				$("#documents_tags").tagit("fill",data);
+			}
+		});
+	}
+	$("#documents_view_tags").tagit({
+		tagSource: function (req, add){
+			$.ajax({
+				url: "<?php echo site_url('search/search_tags');?>",
+				dataType: "json",
+				type: "POST",
+				data: req,
+				success: function(data){
+					if(data.response =='true'){
+						add(data.message);
+					}				
+				}
+			});
+		},
+		tagsChanged: function(a, b) {
+			if (b == "added") {
+				$.ajax({
+					type: "POST",
+					url: "<?php echo site_url('search/save_tag/documents_id') . '/';?>" + $("#view_document_id").val(),
+					data: 'tag=' + a
+				});
+			}
+			if (b == "popped") {
+				$.ajax({
+					type: "POST",
+					url: "<?php echo site_url('search/remove_tag/documents_id') . '/';?>" + $("#view_document_id").val(),
+					data: 'tag=' + a
+				});
+			}
+		}
+	});
+	function documents_view_tags() {
+		var id = $("#view_document_id").val();
+		$.ajax({
+			type: "POST",
+			url: "<?php echo site_url('search/get_tags/documents_id');?>" + "/" + id,
+			dataType: "json",
+			success: function(data){
+				$("#documents_view_tags").tagit("fill",data);
+			}
+		});
+	}
 </script>
-						
+

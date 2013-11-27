@@ -311,12 +311,13 @@ class Chartmenu extends Application
 	
 	function encounters()
 	{
+		$practice_id = $this->session->userdata('practice_id');
 		$pid = $this->session->userdata('pid');
 		$page = $this->input->post('page');
 		$limit = $this->input->post('rows');
 		$sidx = $this->input->post('sidx');
 		$sord = $this->input->post('sord');
-		$query = $this->db->query("SELECT * FROM encounters WHERE pid=$pid AND encounter_signed='Yes' AND addendum='n'");
+		$query = $this->db->query("SELECT * FROM encounters WHERE pid=$pid AND encounter_signed='Yes' AND addendum='n' AND practice_id=$practice_id");
 		$count = $query->num_rows(); 
 		if($count > 0) { 
 			$total_pages = ceil($count/$limit); 
@@ -326,7 +327,7 @@ class Chartmenu extends Application
 		if ($page > $total_pages) $page=$total_pages;
 		$start = $limit*$page - $limit;
 		if($start < 0) $start = 0;
-		$query1 = $this->db->query("SELECT * FROM encounters WHERE pid=$pid AND encounter_signed='Yes' AND addendum='n' ORDER BY $sidx $sord LIMIT $start , $limit");
+		$query1 = $this->db->query("SELECT * FROM encounters WHERE pid=$pid AND encounter_signed='Yes' AND addendum='n' AND practice_id=$practice_id ORDER BY $sidx $sord LIMIT $start , $limit");
 		$response['page'] = $page;
 		$response['total'] = $total_pages;
 		$response['records'] = $count;
@@ -442,7 +443,7 @@ class Chartmenu extends Application
 		} else {
 			$data['plan'] = '';
 		}		
-		$practice = $this->practiceinfo_model->get()->row();
+		$practice = $this->practiceinfo_model->get($this->session->userdata('practice_id'))->row();
 		$data['practiceName'] = $practice->practice_name;
 		$data['website'] = $practice->website;
 		$data['practiceInfo'] = $practice->street_address1;
@@ -986,12 +987,13 @@ class Chartmenu extends Application
 
 	function billing_encounters()
 	{
+		$practice_id = $this->session->userdata('practice_id');
 		$pid = $this->session->userdata('pid');
 		$page = $this->input->post('page');
 		$limit = $this->input->post('rows');
 		$sidx = $this->input->post('sidx');
 		$sord = $this->input->post('sord');
-		$query = $this->db->query("SELECT * FROM encounters WHERE pid=$pid");
+		$query = $this->db->query("SELECT * FROM encounters WHERE pid=$pid AND practice_id=$practice_id");
 		$count = $query->num_rows(); 
 		if($count > 0) { 
 			$total_pages = ceil($count/$limit); 
@@ -1001,7 +1003,7 @@ class Chartmenu extends Application
 		if ($page > $total_pages) $page=$total_pages;
 		$start = $limit*$page - $limit;
 		if($start < 0) $start = 0;
-		$query1 = $this->db->query("SELECT * FROM encounters WHERE pid=$pid ORDER BY $sidx $sord LIMIT $start , $limit");
+		$query1 = $this->db->query("SELECT * FROM encounters WHERE pid=$pid AND practice_id=$practice_id ORDER BY $sidx $sord LIMIT $start , $limit");
 		$response['page'] = $page;
 		$response['total'] = $total_pages;
 		$response['records'] = $count;
@@ -1033,12 +1035,13 @@ class Chartmenu extends Application
 	
 	function billing_other()
 	{
+		$practice_id = $this->session->userdata('practice_id');
 		$pid = $this->session->userdata('pid');
 		$page = $this->input->post('page');
 		$limit = $this->input->post('rows');
 		$sidx = $this->input->post('sidx');
 		$sord = $this->input->post('sord');
-		$query = $this->db->query("SELECT * FROM billing_core WHERE pid=$pid AND eid='0' AND payment='0'");
+		$query = $this->db->query("SELECT * FROM billing_core WHERE pid=$pid AND eid='0' AND payment='0' AND practice_id=$practice_id");
 		$count = $query->num_rows(); 
 		if($count > 0) { 
 			$total_pages = ceil($count/$limit); 
@@ -1048,7 +1051,7 @@ class Chartmenu extends Application
 		if ($page > $total_pages) $page=$total_pages;
 		$start = $limit*$page - $limit;
 		if($start < 0) $start = 0;
-		$query1 = $this->db->query("SELECT * FROM billing_core WHERE pid=$pid AND eid='0' AND payment='0' ORDER BY $sidx $sord LIMIT $start , $limit");
+		$query1 = $this->db->query("SELECT * FROM billing_core WHERE pid=$pid AND eid='0' AND payment='0' AND practice_id=$practice_idORDER BY $sidx $sord LIMIT $start , $limit");
 		$response['page'] = $page;
 		$response['total'] = $total_pages;
 		$response['records'] = $count;
@@ -1231,7 +1234,7 @@ class Chartmenu extends Application
 		} else {
 			$data['text'] = 'No procedures.';
 		}
-		$practice = $this->practiceinfo_model->get()->row();
+		$practice = $this->practiceinfo_model->get($this->session->userdata('practice_id'))->row();
 		$data['practiceName'] = $practice->practice_name;
 		$data['website'] = $practice->website;
 		$data['practiceInfo'] = $practice->street_address1;
@@ -1258,9 +1261,9 @@ class Chartmenu extends Application
 		$data['title'] = "INVOICE";
 		$date = now();
 		$data['date'] = date('F jS, Y', $date);
-		$this->db->select('billing_notes');
 		$this->db->where('pid', $pid);
-		$result = $this->db->get('demographics')->row_array();
+		$this->db->where('practice_id', $this->session->userdata('practice_id'));
+		$result = $this->db->get('demographics_notes')->row_array();
 		if (is_null($result['billing_notes']) || $result['billing_notes'] == '') {
 			$billing_notes = 'Invoice for encounter (Date of Service: ' . $data['encounter_DOS'] . ') printed on ' . $data['date'] . '.';
 		} else {
@@ -1269,7 +1272,9 @@ class Chartmenu extends Application
 		$billing_notes_data = array(
 			'billing_notes' => $billing_notes
 		);
-		$this->demographics_model->update($pid, $billing_notes_data);
+		$this->db->where('pid', $pid);
+		$this->db->where('practice_id', $this->session->userdata('practice_id'));
+		$this->db->update('demographics_notes', $billing_notes_data);
 		$this->audit_model->update();
 		return $this->load->view('auth/pages/provider/chart/invoice_page',$data, TRUE);
 	}
@@ -1348,7 +1353,7 @@ class Chartmenu extends Application
 		} else {
 			$data['text'] = 'No procedures.';
 		}
-		$practice = $this->practiceinfo_model->get()->row();
+		$practice = $this->practiceinfo_model->get($this->session->userdata('practice_id'))->row();
 		$data['practiceName'] = $practice->practice_name;
 		$data['website'] = $practice->website;
 		$data['practiceInfo'] = $practice->street_address1;
@@ -1363,9 +1368,9 @@ class Chartmenu extends Application
 		$data['title'] = "INVOICE";
 		$date = now();
 		$data['date'] = date('F jS, Y', $date);
-		$this->db->select('billing_notes');
 		$this->db->where('pid', $pid);
-		$result = $this->db->get('demographics')->row_array();
+		$this->db->where('practice_id', $this->session->userdata('practice_id'));
+		$result = $this->db->get('demographics_notes')->row_array();
 		if (is_null($result['billing_notes']) || $result['billing_notes'] == '') {
 			$billing_notes = 'Invoice for ' . $result1['reason'] . ' (Date of Bill: ' . $result1['dos_f'] . ') printed on ' . $data['date'] . '.';
 		} else {
@@ -1374,7 +1379,9 @@ class Chartmenu extends Application
 		$billing_notes_data = array(
 			'billing_notes' => $billing_notes
 		);
-		$this->demographics_model->update($pid, $billing_notes_data);
+		$this->db->where('pid', $pid);
+		$this->db->where('practice_id', $this->session->userdata('practice_id'));
+		$this->db->update('demographics_notes', $billing_notes_data);
 		$this->audit_model->update();
 		return $this->load->view('auth/pages/provider/chart/invoice_page2',$data, TRUE);
 	}
@@ -1519,8 +1526,9 @@ class Chartmenu extends Application
 	
 	function total_balance()
 	{
+		$practice_id = $this->session->userdata('practice_id');
 		$pid = $this->session->userdata('pid');
-		$query1 = $this->db->query("SELECT * FROM encounters WHERE pid=$pid");
+		$query1 = $this->db->query("SELECT * FROM encounters WHERE pid=$pid AND practice_id=$practice_id");
 		$i = 0;
 		if ($query1->num_rows() > 0) {
 			foreach ($query1->result_array() as $row1) {
@@ -1542,7 +1550,7 @@ class Chartmenu extends Application
 		} else {
 			$balance1 = 0;
 		}
-		$query2 = $this->db->query("SELECT * FROM billing_core WHERE pid=$pid AND eid='0' AND payment='0'");
+		$query2 = $this->db->query("SELECT * FROM billing_core WHERE pid=$pid AND eid='0' AND payment='0' AND practice_id=$practice_id");
 		$j = 0;
 		$charge2 = 0;
 		$payment2 = 0;
@@ -1578,9 +1586,10 @@ class Chartmenu extends Application
 	function get_billing_notes()
 	{
 		$pid = $this->session->userdata('pid');
-		$this->db->select('billing_notes');
 		$this->db->where('pid', $pid);
-		$result = $this->db->get('demographics')->row_array();
+		$this->db->where('pid', $pid);
+		$this->db->where('practice_id', $this->session->userdata('practice_id'));
+		$result = $this->db->get('demographics_notes')->row_array();
 		if (is_null($result['billing_notes']) || $result['billing_notes'] == '') {
 			echo "";
 		} else {
@@ -1593,12 +1602,13 @@ class Chartmenu extends Application
 
 	function records_release()
 	{
+		$practice_id = $this->session->userdata('practice_id');
 		$pid = $this->session->userdata('pid');
 		$page = $this->input->post('page');
 		$limit = $this->input->post('rows');
 		$sidx = $this->input->post('sidx');
 		$sord = $this->input->post('sord');
-		$query = $this->db->query("SELECT * FROM hippa WHERE pid=$pid AND other_hippa_id='0'");
+		$query = $this->db->query("SELECT * FROM hippa WHERE pid=$pid AND other_hippa_id='0' AND practice_id=$practice_id");
 		$count = $query->num_rows();
 		if($count > 0) { 
 			$total_pages = ceil($count/$limit); 
@@ -1608,7 +1618,7 @@ class Chartmenu extends Application
 		if ($page > $total_pages) $page=$total_pages;
 		$start = $limit*$page - $limit;
 		if($start < 0) $start = 0;
-		$query1 = $this->db->query("SELECT * FROM hippa WHERE pid=$pid AND other_hippa_id='0' ORDER BY $sidx $sord LIMIT $start , $limit");
+		$query1 = $this->db->query("SELECT * FROM hippa WHERE pid=$pid AND other_hippa_id='0' AND practice_id=$practice_id ORDER BY $sidx $sord LIMIT $start , $limit");
 		$response['page'] = $page;
 		$response['total'] = $total_pages;
 		$response['records'] = $count;
@@ -1633,7 +1643,9 @@ class Chartmenu extends Application
 			'pid' => $pid,
 			'hippa_reason' => $this->input->post('hippa_reason'),
 			'hippa_provider' => $this->input->post('hippa_provider'),
-			'other_hippa_id' => 0
+			'other_hippa_id' => 0,
+			'practice_id' => $this->session->userdata('practice_id')
+		
 		);
 		$id = $this->chart_model->addHippa($data);
 		$this->audit_model->add();
@@ -1719,7 +1731,9 @@ class Chartmenu extends Application
 		$data = array(
 			'documents_id' => $this->input->post('documents_id'),
 			'other_hippa_id' => $this->input->post('hippa_id'),
-			'pid' => $pid
+			'pid' => $pid,
+			'practice_id' => $this->session->userdata('practice_id')
+		
 		);
 		$this->db->insert('hippa', $data);
 		$this->audit_model->add();
@@ -1732,7 +1746,8 @@ class Chartmenu extends Application
 		$data = array(
 			'eid' => $this->input->post('eid'),
 			'other_hippa_id' => $this->input->post('hippa_id'),
-			'pid' => $pid
+			'pid' => $pid,
+			'practice_id' => $this->session->userdata('practice_id')
 		);
 		$this->db->insert('hippa', $data);
 		$this->audit_model->add();
@@ -1745,7 +1760,8 @@ class Chartmenu extends Application
 		$data = array(
 			't_messages_id' => $this->input->post('t_messages_id'),
 			'other_hippa_id' => $this->input->post('hippa_id'),
-			'pid' => $pid
+			'pid' => $pid,
+			'practice_id' => $this->session->userdata('practice_id')
 		);
 		$this->db->insert('hippa', $data);
 		$this->audit_model->add();
@@ -1760,7 +1776,7 @@ class Chartmenu extends Application
 		$gender = ucfirst($this->session->userdata('gender'));
 		$header = $row['lastname'] . ', ' . $row['firstname'] . '(DOB: ' . $dob . ', Gender: ' . $gender . ', ID: ' . $pid . ')';
 		$data['header'] = strtoupper($header);
-		$practice = $this->practiceinfo_model->get()->row();
+		$practice = $this->practiceinfo_model->get($this->session->userdata('practice_id'))->row();
 		$data['practiceName'] = $practice->practice_name;
 		$data['website'] = $practice->website;
 		$data['practiceInfo'] = $practice->street_address1;
@@ -1811,6 +1827,7 @@ class Chartmenu extends Application
 		$html = $this->page_intro($pid);
 		$this->db->where('pid', $pid);
 		$this->db->where('encounter_signed', 'Yes');
+		$this->db->where('practice_id', $this->session->userdata('practice_id'));
 		$query1 = $this->db->get('encounters');
 		if ($query1->num_rows() > 0) {
 			$html .= '<table width="100%"><tr><th style="background-color: gray;color: #FFFFFF;">ENCOUNTERS</th></tr></table>';
@@ -1820,6 +1837,7 @@ class Chartmenu extends Application
 		}
 		$this->db->where('pid', $pid);
 		$this->db->where('t_messages_signed', 'Yes');
+		$this->db->where('practice_id', $this->session->userdata('practice_id'));
 		$query2 = $this->db->get('t_messages');
 		if ($query2->num_rows() > 0) {
 			$html .= '<pagebreak /><table width="100%"><tr><th style="background-color: gray;color: #FFFFFF;">MESSAGES</th></tr></table>';
@@ -1861,52 +1879,119 @@ class Chartmenu extends Application
 	
 	function print_chart1($hippa_id)
 	{
-		if (file_exists('/var/www/nosh/printchart.pdf')) {
-			unlink('/var/www/nosh/printchart.pdf');
-		}
-		if (file_exists('/var/www/nosh/printchart_final.pdf')) {
-			unlink('/var/www/nosh/printchart_final.pdf');
-		}
-		$filename = '/var/www/nosh/printchart.pdf';
+		$practice_id = $this->session->userdata('practice_id');
+		$query = $this->practiceinfo_model->get($this->session->userdata('practice_id'));
+		$result = $query->row_array();
 		$pid = $this->session->userdata('pid');
-		$html = $this->page_intro($pid);
-		$query1 = $this->db->query("SELECT * FROM hippa WHERE other_hippa_id=$hippa_id AND eid IS NOT NULL");
-		if ($query1->num_rows() > 0) {
-			$html .= '<table width="100%"><tr><th style="background-color: gray;color: #FFFFFF;">ENCOUNTERS</th></tr></table>';
-			foreach ($query1->result_array() as $row1) {
-				$html .= $this->encounters_view($row1['eid']);
+		$directory = $result['documents_dir'] . $pid . "/print_" . $hippa_id;
+		$directory_links = $directory . "/links";
+		if (file_exists($directory)) {
+			foreach (scandir($directory) as $item) {
+				if ($item == '.' || $item == '..' || $item == 'links') continue;
+				unlink ($directory.DIRECTORY_SEPARATOR.$item);
 			}
+		} else {
+			mkdir($directory, 0775);
 		}
-		$query2 = $this->db->query("SELECT * FROM hippa WHERE other_hippa_id=$hippa_id AND t_messages_id IS NOT NULL");
-		if ($query2->num_rows() > 0) {
-			$html .= '<pagebreak /><table width="100%"><tr><th style="background-color: gray;color: #FFFFFF;">MESSAGES</th></tr></table>';
-			foreach ($query2->result_array() as $row2) {
-				$html .= $this->t_messages_view($row2['t_messages_id']);
+		if (file_exists($directory_links)) {
+			foreach (scandir($directory_links) as $item1) {
+				if ($item1 == '.' || $item1 == '..') continue;
+				unlink ($directory_links.DIRECTORY_SEPARATOR.$item1);
 			}
+		} else {
+			mkdir($directory_links, 0775);
 		}
-		ini_set('memory_limit','196M');
+		$row = $this->demographics_model->get($pid)->row_array();
+		$header_text = $row['lastname'] . ', ' . $row['firstname'] . '(DOB: ' . date('m/d/Y', human_to_unix($row['DOB'])) . ', Gender: ' . ucfirst($this->session->userdata('gender')) . ', ID: ' . $pid . ')';
+		$header = strtoupper($header_text);
+		$footer = '<div style="border-top: 1px solid #000000; text-align: center; padding-top: 3mm; font-size: 8px;">Page {PAGENO} of {nb}</div>';
+		$footer .= '<p style="text-align:center; font-size: 8px;">';
+		$footer .= "CONFIDENTIALITY NOTICE: The information contained in this facsimile transmission is intended for the recipient named above. If you are not the intended recipient or the intended recipient's agent, you are hereby notified that dissemination, copying, or distribution of the information contained in the transmission is prohibited. If you are not the intended recipient, please notify us immediately by telephone and return the documents to us by mail. Thank you.";
+		$footer .= '</p><p style="text-align:center; font-size: 8px;">This document was generated by NOSH ChartingSystem</p>';
+		$file_path_ccr = $directory . '/ccr.pdf';
+		$html_ccr = $this->page_intro('Continuity of Care Record');
+		$html_ccr .= $this->page_ccr($pid);
+		if (file_exists($file_path_ccr)) {
+			unlink($file_path_ccr);
+		}
 		$this->load->library('mpdf');
+		$this->mpdf=new mpdf('','Letter',0,'',16,16,16,26,9,9,'P');
 		$this->mpdf->useOnlyCoreFonts = true;
-		$this->mpdf->WriteHTML($html);
-		$this->mpdf->SetTitle('Chart Generated by NOSH EMR');
+		$this->mpdf->shrink_tables_to_fit=1;
+		$this->mpdf->AddPage();
+		$this->mpdf->SetHTMLFooter($footer,'O');
+		$this->mpdf->SetHTMLFooter($footer,'E');
+		$this->mpdf->SetHTMLHeader($header,'O');
+		$this->mpdf->SetHTMLHeader($header,'E');
+		$this->mpdf->WriteHTML($html_ccr);
+		$this->mpdf->SetTitle('Document Generated by NOSH ChartingSystem');
 		$this->mpdf->debug = true;
 		$this->mpdf->simpleTables = true;
-		$this->mpdf->Output($filename,'F');	
-		while(!file_exists($filename)) {
+		$this->mpdf->Output($file_path_ccr,'F');
+		while(!file_exists($file_path_ccr)) {
 			sleep(2);
 		}
-		$input = $filename;
-		$query3 = $this->db->query("SELECT * FROM hippa JOIN documents ON hippa.documents_id=documents.documents_id WHERE hippa.other_hippa_id=$hippa_id AND hippa.documents_id IS NOT NULL GROUP BY documents.documents_type ORDER BY documents.documents_date ASC");
-		if ($query3->num_rows() > 0) {	
-			foreach ($query3->result_array() as $row3) {
-				$input .= ' ' . $row3['documents_url'];
+		$query1 = $this->db->query("SELECT * FROM hippa JOIN encounters ON hippa.eid=encounters.eid WHERE hippa.other_hippa_id=$hippa_id AND hippa.eid IS NOT NULL ORDER BY encounters.encounter_DOS DESC");
+		$query2 = $this->db->query("SELECT * FROM hippa JOIN t_messages ON hippa.t_messages_id=t_messages.t_messages_id WHERE hippa.other_hippa_id=$hippa_id AND hippa.t_messages_id IS NOT NULL ORDER BY t_messages.t_messages_dos DESC");
+		if ($query1->num_rows() > 0 || $query2->num_rows() > 0) {
+			$filename = $directory . '/printchart.pdf';
+			if (file_exists($filename)) {
+				unlink($filename);
+			}
+			$html = $this->page_intro('Medical Records');
+			if ($query1->num_rows() > 0) {
+				$html .= '<table width="100%"><tr><th style="background-color: gray;color: #FFFFFF;">ENCOUNTERS</th></tr></table>';
+				foreach ($query1->result_array() as $row1) {
+					$html .= $this->encounters_view($row1['eid']);
+				}
+			}
+			if ($query2->num_rows() > 0) {
+				$html .= '<pagebreak /><table width="100%"><tr><th style="background-color: gray;color: #FFFFFF;">MESSAGES</th></tr></table>';
+				foreach ($query2->result_array() as $row2) {
+					$html .= $this->t_messages_view($row2['t_messages_id']);
+				}
+			}
+			$this->mpdf=new mpdf('','Letter',0,'',16,16,16,26,9,9,'P');
+			$this->mpdf->useOnlyCoreFonts = true;
+			$this->mpdf->shrink_tables_to_fit=1;
+			$this->mpdf->AddPage();
+			$this->mpdf->SetHTMLFooter($footer,'O');
+			$this->mpdf->SetHTMLFooter($footer,'E');
+			$this->mpdf->SetHTMLHeader($header,'O');
+			$this->mpdf->SetHTMLHeader($header,'E');
+			$this->mpdf->WriteHTML($html);
+			$this->mpdf->SetTitle('Chart Generated by NOSH ChartingSystem');
+			$this->mpdf->debug = true;
+			$this->mpdf->simpleTables = true;
+			$this->mpdf->Output($filename,'F');
+			while(!file_exists($filename)) {
+				sleep(2);
 			}
 		}
-		$commandpdf1 = "pdftk " . $input . " cat output /var/www/nosh/printchart_final.pdf";
-		$commandpdf2 = escapeshellcmd($commandpdf1);
-		exec($commandpdf2);
-		while(!file_exists('/var/www/nosh/printchart_final.pdf')) {
-			sleep(2);
+		$query3 = $this->db->query("SELECT * FROM hippa JOIN documents ON hippa.documents_id=documents.documents_id WHERE hippa.other_hippa_id=$hippa_id AND hippa.documents_id IS NOT NULL ORDER BY documents.documents_date DESC");
+		if ($query3->num_rows() > 0) {
+			$file_path_docs = $directory . '/printchart_docs.pdf';
+			if (file_exists($file_path_docs)) {
+				unlink($file_path_docs);
+			}
+			if ($query3->num_rows() > 1) {
+				foreach ($query3->result_array() as $row3) {
+					$search = $result['documents_dir'] . $pid . "/";
+					$link1 = str_replace($search, '', $row3['documents_url']);
+					$link = $directory_links . "/" . now() . "_" . $link1;
+					if(!file_exists($link)) {
+						symlink($row3['documents_url'], $link);
+					}
+				}
+				$documents_commandpdf1 = "gs -sDEVICE=pdfwrite -dNOPAUSE -dQUIET -dBATCH -sOutputFile=" . $file_path_docs . " " . $directory_links . "/*.pdf";
+				exec($documents_commandpdf1);
+			} else {
+				$row4 = $query3->row_array();
+				copy($row4['documents_url'], $file_path_docs);
+			}
+			while(!file_exists($file_path_docs)) {
+				sleep(2);
+			}
 		}
 		echo 'OK';
 	}
@@ -1954,7 +2039,7 @@ class Chartmenu extends Application
 		$data['date_signed'] = date('F jS, Y; h:i A', $date_signed1);
 		$data['age1'] = $encounterInfo->encounter_age;
 		$data['encounter_cc'] = nl2br($encounterInfo->encounter_cc);
-		$practiceInfo = $this->practiceinfo_model->get()->row();	
+		$practiceInfo = $this->practiceinfo_model->get($this->session->userdata('practice_id'))->row();	
 		$hpiInfo = $this->encounters_model->getHPI($eid)->row();
 		if ($hpiInfo) {
 			$data['hpi'] = '<br><h3>History of Present Illness:</h3><p>';
@@ -2758,7 +2843,7 @@ class Chartmenu extends Application
 		}
 		$data['age1'] = $encounterInfo->encounter_age;
 		$data['encounter_cc'] = nl2br($encounterInfo->encounter_cc);	
-		$practiceInfo = $this->practiceinfo_model->get()->row();
+		$practiceInfo = $this->practiceinfo_model->get($this->session->userdata('practice_id'))->row();
 		$data['practiceName'] = $practiceInfo->practice_name;
 		$data['website'] = $practiceInfo->website;
 		$data['practiceInfo'] = $practiceInfo->street_address1;
@@ -3533,12 +3618,13 @@ class Chartmenu extends Application
 	
 	function print_messages()
 	{
+		$practice_id = $this->session->userdata('practice_id');
 		$pid = $this->session->userdata('pid');
 		$page = $this->input->post('page');
 		$limit = $this->input->post('rows');
 		$sidx = $this->input->post('sidx');
 		$sord = $this->input->post('sord');
-		$query = $this->db->query("SELECT * FROM t_messages WHERE pid=$pid AND t_messages_signed='Yes'");
+		$query = $this->db->query("SELECT * FROM t_messages WHERE pid=$pid AND t_messages_signed='Yes' AND practice_id=$practice_id");
 		$count = $query->num_rows(); 
 		if($count > 0) { 
 			$total_pages = ceil($count/$limit); 
@@ -3548,7 +3634,7 @@ class Chartmenu extends Application
 		if ($page > $total_pages) $page=$total_pages;
 		$start = $limit*$page - $limit;
 		if($start < 0) $start = 0;
-		$query1 = $this->db->query("SELECT * FROM t_messages WHERE pid=$pid AND t_messages_signed='Yes' ORDER BY $sidx $sord LIMIT $start , $limit");
+		$query1 = $this->db->query("SELECT * FROM t_messages WHERE pid=$pid AND t_messages_signed='Yes' AND practice_id=$practice_id ORDER BY $sidx $sord LIMIT $start , $limit");
 		$response['page'] = $page;
 		$response['total'] = $total_pages;
 		$response['records'] = $count;
@@ -3683,6 +3769,33 @@ class Chartmenu extends Application
 		}
 		echo ("Form saved and submitted to your provider!");
 		exit (0);
+	}
+	
+	function tests()
+	{
+		$pid = $this->session->userdata('pid');
+		$page = $this->input->post('page');
+		$limit = $this->input->post('rows');
+		$sidx = $this->input->post('sidx');
+		$sord = $this->input->post('sord'); 
+		$query = $this->db->query("SELECT * FROM tests WHERE pid=$pid");
+		$count = $query->num_rows(); 
+		if($count > 0) { 
+			$total_pages = ceil($count/$limit); 
+		} else { 
+			$total_pages = 0; 
+		}
+		if ($page > $total_pages) $page=$total_pages;
+		$start = $limit*$page - $limit;
+		if($start < 0) $start = 0;
+		$query1 = $this->db->query("SELECT * FROM tests WHERE pid=$pid ORDER BY $sidx $sord LIMIT $start , $limit");
+		$response['page'] = $page;
+		$response['total'] = $total_pages;
+		$response['records'] = $count;
+		$records = $query1->result_array();
+		$response['rows'] = $records;
+		echo json_encode($response);
+		exit( 0 );
 	}
 }
 /* End of file: chartmenu.php */

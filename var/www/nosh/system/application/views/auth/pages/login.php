@@ -5,6 +5,15 @@ $(document).ready(function() {
 	$("#login_button").button();
 	$.ajax({
 		type: "POST",
+		url: "<?php echo site_url('start/get_practices');?>",
+		dataType: "json",
+		success: function(data){
+			$("#practice_id").addOption(data.message);
+			$("#practice_id").val("<?php echo $practice_id;?>");
+		}
+	});
+	$.ajax({
+		type: "POST",
 		url: "<?php echo site_url('start/check_cookie');?>",
 		success: function(data){
 			if (data != "") {
@@ -24,6 +33,7 @@ $(document).ready(function() {
 			$("#new_password_count").val("0");
 			$('#numberReal').realperson({includeNumbers: true});
 			$("#username1").removeClass("ui-state-error");
+			$("#register_practice_id").val($("#practice_id").val());
 		},
 		close: function(event, ui) {
 			$("#register_form").clearForm();
@@ -242,7 +252,8 @@ $(document).ready(function() {
 		<div id="box" align="left" class="ui-corner-all">
 			<form method="POST">
 				Username:<br><input type="text" id="username" name="username" class="text ui-widget-content ui-corner-all" value="<?php echo set_value('username'); ?>" style="width:292px" class="form" /><br><br>
-				Password:<br><input type="password" name="password" class="text ui-widget-content ui-corner-all" value="<?php echo set_value('password'); ?>" style="width:292px" class="form" />
+				Password:<br><input type="password" name="password" class="text ui-widget-content ui-corner-all" value="<?php echo set_value('password'); ?>" style="width:292px" class="form" /><br><br>
+				Organization/Practice:<br><select name="practice_id" id="practice_id" class="text ui-widget-content ui-corner-all"></select>
 				<br><?php echo form_error('username'); ?><?php echo form_error('password'); ?>
 				<div align="center">
 				<input type="submit" id="login_button" value="Login" name="login" class="ui-button ui-state-default ui-corner-all"/>
@@ -257,6 +268,7 @@ $(document).ready(function() {
 	<div id="register_dialog" title="New User Registration">
 		<form id="register_form">
 			<input type="hidden" name="count" id="new_password_count" value="" />
+			<input type="hidden" name="practice_id" id="register_practice_id" value="" />
 			Last name:<br><input type="text" style="width:200px" id="lastname" name="lastname" class="text ui-widget-content ui-corner-all" /><br>
 			First name:<br><input type="text" style="width:200px" id="firstname" name="firstname" class="text ui-widget-content ui-corner-all" /><br>
 			Date of birth:<br><input type="text" style="width:200px" id="dob" name="dob" class="text ui-widget-content ui-corner-all" /><br>

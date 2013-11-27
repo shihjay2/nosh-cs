@@ -216,7 +216,7 @@ $(document).ready(function() {
 					<li><a href="#admin_tabs_3">Practice Logo</a></li>
 					<li><a href="#admin_tabs_4">Fax Service</a></li>
 					<li><a href="#admin_tabs_5">Practice Billing</a></li>
-					<li><?php echo anchor('admin/setup/extensions/', 'Extensions');?></li>
+					<li><?php echo anchor('admin/setup/extensions/', 'Extensions and Accounts');?></li>
 					<li><?php echo anchor('admin/setup/cpt/', 'CPT Codes');?></li>
 					<li><?php echo anchor('admin/setup/update/', 'Update ');?></li>
 				</ul>
@@ -318,7 +318,7 @@ $(document).ready(function() {
 						<table>
 							<tr>
 								<td>Billing Street Address:</td>
-								<td><input type="text" name="billing_street_address1" id="billing_street_address1" class="text ui-widget-content ui-corner-all"style="width:400px""/></td>
+								<td><input type="text" name="billing_street_address1" id="billing_street_address1" class="text ui-widget-content ui-corner-all" style="width:400px""/></td>
 							</tr>
 							<tr>
 								<td>Billing Street Address Line 2:</td>

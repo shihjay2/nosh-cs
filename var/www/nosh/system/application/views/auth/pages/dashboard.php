@@ -1,5 +1,13 @@
 <script type="text/javascript">
 $(document).ready(function() {
+	$(document).idleTimeout({
+		inactivity: 3600000,
+		noconfirm: 10000,
+		alive_url: '<?php echo site_url("start");?>',
+		redirect_url: '<?php echo site_url("logout");?>',
+		logout_url: '<?php echo site_url("logout");?>',
+		sessionAlive: false
+	});
 	$("#heading2").load("<?php echo site_url('search/loadpage');?>");
 	$("#provider_draft").click(function(){
 		jQuery("#draft_messages").jqGrid('GridUnload');
@@ -430,27 +438,6 @@ $(document).ready(function() {
 			}
 		}
 	});
-	$("#provider_signature_dialog").dialog({ 
-		bgiframe: true, 
-		autoOpen: false, 
-		height: 320, 
-		width: 500, 
-		modal: true,
-		overlay: {
-			backgroundColor: '#000',
-			opacity: 50
-		}
-	});
-	$("#provider_signature").click(function(){
-		$.ajax({
-			type: "POST",
-			url: "<?php echo site_url('start/preview_signature');?>",
-			success: function(data){
-				$("#preview_signature").html(data);
-			}
-		});
-		$("#provider_signature_dialog").dialog('open');
-	});
 	$('.sigPad').signaturePad({drawOnly:true});
 	$("#provider_info_dialog").dialog({ 
 		bgiframe: true, 
@@ -463,6 +450,7 @@ $(document).ready(function() {
 			opacity: 50
 		},
 		open: function() {
+			$("#provider_info_accordion").accordion({ heightStyle: "content" });
 			$.ajax({
 				type: "POST",
 				url: "<?php echo site_url('start/check_rcopia_extension');?>",
@@ -473,6 +461,13 @@ $(document).ready(function() {
 						$('#rcopia_username').hide();
 						$('#rcopia_status').html('rCopia extension not enabled.');
 					}
+				}
+			});
+			$.ajax({
+				type: "POST",
+				url: "<?php echo site_url('start/preview_signature');?>",
+				success: function(data){
+					$("#preview_signature").html(data);
 				}
 			});
 		}
@@ -1470,6 +1465,207 @@ $(document).ready(function() {
 			}
 		});
 	});
+	$("#assistant_test_reconcile").click(function(){
+		$("#tests_reconcile_dialog").dialog('open');
+	});
+	$("#provider_test_reconcile").click(function(){
+		$("#tests_reconcile_dialog").dialog('open');
+	});
+	$("#tests_reconcile_dialog").dialog({ 
+		bgiframe: true, 
+		autoOpen: false, 
+		height: 500, 
+		width: 800,
+		open: function(event, ui) {
+			jQuery("#tests_reconcile_list").jqGrid('GridUnload');
+			jQuery("#tests_reconcile_list").jqGrid({
+				url:"<?php echo site_url('start/tests/');?>",
+				datatype: "json",
+				mtype: "POST",
+				colNames:['ID','Date','Patient','Test','Result','Unit','Normal','Flags','Type'],
+				colModel:[
+					{name:'tests_id',index:'tests_id',width:1,hidden:true},
+					{name:'test_datetime',index:'test_datetime',width:75,formatter:'date',formatoptions:{srcformat:"ISO8601Long", newformat: "ISO8601Short"}},
+					{name:'test_unassigned',index:'test_unassigned',width:110},
+					{name:'test_name',index:'test_name',width:200},
+					{name:'test_result',index:'test_result',width:120},
+					{name:'test_units',index:'test_units',width:50},
+					{name:'test_reference',index:'test_reference',width:100},
+					{name:'test_flags',index:'test_flags',width:50,
+						cellattr: function (rowId, val, rawObject, cm, rdata) {
+							if (rawObject.test_flags == "L") {
+								var response = "Below low normal";
+							}
+							if (rawObject.test_flags == "H") {
+								var response = "Above high normal";
+							}
+							if (rawObject.test_flags == "LL") {
+								var response = "Below low panic limits";
+							}
+							if (rawObject.test_flags == "HH") {
+								var response = "Above high panic limits";
+							}
+							if (rawObject.test_flags == "<") {
+								var response = "Below absolute low-off instrument scale";
+							}
+							if (rawObject.test_flags == ">") {
+								var response = "Above absolute high-off instrument scale";
+							}
+							if (rawObject.test_flags == "N") {
+								var response = "Normal";
+							}
+							if (rawObject.test_flags == "A") {
+								var response = "Abnormal";
+							}
+							if (rawObject.test_flags == "AA") {
+								var response = "Very abnormal";
+							}
+							if (rawObject.test_flags == "U") {
+								var response = "Significant change up";
+							}
+							if (rawObject.test_flags == "D") {
+								var response = "Significant change down";
+							}
+							if (rawObject.test_flags == "B") {
+								var response = "Better";
+							}
+							if (rawObject.test_flags == "W") {
+								var response = "Worse";
+							}
+							if (rawObject.test_flags == "S") {
+								var response = "Susceptible";
+							}
+							if (rawObject.test_flags == "R") {
+								var response = "Resistant";
+							}
+							if (rawObject.test_flags == "I") {
+								var response = "Intermediate";
+							}
+							if (rawObject.test_flags == "MS") {
+								var response = "Moderately susceptible";
+							}
+							if (rawObject.test_flags == "VS") {
+								var response = "Very susceptible";
+							}
+							if (rawObject.test_flags == "") {
+								var response = "";
+							}
+							return 'title="' + response + '"';
+						}
+					},
+					{name:'test_type',index:'test_type',width:1,hidden:true}
+				],
+				rowNum:10,
+				rowList:[10,20,30],
+				pager: jQuery('#tests_reconcile_list_pager'),
+				sortname: 'test_datetime',
+			 	viewrecords: true,
+			 	sortorder: "desc",
+			 	caption:"Test Results",
+			 	height: "100%",
+			 	gridview: true,
+			 	multiselect: true,
+				multiboxonly: true,
+			 	rowattr: function (rd) {
+					if (rd.test_flags == "HH" || rd.test_flags == "LL" || rd.test_flags == "H" || rd.test_flags == "L") {
+						return {"class": "myAltRowClass"};
+					}
+				},
+			 	jsonReader: { repeatitems : false, id: "0" }
+			}).navGrid('#tests_reconcile_list_pager',{search:false,edit:false,add:false,del:false});
+		}
+	});
+	$("#reconcile_tests").button({
+		icons: {
+			primary: "ui-icon-disk"
+		}
+	}).click(function(){
+		var click_id = jQuery("#tests_reconcile_list").getGridParam('selarrrow');
+		if(click_id.length > 0){
+			$("#reconcile_tests_pid").val('');
+			$("#scan_patient_search1").val('');
+			$("#reconcile_tests_div").show();
+			$("#reconcile_test_patient_search1").focus();
+		} else {
+			$.jGrowl("Choose test to reconcile!");
+		}
+	});
+	$("#reconcile_test_patient_search1").autocomplete({
+		source: function (req, add){
+			$.ajax({
+				url: "<?php echo site_url('search');?>",
+				dataType: "json",
+				type: "POST",
+				data: req,
+				success: function(data){
+					if(data.response =='true'){
+						add(data.message);
+					}				
+				}
+			});
+		},
+		minLength: 1,
+		select: function(event, ui){
+			$("#reconcile_tests_pid").val(ui.item.id);
+		}
+	});
+	$("#reconcile_tests_send").button({
+		icons: {
+			primary: "ui-icon-disk"
+		}
+	}).click(function(){
+		var click_id = jQuery("#tests_reconcile_list").getGridParam('selarrrow');
+		var pid = $("#reconcile_tests_pid").val();
+		if(click_id){
+			var json_flat = JSON.stringify(click_id);
+			$.ajax({
+				type: "POST",
+				url: "<?php echo site_url('start/tests_import');?>",
+				data: "tests_id_array=" + json_flat + "&pid=" + pid,
+				success: function(data){
+					$.jGrowl('Imported ' + data + ' tests!');
+					$("#reconcile_tests_pid").val('');
+					$("#reconcile_test_patient_search1").val('');
+					$("#reconcile_tests_div").hide();
+					jQuery("#tests_reconcile_list").trigger("reloadGrid");
+				}
+			});
+		}
+	});
+	$("#reconcile_tests_cancel").button({
+		icons: {
+			primary: "ui-icon-close"
+		}
+	}).click(function(){
+		$("#reconcile_tests_pid").val('');
+			$("#reconcile_test_patient_search1").val('');
+			$("#reconcile_tests_div").hide();
+	});
+	$("#delete_tests").button({
+		icons: {
+			primary: "ui-icon-trash"
+		}
+	}).click(function(){
+		var click_id = jQuery("#tests_reconcile_list").getGridParam('selarrrow');
+		if(click_id.length > 0){
+			if(confirm('Are you sure you want to delete the seletected tests?')){ 
+				var count = click_id.length;
+				for (var i = 0; i < count; i++) {
+					$.ajax({
+						type: "POST",
+						url: "<?php echo site_url('start/delete_tests');?>",
+						data: "tests_id=" + click_id[i],
+						success: function(data){
+						}
+					});
+				}
+				$.jGrowl('Deleted ' + i + ' tests!');
+				jQuery("#tests_reconcile_list").trigger("reloadGrid");
+			}
+		} else {
+			$.jGrowl("Please select test to delete!");
+		}
+	});
 });
 </script>
 <?php if(user_group('admin') || user_group('provider') || user_group('assistant') || user_group('billing')) { echo '<div id ="heading2"></div>';}?>
@@ -1484,7 +1680,7 @@ $(document).ready(function() {
 						<?php if(user_group('admin')) { echo '<tr><td><img src="' . base_url().'images/control.png' . '" height="40" width="40" border="0"></td><td>' . anchor('admin/setup', 'Modify clinic settings') . '.</td></tr>';}?>
 						<?php if(user_group('admin')) { echo '<tr><td><img src="' . base_url().'images/usersadmin.png' . '" height="40" width="40" border="0"></td><td>' . anchor('admin/users', 'Administer users') . '.</td></tr>';}?>
 						<?php if(user_group('admin')) { echo '<tr><td><img src="' . base_url().'images/schedule.png' . '" height="40" width="40" border="0"></td><td>' . anchor('admin/schedule', 'Setup schedule') . '.</td></tr>';}?>
-						<?php if(user_group('admin')) { echo '<tr><td><img src="' . base_url().'images/newencounter.png' . '" height="40" width="40" border="0"></td><td>' . anchor('admin/template', 'Setup templates') . '.</td></tr>';}?>
+						<?php if(user_group('admin')) { echo '<tr><td><img src="' . base_url().'images/newencounter.png' . '" height="40" width="40" border="0"></td><td>' . anchor('admin/logs', 'View system logs') . '.</td></tr>';}?>
 						<?php if(user_group('admin')) { echo '<tr><td><img src="' . base_url().'images/kdisknav.png' . '" height="40" width="40" border="0"></td><td><a href="#" id="restore_database_link">Restore the database</a>.</td></tr>';}?>
 						<?php if(user_group('provider')) { echo '<tr><td><img src="' . base_url().'images/personal.png' . '" height="40" width="40" border="0"></td><td><a href="#" id="provider_info">Update your user information</a>.</td></tr>';}?>
 						<?php if(user_group('provider')) { echo '<tr><td><img src="' . base_url().'images/email.png' . '" height="40" width="40" border="0"></td><td>You have ' . $number_messages . ' ' . anchor('provider/messaging', 'messages to view') . '.</td></tr>';}?>
@@ -1492,13 +1688,14 @@ $(document).ready(function() {
 						<?php if(user_group('provider')) { echo '<tr><td><img src="' . base_url().'images/schedule.png' . '" height="40" width="40" border="0"></td><td>You have ' . $number_appts . ' ' . anchor('provider/schedule', 'pending appointments today') . '.</td></tr>';}?>
 						<?php if(user_group('provider')) { echo '<tr><td><img src="' . base_url().'images/chart1.png' . '" height="40" width="40" border="0"></td><td>You have ' . $number_drafts . ' <a href="#" id="provider_draft">unsigned messages and encounters</a>.</td></tr>';}?>
 						<?php if(user_group('provider')) { echo '<tr><td><img src="' . base_url().'images/important.png' . '" height="40" width="40" border="0"></td><td>You have ' . $number_reminders . ' <a href="#" id="provider_alerts">reminders</a>.</td></tr>';}?>
+						<?php if(user_group('provider')) { echo '<tr><td><img src="' . base_url().'images/science.png' . '" height="40" width="40" border="0"></td><td>You have ' . $number_tests . ' <a href="#" id="provider_test_reconcile">test results to reconcile</a>.</td></tr>';}?>
 						<?php if(user_group('provider') && $mtm_alerts_status == "y") { echo '<tr><td><img src="' . base_url().'images/search.png' . '" height="40" width="40" border="0"></td><td>You have ' . $mtm_alerts . ' <a href="#" id="provider_mtm_alerts">patients on Medical Therapy Management</a>.</td></tr>';}?>
 						<?php if(user_group('provider')) { echo '<tr><td><img src="' . base_url().'images/billing.png' . '" height="40" width="40" border="0"></td><td>You have ' . $number_bills . ' ' . anchor('provider/billing', 'new bills to process and send') . '.</td></tr>';}?>
-						<?php if(user_group('provider')) { echo '<tr><td><img src="' . base_url().'images/sign.png' . '" height="40" width="40" border="0"></td><td><a href="#" id="provider_signature">Create/update your signature</a>.</td></tr>';}?>
 						<?php if(user_group('assistant')) { echo '<tr><td><img src="' . base_url().'images/email.png' . '" height="40" width="40" border="0"></td><td>You have ' . $number_messages . ' ' . anchor('assistant/messaging', 'messages to view') . '.</td></tr>';}?>
 						<?php if(user_group('assistant')) { echo '<tr><td><img src="' . base_url().'images/scanner.png' . '" height="40" width="40" border="0"></td><td>You have ' . $number_documents . ' ' . anchor('assistant/messaging', 'new documents from the fax or scanner to view') . '.</td></tr>';}?>
 						<?php if(user_group('assistant')) { echo '<tr><td><img src="' . base_url().'images/chart1.png' . '" height="40" width="40" border="0"></td><td>You have ' . $number_drafts . ' <a href="#" id="assistant_draft">unsigned messages</a>.</td></tr>';}?>
 						<?php if(user_group('assistant')) { echo '<tr><td><img src="' . base_url().'images/important.png' . '" height="40" width="40" border="0"></td><td>You have ' . $number_reminders . ' <a href="#" id="assistant_alerts">reminders</a>.</td></tr>';}?>
+						<?php if(user_group('assistant')) { echo '<tr><td><img src="' . base_url().'images/science.png' . '" height="40" width="40" border="0"></td><td>You have ' . $number_tests . ' <a href="#" id="assistant_test_reconcile">test results to reconcile</a>.</td></tr>';}?>
 						<?php if(user_group('assistant')) { echo '<tr><td><img src="' . base_url().'images/billing.png' . '" height="40" width="40" border="0"></td><td>You have ' . $number_bills . ' ' . anchor('assistant/billing', 'new bills to review') . '.</td></tr>';}?>
 						<?php if(user_group('billing')) { echo '<tr><td><img src="' . base_url().'images/email.png' . '" height="40" width="40" border="0"></td><td>You have ' . $number_messages . ' ' . anchor('billing/messaging', 'messages to view') . '.</td></tr>';}?>
 						<?php if(user_group('billing')) { echo '<tr><td><img src="' . base_url().'images/scanner.png' . '" height="40" width="40" border="0"></td><td>You have ' . $number_documents . ' ' . anchor('billing/messaging', 'new documents from the fax or scanner to view') . '.</td></tr>';}?>
@@ -1569,25 +1766,6 @@ $(document).ready(function() {
 				<td><input type="text" name="secret_answer" id="secret_answer1" class="text ui-widget-content ui-corner-all"></td>
 			</tr>
 		</table>
-	</form>
-</div>
-<div id="provider_signature_dialog" title="Create/Update Provider Signature">
-	<form method="post" action="<?php echo site_url('start/change_signature');?>" class="sigPad">
-		Preview Signature:<br>
-		<div id="preview_signature"></div>
-		<label for="name">Print your name for verification.</label>
-		<input type="text" name="name" id="name" class="name">
-		<p class="drawItDesc">Draw your signature</p>
-		<ul class="sigNav">
-			<li class="drawIt"><a href="#draw-it">Draw It</a></li>
-			<li class="clearButton"><a href="#clear">Clear</a></li>
-		</ul>
-		<div class="sig sigWrapper">
-			<div class="typed"></div>
-			<canvas class="pad" width="198" height="55"></canvas>
-			<input type="hidden" name="output" class="output">
-		</div>
-		<button type="submit">Save signature</button>
 	</form>
 </div>
 <div id="restore_database_dialog" title="Restore Database">
@@ -1826,52 +2004,92 @@ $(document).ready(function() {
 	<input type="button" id="demographics_reactivate_insurance" value="Reactivate Insurance" class="nosh_button"/><br><br>
 </div>
 <div id="provider_info_dialog" title="Edit Provider Information">
-	<form name="provider_info_form" id="provider_info_form">
-		<button type="button" id="save_provider_info">Save</button>
-		<button type="button" id="cancel_provider_info" >Cancel</button>
-		<hr/>
-		<input type="hidden" name="id" id="id"/>
-		<table>
-			<tr>
-				<td>Specialty:</td>
-				<td><input type="text" name="specialty" id="specialty" style="width:164px" class="text ui-widget-content ui-corner-all"/></td>
-			</tr>
-			<tr>
-				<td>License Number:</td>
-				<td><input type="text" name="license" id="license" style="width:164px" class="text ui-widget-content ui-corner-all"/></td>
-			</tr>
-			<tr>
-				<td>State Licensed:</td>
-				<td><select name="license_state" id="license_state" style="width:164px" class="text ui-widget-content ui-corner-all"></select></td>
-			</tr>
-			<tr>
-				<td>NPI:</td>
-				<td><input type="text" name="npi" id="npi" style="width:164px" class="text ui-widget-content ui-corner-all"/></td>
-			</tr>
-			<tr>
-				<td>UPIN:</td>
-				<td><input type="text" name="upin" id="upin" style="width:164px" class="text ui-widget-content ui-corner-all"/></td>
-			</tr>
-			<tr>
-				<td>DEA Number:</td>
-				<td><input type="text" name="dea" id="dea" style="width:164px" class="text ui-widget-content ui-corner-all"/></td>
-			</tr>
-			<tr>
-				<td>Medicare Number:</td>
-				<td><input type="text" name="medicare" id="medicare" style="width:164px" class="text ui-widget-content ui-corner-all"/></td>
-			</tr>
-			<tr>
-				<td>Tax ID Number:</td>
-				<td><input type="text" name="tax_id" id="tax_id" style="width:164px" class="text ui-widget-content ui-corner-all"/></td>
-			</tr>
-			<tr>
-				<td>RCopia Username:</span></td>
-				<td><input type="text" name="rcopia_username" id="rcopia_username" style="width:164px" class="text ui-widget-content ui-corner-all"/><span id="rcopia_status"></span></td>
-			</tr>
-			<tr>
-				<td>Time increments for schedule (minutes):</span></td>
-				<td><input type="text" name="schedule_increment" id="schedule_increment" style="width:164px" class="text ui-widget-content ui-corner-all"/><span id="rcopia_status"></span></td>
-			</tr>
-		</table>
-	</form>
+	<div id="provider_info_accordion">
+		<h3 class="provider_info_class1"><a href="#">Accounts</a></h3>
+		<div class="provider_info_class1">
+			<form name="provider_info_form" id="provider_info_form">
+				<button type="button" id="save_provider_info">Save</button>
+				<button type="button" id="cancel_provider_info" >Cancel</button>
+				<hr class="ui-state-default"/>
+				<input type="hidden" name="id" id="id"/>
+				<table>
+					<tr>
+						<td>Specialty:</td>
+						<td><input type="text" name="specialty" id="specialty" style="width:164px" class="text ui-widget-content ui-corner-all"/></td>
+					</tr>
+					<tr>
+						<td>License Number:</td>
+						<td><input type="text" name="license" id="license" style="width:164px" class="text ui-widget-content ui-corner-all"/></td>
+					</tr>
+					<tr>
+						<td>State Licensed:</td>
+						<td><select name="license_state" id="license_state" style="width:164px" class="text ui-widget-content ui-corner-all"></select></td>
+					</tr>
+					<tr>
+						<td>NPI:</td>
+						<td><input type="text" name="npi" id="npi" style="width:164px" class="text ui-widget-content ui-corner-all"/></td>
+					</tr>
+					<tr>
+						<td>UPIN:</td>
+						<td><input type="text" name="upin" id="upin" style="width:164px" class="text ui-widget-content ui-corner-all"/></td>
+					</tr>
+					<tr>
+						<td>DEA Number:</td>
+						<td><input type="text" name="dea" id="dea" style="width:164px" class="text ui-widget-content ui-corner-all"/></td>
+					</tr>
+					<tr>
+						<td>Medicare Number:</td>
+						<td><input type="text" name="medicare" id="medicare" style="width:164px" class="text ui-widget-content ui-corner-all"/></td>
+					</tr>
+					<tr>
+						<td>Tax ID Number:</td>
+						<td><input type="text" name="tax_id" id="tax_id" style="width:164px" class="text ui-widget-content ui-corner-all"/></td>
+					</tr>
+					<tr>
+						<td>RCopia Username:</span></td>
+						<td><input type="text" name="rcopia_username" id="rcopia_username" style="width:164px" class="text ui-widget-content ui-corner-all"/><span id="rcopia_status"></span></td>
+					</tr>
+					<tr>
+						<td>PeaceHealth Labs ID:</span></td>
+						<td><input type="text" name="peacehealth_id" id="peacehealth_id" style="width:164px" class="text ui-widget-content ui-corner-all"/><span id="rcopia_status"></span></td>
+					</tr>
+					<tr>
+						<td>Time increments for schedule (minutes):</span></td>
+						<td><input type="text" name="schedule_increment" id="schedule_increment" style="width:164px" class="text ui-widget-content ui-corner-all"/><span id="rcopia_status"></span></td>
+					</tr>
+				</table>
+			</form>
+		</div>
+		<h3 class="provider_info_class2"><a href="#">Signature</a></h3>
+		<div class="provider_info_class2">
+			<form method="post" action="<?php echo site_url('start/change_signature');?>" class="sigPad">
+				Preview Signature:<br>
+				<div id="preview_signature"></div>
+				<label for="name">Print your name for verification.</label>
+				<input type="text" name="name" id="name" class="name">
+				<p class="drawItDesc">Draw your signature</p>
+				<ul class="sigNav">
+					<li class="drawIt"><a href="#draw-it">Draw It</a></li>
+					<li class="clearButton"><a href="#clear">Clear</a></li>
+				</ul>
+				<div class="sig sigWrapper">
+					<div class="typed"></div>
+					<canvas class="pad" width="198" height="55"></canvas>
+					<input type="hidden" name="output" class="output">
+				</div>
+				<button type="submit">Save signature</button>
+			</form>
+		</div>
+</div>
+<div id="tests_reconcile_dialog" title="Test Reconciliation">
+	<table id="tests_reconcile_list" class="scroll" cellpadding="0" cellspacing="0"></table>
+	<div id="tests_reconcile_list_pager" class="scroll" style="text-align:center;"></div><br>
+	<button type="button" id="reconcile_tests">Reconcile</button><button type="button" id="delete_tests">Delete</button>
+	<div id="reconcile_tests_div" style="display:none">
+		<br><br>
+		<input type="hidden" id="reconcile_tests_pid"/>
+		Choose patient:<br><input type="text" id="reconcile_test_patient_search1" style="width:300px" class="text ui-widget-content ui-corner-all" /> 
+		<button type="button" id="reconcile_tests_send">Import</button>
+		<button type="button" id="reconcile_tests_cancel">Cancel</button>
+	</div>
 </div>

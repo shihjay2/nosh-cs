@@ -15,7 +15,7 @@
 	<div id="messages_rad_edit_fields">
 		<button type="button" id="messages_rad_save">Save</button>
 		<button type="button" id="messages_rad_cancel">Cancel</button>
-		<div style="float:right;" "id="messages_rad_status"></div>
+		<div style="float:right;" id="messages_rad_status"></div>
 		<hr class="ui-state-default"/>
 		<input type="hidden" name="orders_id" id="messages_rad_orders_id"/>
 		<input type="hidden" name="t_messages_id" id="messages_rad_t_messages_id"/>
@@ -211,28 +211,35 @@
 					var insurance_group = jQuery("#messages_rad_insurance_grid").getCell(id,'insurance_group');
 					var insurance_insu_lastname = jQuery("#messages_rad_insurance_grid").getCell(id,'insurance_insu_lastname');
 					var insurance_insu_firstname = jQuery("#messages_rad_insurance_grid").getCell(id,'insurance_insu_firstname');
-					var text = insurance_plan_name + '; ID: ' + insurance_id_num;
-					if(insurance_group != ''){
-						text += "; Group: " + insurance_group;
-					}
-					text += "; " + insurance_insu_lastname + ", " + insurance_insu_firstname;
-					var old = $("#messages_rad_insurance").val();
-					if(old){
-						var pos = old.lastIndexOf('\n');
-						if (pos == -1) {
-							var old1 = old + '\n';
-						} else {
-							var a = old.slice(pos);
-							if (a == '') {
-								var old1 = old;
-							} else {
-								var old1 = old + '\n';
+					var address_id = jQuery("#messages_rad_insurance_grid").getCell(id,'address_id');
+					$.ajax({
+						url: "<?php echo site_url('search/payor_id');?>/" + address_id,
+						type: "POST",
+						success: function(data){
+							var text = insurance_plan_name + '; Payor ID: ' + data + '; ID: ' + insurance_id_num;
+							if(insurance_group != ''){
+								text += "; Group: " + insurance_group;
 							}
+							text += "; " + insurance_insu_lastname + ", " + insurance_insu_firstname;
+							var old = $("#messages_rad_insurance").val();
+							if(old){
+								var pos = old.lastIndexOf('\n');
+								if (pos == -1) {
+									var old1 = old + '\n';
+								} else {
+									var a = old.slice(pos);
+									if (a == '') {
+										var old1 = old;
+									} else {
+										var old1 = old + '\n';
+									}
+								}
+							} else {
+								var old1 = '';
+							}
+							$("#messages_rad_insurance").val(old1+text);
 						}
-					} else {
-						var old1 = '';
-					}
-					$("#messages_rad_insurance").val(old1+text);
+					});
 				},
 			 	jsonReader: { repeatitems : false, id: "0" }
 			}).navGrid('#messages_rad_insurance_pager',{search:false,edit:false,add:false,del:false});
@@ -475,7 +482,7 @@
 		var order = $("#messages_rad_orders");
 		var codes = $("#messages_rad_codes");
 		var location = $("#messages_rad_location");
-		var insurance = $("#messages_rad_insurance")
+		var insurance = $("#messages_rad_insurance");
 		var bValid = true;
 		bValid = bValid && checkEmpty(order,"Tests");
 		bValid = bValid && checkEmpty(codes,"Diagnosis Codes");

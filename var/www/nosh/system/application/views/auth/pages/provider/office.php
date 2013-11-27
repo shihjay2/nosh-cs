@@ -5,9 +5,9 @@ $(document).ready(function() {
 		inactivity: 3600000,
 		noconfirm: 10000,
 		alive_url: '<?php echo site_url("provider/office");?>',
-		redirect_url: '<?php echo site_url("start");?>',
+		redirect_url: '<?php echo site_url("logout");?>',
 		logout_url: '<?php echo site_url("logout");?>',
-		sessionAlive: 300000
+		sessionAlive: false
 	});
 	$("#imm_immunization").autocomplete({
 		source: function (req, add){
@@ -592,7 +592,7 @@ $(document).ready(function() {
 		}
 	});
 	
-	$("#search_field_1").addOption({"":"Select Field","age":"Patient's age","insurance":"Patient's primary insurance","issue":"Patient's active medical issue list","billing":"Patient's billing code","rxl_medication":"Patient's active medication list","imm_immunization":"Patient's immunization list"},false);
+	$("#search_field_1").addOption({"":"Select Field","age":"Patient's age","insurance":"Patient's primary insurance","issue":"Patient's active medical issue list","billing":"Patient's billing code","rxl_medication":"Patient's active medication list","imm_immunization":"Patient's immunization list","sup_supplement":"Patient's active supplement list"},false);
 	$("#search_op_1").addOption({"":"Select Operator"},false);
 	$("#search_field_1").change(function(){
 		var a = $("#search_field_1").val();
@@ -601,7 +601,7 @@ $(document).ready(function() {
 			$("#search_op_1").addOption({"":"Select Operator","less than":"is less than","equal":"is equal to","greater than":"is greater than","contains":"contains","not equal":"is not equal to"},false);
 			$("#search_desc_1").val("");
 		}
-		if (a == "issue" || a == "rxl_medication" || a == "imm_immunization" || a == "insurance") {
+		if (a == "issue" || a == "rxl_medication" || a == "imm_immunization" || a == "insurance" || a == "sup_supplement") {
 			$("#search_op_1").removeOption(/./);
 			$("#search_op_1").addOption({"":"Select Operator","equal":"is equal to","contains":"contains","not equal":"is not equal to"},false);
 			$("#search_desc_1").val("");
@@ -645,7 +645,7 @@ $(document).ready(function() {
 		var a1 = a.split("_");
 		var count = parseInt(a1[2]) + 1;
 		$("#super_query_div").append('<br><select name="search_join[]" id="search_join_'+count+'" class="text ui-widget-content ui-corner-all search_join_class"></select> <select name="search_field[]" id="search_field_'+count+'" class="text ui-widget-content ui-corner-all search_field_class"></select> <select name="search_op[]" id="search_op_'+count+'" class="text ui-widget-content ui-corner-all search_op_class"></select> <input type="text" name="search_desc[]" id="search_desc_'+count+'"  class="text ui-widget-content ui-corner-all search_desc_class"></input>');
-		$("#search_field_"+count).addOption({"":"Select Field","age":"Patient's age","insurance":"Patient's primary insurance","issue":"Patient's active medical issue list","billing":"Patient's billing code","rxl_medication":"Patient's active medication list","imm_immunization":"Patient's immunization list"},false);
+		$("#search_field_"+count).addOption({"":"Select Field","age":"Patient's age","insurance":"Patient's primary insurance","issue":"Patient's active medical issue list","billing":"Patient's billing code","rxl_medication":"Patient's active medication list","imm_immunization":"Patient's immunization list","sup_supplement":"Patient's active supplement list","sup_supplement":"Patient's active supplement list"},false);
 		$("#search_op_"+count).addOption({"":"Select Operator"},false);
 		$("#search_join_"+count).addOption({"AND":"And (&)","OR":"Or (||)"},false);
 		$("#search_field_"+count).change(function(){
@@ -655,7 +655,7 @@ $(document).ready(function() {
 				$("#search_op_"+count).addOption({"":"Select Operator","less than":"is less than","equal":"is equal to","greater than":"is greater than","between":"is between"},false);
 				$("#search_desc_"+count).val("");
 			}
-			if (a == "issue" || a == "rxl_medication" || a == "imm_immunization" || a == "insurance") {
+			if (a == "issue" || a == "rxl_medication" || a == "imm_immunization" || a == "insurance" || a == "sup_supplement") {
 				$("#search_op_"+count).removeOption(/./);
 				$("#search_op_"+count).addOption({"":"Select Operator","equal":"is equal to","contains":"contains","not equal":"is not equal to"},false);
 				$("#search_desc_"+count).val("");
@@ -719,7 +719,7 @@ $(document).ready(function() {
 	$("#super_query_reset").button();
 	$("#super_query_reset").click(function(){
 		$("#super_query_div").html('Search patients with the following filters:<br><button type="button" id="search_add">Add </button> <input type="hidden" name="search_join[]" id="search_join_first" value="start"></input><select name="search_field[]" id="search_field_1" class="text ui-widget-content ui-corner-all search_field_class"></select> <select name="search_op[]" id="search_op_1" class="text ui-widget-content ui-corner-all search_op_class"></select> <input type="text" name="search_desc[]" id="search_desc_1"  class="text ui-widget-content ui-corner-all search_desc_class"></input>');
-		$("#search_field_1").addOption({"":"Select Field","age":"Patient's age","insurance":"Patient's primary insurance","issue":"Patient's active medical issue list","billing":"Patient's billing code","rxl_medication":"Patient's active medication list","imm_immunization":"Patient's immunization list"},false);
+		$("#search_field_1").addOption({"":"Select Field","age":"Patient's age","insurance":"Patient's primary insurance","issue":"Patient's active medical issue list","billing":"Patient's billing code","rxl_medication":"Patient's active medication list","imm_immunization":"Patient's immunization list","sup_supplement":"Patient's active supplement list"},false);
 		$("#search_op_1").addOption({"":"Select Operator"},false);
 		$("#search_field_1").change(function(){
 			var a = $("#search_field_1").val();
@@ -728,7 +728,7 @@ $(document).ready(function() {
 				$("#search_op_1").addOption({"":"Select Operator","less than":"is less than","equal":"is equal to","greater than":"is greater than","contains":"contains","not equal":"is not equal to","between":"is between"},false);
 				$("#search_desc_1").val("");
 			}
-			if (a == "issue" || a == "rxl_medication" || a == "imm_immunization" || a == "insurance") {
+			if (a == "issue" || a == "rxl_medication" || a == "imm_immunization" || a == "insurance" || a == "sup_supplement") {
 				$("#search_op_1").removeOption(/./);
 				$("#search_op_1").addOption({"":"Select Operator","equal":"is equal to","contains":"contains","not equal":"is not equal to"},false);
 				$("#search_desc_1").val("");
@@ -771,7 +771,7 @@ $(document).ready(function() {
 			var a1 = a.split("_");
 			var count = parseInt(a1[2]) + 1;
 			$("#super_query_div").append('<br><select name="search_join[]" id="search_join_'+count+'" class="text ui-widget-content ui-corner-all search_join_class"></select> <select name="search_field[]" id="search_field_'+count+'" class="text ui-widget-content ui-corner-all search_field_class"></select> <select name="search_op[]" id="search_op_'+count+'" class="text ui-widget-content ui-corner-all search_op_class"></select> <input type="text" name="search_desc[]" id="search_desc_'+count+'"  class="text ui-widget-content ui-corner-all search_desc_class"></input>');
-			$("#search_field_"+count).addOption({"":"Select Field","age":"Patient's age","insurance":"Patient's primary insurance","issue":"Patient's active medical issue list","billing":"Patient's billing code","rxl_medication":"Patient's active medication list","imm_immunization":"Patient's immunization list"},false);
+			$("#search_field_"+count).addOption({"":"Select Field","age":"Patient's age","insurance":"Patient's primary insurance","issue":"Patient's active medical issue list","billing":"Patient's billing code","rxl_medication":"Patient's active medication list","imm_immunization":"Patient's immunization list","sup_supplement":"Patient's active supplement list"},false);
 			$("#search_op_"+count).addOption({"":"Select Operator"},false);
 			$("#search_join_"+count).addOption({"AND":"And","OR":"Or"},false);
 			$("#search_field_"+count).change(function(){
@@ -793,7 +793,7 @@ $(document).ready(function() {
 					$("#search_op_"+count).addOption({"":"Select Operator","less than":"is less than","equal":"is equal to","greater than":"is greater than"},false);
 					$("#search_desc_"+count).val("");
 				}
-				if (a == "issue" || a == "rxl_medication" || a == "imm_immunization") {
+				if (a == "issue" || a == "rxl_medication" || a == "imm_immunization" || a == "insurance" || a == "sup_supplement") {
 					$("#search_op_"+count).removeOption(/./);
 					$("#search_op_"+count).addOption({"":"Select Operator","equal":"is equal to","contains":"contains","not equal":"is not equal to"},false);
 					$("#search_desc_"+count).val("");
@@ -865,6 +865,186 @@ $(document).ready(function() {
 	$("#export_demographics1").button().click(function(){
 		window.open("<?php echo site_url('provider/office/export_demographics');?>/active");
 	});
+	$("#tags_search").chosen().change(function() {
+		tag_grid_reload();
+	});
+	$.ajax({
+		type: "POST",
+		url: "<?php echo site_url('search/search_tags1');?>",
+		dataType: "json",
+		success: function(data){
+			if (data.message == "OK") {
+				$("#tags_search").addOption(data, false).removeOption("message").trigger("liszt:updated");
+			} else {
+				$.jGrowl(data.message);
+			}
+		}
+	});
+	$("#tag_patient").autocomplete({
+		source: function (req, add){
+			$.ajax({
+				url: "<?php echo site_url('search');?>",
+				dataType: "json",
+				type: "POST",
+				data: req,
+				success: function(data){
+					if(data.response =='true'){
+						add(data.message);
+					}
+				}
+			});
+		},
+		minLength: 1,
+		select: function(event, ui){
+			$("#tag_pid").val(ui.item.id);
+		}
+	}).change(function() {
+		tag_grid_reload();
+	});
+	$("#tag_modal_view_dialog").dialog({ 
+		bgiframe: true, 
+		autoOpen: false, 
+		height: 500, 
+		width: 800, 
+		draggable: false,
+		resizable: false,
+		close: function(event, ui) {
+			var a = $("#tag_document_filepath").val();
+			if (a != '') {
+				$.ajax({
+					type: "POST",
+					url: "<?php echo site_url('search/close_document');?>",
+					data: "document_filepath=" + a,
+					success: function(data){
+						$("#tag_document_filepath").val('');
+						$("#tag_view_document_id").val('');
+					}
+				});	
+			}
+			$("#tag_modal_view").html('');
+		}
+	});
+	function tag_grid_reload() {
+		var a = $("#tags_search").val();
+		if (a !== null) {
+			var json_result = $("#tag_query_form").serializeObject();
+			var b = $("#tag_patient").val();
+			if (b != '') {
+				var pid = $("#tag_pid").val();
+			} else {
+				var pid = '';
+			}
+			jQuery("#tag_query_results").jqGrid('GridUnload');
+			jQuery("#tag_query_results").jqGrid({
+				url:"<?php echo site_url('search/tag_query/');?>/" + pid,
+				datatype: "json",
+				postData: json_result,
+				mtype: "POST",
+				colNames:['Index','PID','Last Name','First Name','Date','Document Type','Document Type Index','ID'],
+				colModel:[
+					{name:'index',index:'index',width:1,hidden:true},
+					{name:'pid',index:'pid',width:50},
+					{name:'lastname',index:'lastname',width:150,sortable:false},
+					{name:'firstname',index:'firstname',width:150,sortable:false},
+					{name:'doc_date',index:'doc_date',width:150,formatter:'date',formatoptions:{srcformat:"ISO8601Long", newformat: "ISO8601Short"},sortable:false},
+					{name:'doctype',index:'doctype',width:150,sortable:false},
+					{name:'doctype_index',index:'doctype_index',width:1,hidden:true},
+					{name:'doc_id',index:'doc_id',width:1,hidden:true}
+				],
+				rowNum:10,
+				rowList:[10,20,30],
+				pager: jQuery('#tag_query_results_pager'),
+				sortname: 'pid',
+				viewrecords: true,
+				sortorder: "asc",
+				caption:"Search Results",
+				height: "100%",
+				jsonReader: { repeatitems : false, id: "0" },
+				onSelectRow: function(row_id) {
+					var row = $(this).getRowData(row_id);
+					if (row['doctype_index'] == 'eid') {
+						$("#tag_modal_view").load('<?php echo site_url("search/modal_view");?>/' + row['doc_id'] + '/' + row['pid']);
+						$("#tag_modal_view_dialog").dialog("option", "title", "Encounter");
+					}
+					if (row['doctype_index'] == 't_messages_id') {
+						$.ajax({
+							type: "POST",
+							url: "<?php echo site_url('search/t_messages_view');?>/" + row['doc_id'] + '/' + row['pid'],
+							success: function(data){
+								$("#tag_modal_view").html(data);
+								$("#tag_modal_view_dialog").dialog("option", "title", "Patient Message");
+							}
+						});
+					}
+					if (row['doctype_index'] == 'message_id') {
+						$.ajax({
+							type: "POST",
+							url: "<?php echo site_url('search/messages_view');?>/" + row['doc_id'] + '/' + row['pid'],
+							success: function(data){
+								$("#tag_modal_view").html(data);
+								$("#tag_modal_view_dialog").dialog("option", "title", "Message");
+							}
+						});
+					}
+					if (row['doctype_index'] == 'documents_id') {
+						$.ajax({
+							type: "POST",
+							url: "<?php echo site_url('search/documents_view');?>/" + row['doc_id'] + '/' + row['pid'],
+							dataType: "json",
+							success: function(data){
+								$("#tag_modal_view").html(data.html);
+								$("#tag_document_filepath").val(data.filepath);
+								$("#tag_modal_view_dialog").dialog("option", "title", "Document");
+							}
+						});
+					}
+					if (row['doctype_index'] == 'mtm_id') {
+						$.ajax({
+							type: "POST",
+							url: "<?php echo site_url('search/mtm_view');?>/" + row['doc_id'] + '/' + row['pid'],
+							success: function(data){
+								$("#tag_modal_view").html(data);
+								$("#tag_modal_view_dialog").dialog("option", "title", "Medication Therapy Management");
+							}
+						});
+					}
+					if (row['doctype_index'] == 'appt_id') {
+						$.ajax({
+							type: "POST",
+							url: "<?php echo site_url('search/appt_view');?>/" + row['doc_id'] + '/' + row['pid'],
+							success: function(data){
+								$("#tag_modal_view").html(data);
+								$("#tag_modal_view_dialog").dialog("option", "title", "Appointment Details");
+							}
+						});
+					}
+					if (row['doctype_index'] == 'hippa_id') {
+						$.ajax({
+							type: "POST",
+							url: "<?php echo site_url('search/hippa_view');?>/" + row['doc_id'] + '/' + row['pid'],
+							success: function(data){
+								$("#tag_modal_view").html(data);
+								$("#tag_modal_view_dialog").dialog("option", "title", "Records Release Details");
+							}
+						});
+					}
+					if (row['doctype_index'] == 'tests_id') {
+						$.ajax({
+							type: "POST",
+							url: "<?php echo site_url('search/tests_view');?>/" + row['doc_id'] + '/' + row['pid'],
+							success: function(data){
+								$("#tag_modal_view").html(data);
+								$("#tag_modal_view_dialog").dialog("option", "title", "Test Details");
+							}
+						});
+					}
+					$("#tag_modal_view_dialog").dialog('open');
+				}
+			}).navGrid('#tag_query_results_pager',{search:false,edit:false,add:false,del:false});
+		} else {
+			jQuery("#tag_query_results").jqGrid('GridUnload');
+		}
+	}
 });
 </script>
 <div id="heading2"></div>
@@ -1038,6 +1218,20 @@ $(document).ready(function() {
 							<div id="super_query_results_pager" class="scroll" style="text-align:center;"></div><br>
 						</fieldset><br><br>
 					</form>
+					<form name="tag_query_form" id="tag_query_form">
+						<fieldset class="ui-corner-all">
+							<legend>Tag Search</legend>
+							<div id="tag_query_div">
+								Patient (optional):<br>
+								<input type="text" id="tag_patient" style="width:400px" class="text ui-widget-content ui-corner-all"/><br><br>
+								Search items with the following tag(s):<br>
+								<select name="tags_array[]" id="tags_search" multiple="multiple" style="width:400px" class="multiselect"></select>
+								<input type="hidden" id="tag_pid"/>
+							</div><br>
+							<table id="tag_query_results" class="scroll" cellpadding="0" cellspacing="0"></table>
+							<div id="tag_query_results_pager" class="scroll" style="text-align:center;"></div><br>
+						</fieldset><br><br>
+					</form>
 				</div>
 				<div id="provider_office_tabs_5">
 					Export demographic information to CSV file: <button type="button" id="export_demographics">All Patients</button> <button type="button" id="export_demographics1">Active Patients Only</button>
@@ -1108,4 +1302,9 @@ $(document).ready(function() {
 			<td><input type="text" name="quantity" id="reactivate_sup_quantity" class="text ui-widget-content ui-corner-all" /></td>
 		</tr>
 	</table>
+</div>
+<div id="tag_modal_view_dialog" title="">
+	<input type="hidden" id="tag_view_document_id"/>
+	<input type="hidden" id="tag_document_filepath"/>
+	<div id="tag_modal_view"></div>
 </div>

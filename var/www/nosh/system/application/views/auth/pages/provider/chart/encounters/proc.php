@@ -1,7 +1,9 @@
 <form id="procedure_form">
 	<button type="button" id="save_procedure">Save</button>
-	<button type="button" id="template_procedure">Add/Update Template</button>
 	<button type="button" id="cancel_procedure">Cancel</button>
+	<button type="button" id="procedure_type_reset">Create New Template</button>
+	<button type="button" id="template_procedure">Save Template</button>
+	<span id="procedure_template_status"></span>
 	<input type="hidden" name="procedure_type_old" id="procedure_type_old"/>
 	<input type="hidden" name="procedure_cpt_old" id="procedure_cpt_old"/>
 	<input type="hidden" name="procedure_description_old" id="procedure_description_old"/>
@@ -11,29 +13,24 @@
 	<input type="hidden" name="procedurelist_id" id="procedurelist_id">
 	<table>
 		<tr>
-			<td valign="top">Type:</td>
-			<td valign="top"><input type="text" style="width:500px" name="procedure_type" id="procedure_type" class="text ui-widget-content ui-corner-all"></td>
-			<td valign="top"><input type="button" id="procedure_type_reset" value="Clear" style="font-size: 0.8em" class="ui-button ui-state-default ui-corner-all"></td>
+			<td valign="top">Type:<br><input type="text" style="width:500px" name="procedure_type" id="procedure_type" class="text ui-widget-content ui-corner-all"></td>
+			<td valign="top"></td>
 		</tr>
 		<tr>
-			<td valign="top">CPT:</td>
-			<td valign="top"><input type="text" style="width:500px" name="procedure_cpt" id="procedure_cpt" class="text ui-widget-content ui-corner-all"></td>
-			<td valign="top"><input type="button" id="procedure_cpt_reset" value="Clear" style="font-size: 0.8em" class="ui-button ui-state-default ui-corner-all"></td>
+			<td valign="top">CPT:<br><input type="text" style="width:500px" name="procedure_cpt" id="procedure_cpt" class="text ui-widget-content ui-corner-all"></td>
+			<td valign="top"><br><button type="button" id="procedure_cpt_reset">Clear</button></td>
 		</tr>
 		<tr>
-			<td valign="top">Description:</td>
-			<td><textarea style="width:500px" rows="10" name="procedure_description" id="procedure_description" class="text ui-widget-content ui-corner-all"></textarea></td>
-			<td valign="top"><input type="button" id="procedure_description_reset" value="Clear" style="font-size: 0.8em" class="ui-button ui-state-default ui-corner-all"></td>
+			<td>Description:<br><textarea style="width:500px" rows="10" name="procedure_description" id="procedure_description" class="text ui-widget-content ui-corner-all"></textarea></td>
+			<td valign="top"><br><button type="button" id="procedure_description_reset">Clear</button></td>
 		</tr>
 		<tr>
-			<td valign="top">Complications:</td>
-			<td><textarea style="width:500px" rows="1" name="procedure_complications" id="procedure_complications" class="text ui-widget-content ui-corner-all"></textarea></td>
-			<td valign="top"><input type="button" id="procedure_complications_reset" value="Clear" style="font-size: 0.8em" class="ui-button ui-state-default ui-corner-all"></td>
+			<td>Complications:<br><textarea style="width:500px" rows="1" name="procedure_complications" id="procedure_complications" class="text ui-widget-content ui-corner-all"></textarea></td>
+			<td valign="top"><br><button type="button" id="procedure_complications_reset">Clear</button></td>
 		</tr>
 		<tr>
-			<td valign="top">Estimated Blood Loss:</td>
-			<td><textarea style="width:500px" rows="1" name="procedure_ebl" id="procedure_ebl" class="text ui-widget-content ui-corner-all"></textarea></td>
-			<td valign="top"><input type="button" id="procedure_ebl_reset" value="Clear" style="font-size: 0.8em" class="ui-button ui-state-default ui-corner-all"></td>
+			<td>Estimated Blood Loss:<br><textarea style="width:500px" rows="1" name="procedure_ebl" id="procedure_ebl" class="text ui-widget-content ui-corner-all"></textarea></td>
+			<td valign="top"><br><button type="button" id="procedure_ebl_reset">Clear</button></td>
 		</tr>
 	</table>
 </form>
@@ -53,6 +50,7 @@
 			$("#procedure_complications_old").val(data.proc_complications);
 			$("#procedure_ebl_old").val(data.proc_ebl);
 			$("#procedure_cpt_old").val(data.proc_cpt);
+			$("#procedure_template_status").html('');
 		}
 	});
 	$("#save_procedure").button({
@@ -92,6 +90,7 @@
 			$("#procedure_ebl").val(ui.item.procedure_ebl);
 			$("#procedurelist_id").val(ui.item.procedurelist_id);
 			$("#procedure_cpt").val(ui.item.cpt);
+			$("#procedure_template_status").html('Template # ' + ui.item.procedurelist_id + ' in use.');
 		}
 	});
 	$("#procedure_cpt").autocomplete({
@@ -194,6 +193,7 @@
 	$('#procedure_type_reset').click(function(){
 		$("#procedure_type").val('');
 		$("#procedurelist_id").val('');
+		$("#procedure_template_status").html('');
 	});
 	$('#procedure_cpt_reset').button();
 	$('#procedure_cpt_reset').click(function(){

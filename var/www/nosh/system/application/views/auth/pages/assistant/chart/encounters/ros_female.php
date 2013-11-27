@@ -69,7 +69,7 @@
 	<button type="button" id="save_ros_gen">Save</button>
 	<button type="button" id="cancel_ros_gen">Cancel</button>
 	<br><hr class="ui-state-default"/>
-	<div>
+	<div class="wrapper">
 		<div style="display:block;float:left;width:310px">
 			Preview:<br><textarea style="width:290px" rows="16" name="ros_gen" id="ros_gen" class="ros_entry text ui-widget-content ui-corner-all"></textarea><input type="hidden" id="ros_gen_old"/>
 		</div>
@@ -87,7 +87,7 @@
 	<button type="button" id="save_ros_eye">Save</button>
 	<button type="button" id="cancel_ros_eye">Cancel</button>
 	<br><hr class="ui-state-default"/>
-	<div>
+	<div class="wrapper">
 		<div style="display:block;float:left;width:310px">
 			Preview:<br><textarea style="width:290px" rows="16" name="ros_eye" id="ros_eye" class="ros_entry text ui-widget-content ui-corner-all"></textarea><input type="hidden" id="ros_eye_old"/>
 		</div>
@@ -104,7 +104,7 @@
 	<button type="button" id="save_ros_ent">Save</button>
 	<button type="button" id="cancel_ros_ent">Cancel</button>
 	<br><hr class="ui-state-default"/>
-	<div>
+	<div class="wrapper">
 		<div style="display:block;float:left;width:310px">
 			Preview:<br><textarea style="width:290px" rows="16" name="ros_ent" id="ros_ent" class="ros_entry text ui-widget-content ui-corner-all"></textarea><input type="hidden" id="ros_ent_old"/>
 		</div>
@@ -121,7 +121,7 @@
 	<button type="button" id="save_ros_resp">Save</button>
 	<button type="button" id="cancel_ros_resp">Cancel</button>
 	<br><hr class="ui-state-default"/>
-	<div>
+	<div class="wrapper">
 		<div style="display:block;float:left;width:310px">
 			Preview:<br><textarea style="width:290px" rows="16" name="ros_resp" id="ros_resp" class="ros_entry text ui-widget-content ui-corner-all"></textarea><input type="hidden" id="ros_resp_old"/>
 		</div>
@@ -138,7 +138,7 @@
 	<button type="button" id="save_ros_cv">Save</button>
 	<button type="button" id="cancel_ros_cv">Cancel</button>
 	<br><hr class="ui-state-default"/>
-	<div>
+	<div class="wrapper">
 		<div style="display:block;float:left;width:310px">
 			Preview:<br><textarea style="width:290px" rows="16" name="ros_cv" id="ros_cv" class="ros_entry text ui-widget-content ui-corner-all"></textarea><input type="hidden" id="ros_cv_old"/>
 		</div>
@@ -156,7 +156,7 @@
 	<button type="button" id="save_ros_gi">Save</button>
 	<button type="button" id="cancel_ros_gi">Cancel</button>
 	<br><hr class="ui-state-default"/>
-	<div>
+	<div class="wrapper">
 		<div style="display:block;float:left;width:310px">
 			Preview:<br><textarea style="width:290px" rows="16" name="ros_gi" id="ros_gi" class="ros_entry text ui-widget-content ui-corner-all"></textarea><input type="hidden" id="ros_gi_old"/>
 		</div>
@@ -173,7 +173,7 @@
 	<button type="button" id="save_ros_gu">Save</button>
 	<button type="button" id="cancel_ros_gu">Cancel</button>
 	<br><hr class="ui-state-default"/>
-	<div>
+	<div class="wrapper">
 		<div style="display:block;float:left;width:310px">
 			Preview:<br><textarea style="width:290px" rows="16" name="ros_gu" id="ros_gu" class="ros_entry text ui-widget-content ui-corner-all"></textarea><input type="hidden" id="ros_gu_old"/>
 		</div>
@@ -191,7 +191,7 @@
 	<button type="button" id="cancel_ros_mus">Cancel
 	</button>
 	<br><hr class="ui-state-default"/>
-	<div>
+	<div class="wrapper">
 		<div style="display:block;float:left;width:310px">
 			Preview:<br><textarea style="width:290px" rows="16" name="ros_mus" id="ros_mus" class="ros_entry text ui-widget-content ui-corner-all"></textarea><input type="hidden" id="ros_mus_old"/>
 		</div>
@@ -208,7 +208,7 @@
 	<button type="button" id="save_ros_neuro">Save</button>
 	<button type="button" id="cancel_ros_neuro">Cancel</button>
 	<br><hr class="ui-state-default"/>
-	<div>
+	<div class="wrapper">
 		<div style="display:block;float:left;width:310px">
 			Preview:<br><textarea style="width:290px" rows="16" name="ros_neuro" id="ros_neuro" class="ros_entry text ui-widget-content ui-corner-all"></textarea><input type="hidden" id="ros_neuro_old"/>
 		</div>
@@ -225,7 +225,7 @@
 	<button type="button" id="save_ros_psych">Save</button>
 	<button type="button" id="cancel_ros_psych">Cancel</button>
 	<br><hr class="ui-state-default"/>
-	<div>
+	<div class="wrapper">
 		<div style="display:block;float:left;width:310px">
 			Preview:<br><textarea style="width:290px" rows="16" name="ros_psych" id="ros_psych" class="ros_entry text ui-widget-content ui-corner-all"></textarea><input type="hidden" id="ros_psych_old"/>
 		</div>
@@ -242,7 +242,7 @@
 	<button type="button" id="save_ros_heme">Save</button>
 	<button type="button" id="cancel_ros_heme">Cancel</button>
 	<br><hr class="ui-state-default"/>
-	<div>
+	<div class="wrapper">
 		<div style="display:block;float:left;width:310px">
 			Preview:<br><textarea style="width:290px" rows="16" name="ros_heme" id="ros_heme" class="ros_entry text ui-widget-content ui-corner-all"></textarea><input type="hidden" id="ros_heme_old"/>
 		</div>
@@ -259,7 +259,7 @@
 	<button type="button" id="save_ros_endocrine">Save</button>
 	<button type="button" id="cancel_ros_endocrine">Cancel</button>
 	<br><hr class="ui-state-default"/>
-	<div>
+	<div class="wrapper">
 		<div style="display:block;float:left;width:310px">
 			Preview:<br><textarea style="width:290px" rows="16" name="ros_endocrine" id="ros_endocrine" class="ros_entry text ui-widget-content ui-corner-all"></textarea><input type="hidden" id="ros_endocrine_old"/>
 		</div>
@@ -276,7 +276,7 @@
 	<button type="button" id="save_ros_skin">Save</button>
 	<button type="button" id="cancel_ros_skin">Cancel</button>
 	<br><hr class="ui-state-default"/>
-	<div>
+	<div class="wrapper">
 		<div style="display:block;float:left;width:310px">
 			Preview:<br><textarea style="width:290px" rows="16" name="ros_skin" id="ros_skin" class="ros_entry text ui-widget-content ui-corner-all"></textarea><input type="hidden" id="ros_skin_old"/>
 		</div>
@@ -293,7 +293,7 @@
 	<button type="button" id="save_ros_wcc">Save</button>
 	<button type="button" id="cancel_ros_wcc">Cancel</button>
 	<br><hr class="ui-state-default"/>
-	<div>
+	<div class="wrapper">
 		<div style="display:block;float:left;width:310px">
 			Preview:<br><textarea style="width:290px" rows="16" name="ros_wcc" id="ros_wcc" class="ros_entry text ui-widget-content ui-corner-all"></textarea><input type="hidden" id="ros_wcc_old"/>
 		</div>
@@ -660,10 +660,11 @@
 	$("#ros_gen_dialog").dialog({ 
 		bgiframe: true, 
 		autoOpen: false, 
-		height: 500, 
+		height: 575, 
 		width: 800, 
 		draggable: false,
 		resizable: false,
+		position: [293,43],
 		beforeclose: function(event, ui) {
 			var a = $("#ros_gen").val();
 			var b = $("#ros_gen_old").val();
@@ -682,10 +683,11 @@
 	$("#ros_eye_dialog").dialog({ 
 		bgiframe: true, 
 		autoOpen: false, 
-		height: 500, 
+		height: 575, 
 		width: 800, 
 		draggable: false,
 		resizable: false,
+		position: [293,43],
 		beforeclose: function(event, ui) {
 			var a = $("#ros_eye").val();
 			var b = $("#ros_eye_old").val();
@@ -704,10 +706,11 @@
 	$("#ros_ent_dialog").dialog({ 
 		bgiframe: true, 
 		autoOpen: false, 
-		height: 500, 
+		height: 575, 
 		width: 800, 
 		draggable: false,
 		resizable: false,
+		position: [293,43],
 		beforeclose: function(event, ui) {
 			var a = $("#ros_ent").val();
 			var b = $("#ros_ent_old").val();
@@ -726,10 +729,11 @@
 	$("#ros_resp_dialog").dialog({ 
 		bgiframe: true, 
 		autoOpen: false, 
-		height: 500, 
+		height: 575, 
 		width: 800, 
 		draggable: false,
 		resizable: false,
+		position: [293,43],
 		beforeclose: function(event, ui) {
 			var a = $("#ros_resp").val();
 			var b = $("#ros_resp_old").val();
@@ -748,10 +752,11 @@
 	$("#ros_cv_dialog").dialog({ 
 		bgiframe: true, 
 		autoOpen: false, 
-		height: 500, 
+		height: 575, 
 		width: 800, 
 		draggable: false,
 		resizable: false,
+		position: [293,43],
 		beforeclose: function(event, ui) {
 			var a = $("#ros_cv").val();
 			var b = $("#ros_cv_old").val();
@@ -770,10 +775,11 @@
 	$("#ros_gi_dialog").dialog({ 
 		bgiframe: true, 
 		autoOpen: false, 
-		height: 500, 
+		height: 575, 
 		width: 800, 
 		draggable: false,
 		resizable: false,
+		position: [293,43],
 		beforeclose: function(event, ui) {
 			var a = $("#ros_gi").val();
 			var b = $("#ros_gi_old").val();
@@ -792,10 +798,11 @@
 	$("#ros_gu_dialog").dialog({ 
 		bgiframe: true, 
 		autoOpen: false, 
-		height: 500, 
+		height: 575, 
 		width: 800, 
 		draggable: false,
 		resizable: false,
+		position: [293,43],
 		beforeclose: function(event, ui) {
 			var a = $("#ros_gu").val();
 			var b = $("#ros_gu_old").val();
@@ -814,10 +821,11 @@
 	$("#ros_mus_dialog").dialog({ 
 		bgiframe: true, 
 		autoOpen: false, 
-		height: 500, 
+		height: 575, 
 		width: 800, 
 		draggable: false,
 		resizable: false,
+		position: [293,43],
 		beforeclose: function(event, ui) {
 			var a = $("#ros_mus").val();
 			var b = $("#ros_mus_old").val();
@@ -836,10 +844,11 @@
 	$("#ros_neuro_dialog").dialog({ 
 		bgiframe: true, 
 		autoOpen: false, 
-		height: 500, 
+		height: 575, 
 		width: 800, 
 		draggable: false,
 		resizable: false,
+		position: [293,43],
 		beforeclose: function(event, ui) {
 			var a = $("#ros_neuro").val();
 			var b = $("#ros_neuro_old").val();
@@ -858,10 +867,11 @@
 	$("#ros_psych_dialog").dialog({ 
 		bgiframe: true, 
 		autoOpen: false, 
-		height: 500, 
+		height: 575, 
 		width: 800, 
 		draggable: false,
 		resizable: false,
+		position: [293,43],
 		beforeclose: function(event, ui) {
 			var a = $("#ros_psych").val();
 			var b = $("#ros_psych_old").val();
@@ -880,10 +890,11 @@
 	$("#ros_heme_dialog").dialog({ 
 		bgiframe: true, 
 		autoOpen: false, 
-		height: 500, 
+		height: 575, 
 		width: 800, 
 		draggable: false,
 		resizable: false,
+		position: [293,43],
 		beforeclose: function(event, ui) {
 			var a = $("#ros_heme").val();
 			var b = $("#ros_heme_old").val();
@@ -902,10 +913,11 @@
 	$("#ros_endocrine_dialog").dialog({ 
 		bgiframe: true, 
 		autoOpen: false, 
-		height: 500, 
+		height: 575, 
 		width: 800, 
 		draggable: false,
 		resizable: false,
+		position: [293,43],
 		beforeclose: function(event, ui) {
 			var a = $("#ros_endocrine").val();
 			var b = $("#ros_endocrine_old").val();
@@ -924,10 +936,11 @@
 	$("#ros_skin_dialog").dialog({ 
 		bgiframe: true, 
 		autoOpen: false, 
-		height: 500, 
+		height: 575, 
 		width: 800, 
 		draggable: false,
 		resizable: false,
+		position: [293,43],
 		beforeclose: function(event, ui) {
 			var a = $("#ros_skin").val();
 			var b = $("#ros_skin_old").val();
@@ -946,10 +959,11 @@
 	$("#ros_wcc_dialog").dialog({ 
 		bgiframe: true, 
 		autoOpen: false, 
-		height: 500, 
+		height: 575, 
 		width: 800, 
 		draggable: false,
 		resizable: false,
+		position: [293,43],
 		beforeclose: function(event, ui) {
 			var a = $("#ros_wcc").val();
 			var b = $("#ros_wcc_old").val();

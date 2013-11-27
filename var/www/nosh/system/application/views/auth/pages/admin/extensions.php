@@ -1,9 +1,6 @@
 <script type="text/javascript">
-$(function() {
-	$("#dashboard_admin_tabs").tabs();
-	$("#extensions_accordion").accordion({active: false, fillSpace: true, heightStyle: "content"});
-});
 $(document).ready(function() {
+	$("#extensions_accordion").accordion({active: false, fillSpace: true, heightStyle: "content"});
 	$("#save_extensions_tab").click(function(){
 		var str = $("#extensions_form").serialize();
 		$.ajax({
@@ -143,6 +140,11 @@ $(document).ready(function() {
 			<select name="mtm_extension" id="mtm_extension" class="text ui-widget-content ui-corner-all"></select><br><br>
 			Medication Therapy Management (MTM) Extension Alert Providers:</td>
 			<select name="mtm_alert_users[]" id="mtm_alert_users" multiple="multiple" style="width:400px" class="text ui-widget-content ui-corner-all"></select>
+		</div>
+		<h3>PeaceHealth Laboratories</h3>
+		<div>
+			Practice ID number:<br>
+			<input type="text" name="peacehealth_id" id="peacehealth_id" class="text ui-widget-content ui-corner-all" size="42" value=""/>
 		</div>
 	</div>
 </form>

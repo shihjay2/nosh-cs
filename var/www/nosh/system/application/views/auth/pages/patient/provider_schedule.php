@@ -5,9 +5,9 @@ $(document).ready(function() {
 		inactivity: 3600000,
 		noconfirm: 10000,
 		alive_url: '<?php echo site_url("patient/schedule");?>',
-		redirect_url: '<?php echo site_url("start");?>',
+		redirect_url: '<?php echo site_url("logout");?>',
 		logout_url: '<?php echo site_url("logout");?>',
-		sessionAlive: 300000
+		sessionAlive: false
 	});
 	$.ajax({
 		type: "POST",

@@ -8,7 +8,7 @@ class Front extends Controller {
 
 	// --------------------------------------------------------------------
 
-	function index()
+	function index($practicehandle='')
 	{
 		include(APPPATH.'config/database'.EXT);
 		if ($db['default']['username'] === "") {
@@ -22,14 +22,14 @@ class Front extends Controller {
 		if (!$db_selected) {
 			redirect('install');
 		} else {
-			$this->check_version();
+			$this->check_version($practicehandle);
 		}
 		
 	}
 	
 	// --------------------------------------------------------------------
 	
-	function check_version()
+	function check_version($practicehandle='')
 	{
 		$this->load->database();
 		// Check for version 1.1
@@ -101,8 +101,12 @@ class Front extends Controller {
 		if ($row1['version'] < "1.7.1") {
 			$this->system_update1_7_1();
 		}
-		//$this->run();
-		redirect('start');
+		// Check for version 1.7.2
+		if ($row1['version'] < "1.7.2") {
+			$this->system_update1_7_2();
+		}
+		$this->run();
+		redirect('start/' . $practicehandle);
 	}
 	
 	function system_update1_1() 
@@ -1164,10 +1168,240 @@ class Front extends Controller {
 		$this->db->update('practiceinfo', $version_data);
 	}
 	
+	function system_update1_7_2()
+	{
+		$this->load->dbforge();
+		$this->load->database();
+		$tables = array("users","mtm","extensions_log","audit","providers","messaging","received","sendfax","calendar","encounters","alerts","t_messages","billing_core","hippa","vaccine_temp","vaccine_inventory","supplement_inventory","scans","templates","orderslist","procedurelist","tags_relate");
+		foreach ($tables as $table) {
+			if (!$this->db->field_exists('practice_id',$table)) {
+				$data = array(
+					'practice_id' => array('type' => 'INT', 'constraint' => 11)
+				);
+				$this->dbforge->add_column($table, $data);
+				if ($table == "templates") {
+					$this->db->where('template_name !=', 'Global Default');
+					$template_query = $this->db->get('templates');
+					if ($template_query->num_rows() > 0) {
+						foreach ($template_query->result_array() as $template_row) {
+							$template_data = array(
+								'practice_id' => '1'
+							);
+							$this->db->where('template_id', $template_row['template_id']);
+							$this->db->update('templates', $template_data);
+						}
+					}
+				} else {
+					$practice_data = array(
+						'practice_id' => '1'
+					);
+					$this->db->update($table, $practice_data);
+				}
+			}
+		}
+		$demographics_relate_definition = array(
+			'demographics_relate_id' => array('type' => 'INT', 'constraint' => 40, 'auto_increment' => TRUE),
+			'pid' => array('type' => 'INT', 'constraint' => 11),
+			'practice_id' => array('type' => 'INT', 'constraint' => 11),
+			'id' => array('type' => 'BIGINT', 'constraint' => 20)
+		);
+		$this->dbforge->add_field($demographics_relate_definition);
+		$this->dbforge->add_key('demographics_relate_id', TRUE);
+		$this->dbforge->create_table('demographics_relate', TRUE);
+		$demographics_notes_definition = array(
+			'demographics_notes_id' => array('type' => 'INT', 'constraint' => 40, 'auto_increment' => TRUE),
+			'pid' => array('type' => 'INT', 'constraint' => 11),
+			'practice_id' => array('type' => 'INT', 'constraint' => 11),
+			'billing_notes' => array('type' => 'LONGTEXT'),
+			'imm_notes' => array('type' => 'LONGTEXT')
+		);
+		$this->dbforge->add_field($demographics_notes_definition);
+		$this->dbforge->add_key('demographics_notes_id', TRUE);
+		$this->dbforge->create_table('demographics_notes', TRUE);
+		$patients = $this->db->query("SELECT * FROM demographics")->result_array();
+		foreach ($patients as $patient) {
+			$relate_data = array(
+				'pid' => $patient['pid'],
+				'practice_id' => '1',
+				'id' => $patient['id']
+			);
+			$this->db->insert('demographics_relate', $relate_data);
+			$notes_data = array(
+				'billing_notes' => $patient['billing_notes'],
+				'imm_notes' => $patient['imm_notes'],
+				'pid' => $patient['pid'],
+				'practice_id' => '1'
+			);
+			$this->db->insert('demographics_notes', $notes_data);
+		}
+		$cpt_relate_definition = array(
+			'cpt_relate_id' => array('type' => 'INT', 'constraint' => 40, 'auto_increment' => TRUE),
+			'practice_id' => array('type' => 'INT', 'constraint' => 11),
+			'cpt' => array('type' => 'VARCHAR', 'constraint' => 255),
+			'cpt_description' => array('type' => 'LONGTEXT'),
+			'cpt_charge' => array('type' => 'VARCHAR', 'constraint' => 255),
+			'favorite' => array('type' => 'TINYINT', 'constraint' => 4),
+			'unit' => array('type' => 'INT', 'constraint' => 1)
+		);
+		$this->dbforge->add_field($cpt_relate_definition);
+		$this->dbforge->add_key('cpt_relate_id', TRUE);
+		$this->dbforge->create_table('cpt_relate', TRUE);
+		$this->db->where('cpt_charge is not null');
+		$this->db->or_where('cpt_charge !=', '');
+		$this->db->or_where('cpt', '81002');
+		$this->db->or_where('cpt', '81025');
+		$this->db->or_where('cpt', '87880');
+		$this->db->or_where('cpt', '86308');
+		$this->db->or_where('cpt', '87804');
+		$this->db->or_where('cpt', '82962');
+		$cpt_query = $this->db->get('cpt');
+		if ($cpt_query->num_rows() > 0) {
+			foreach ($cpt_query->result_array() as $cpt_row) {
+				$cpt_relate_data = array(
+					'practice_id' => '1',
+					'cpt' => $cpt_row['cpt'],
+					'cpt_description' => $cpt_row['cpt_description'],
+					'cpt_charge' => $cpt_row['cpt_charge'],
+					'favorite' => '1',
+					'unit' => '1'
+				);
+				$this->db->insert('cpt_relate', $cpt_relate_data);
+			}
+		}
+		if (!$this->db->field_exists('referring_provider_npi','encounters')) {
+			$encounters_definition = array(
+				'referring_provider_npi' => array('type' => 'VARCHAR', 'constraint' => 255)
+			);
+			$this->dbforge->add_column('encounters', $encounters_definition);
+		}
+		if (!$this->db->field_exists('npi','addressbook')) {
+			$addressbook_definition = array(
+				'npi' => array('type' => 'VARCHAR', 'constraint' => 255)
+			);
+			$this->dbforge->add_column('addressbook', $addressbook_definition);
+		}
+		if (!$this->db->field_exists('practicehandle','practiceinfo')) {
+			$practiceinfo_definition = array(
+				'practicehandle' => array('type' => 'VARCHAR', 'constraint' => 255),
+				'peacehealth_id' => array('type' => 'VARCHAR', 'constraint' => 100)
+			);
+			$this->dbforge->add_column('practiceinfo', $practiceinfo_definition);
+		}
+		if (!$this->db->field_exists('electronic_order','addressbook')) {
+			$addressbook_definition = array(
+				'electronic_order' => array('type' => 'VARCHAR', 'constraint' => 255)
+			);
+			$this->dbforge->add_column('addressbook', $addressbook_definition);
+		}
+		if (!$this->db->field_exists('id','orders')) {
+			$orders_definition = array(
+				'id' => array('type' => 'BIGINT', 'constraint' => 20)
+			);
+			$this->dbforge->add_column('orders', $orders_definition);
+		}
+		$orderslist1_definition = array(
+			'orderslist1_id' => array('type' => 'INT', 'constraint' => 11, 'auto_increment' => TRUE),
+			'orders_code' => array('type' => 'BIGINT', 'constraint' => 20),
+			'orders_category' => array('type' => 'VARCHAR', 'constraint' => 255),
+			'orders_vendor' => array('type' => 'VARCHAR', 'constraint' => 255),
+			'cpt' => array('type' => 'VARCHAR', 'constraint' => 255),
+			'orders_description' => array('type' => 'LONGTEXT'),
+			'result_code' => array('type' => 'BIGINT', 'constraint' => 20),
+			'result_name' => array('type' => 'VARCHAR', 'constraint' => 255),
+			'units' => array('type' => 'VARCHAR', 'constraint' => 255)
+		);
+		$this->dbforge->add_field($orderslist1_definition);
+		$this->dbforge->add_key('orderslist1_id', TRUE);
+		$this->dbforge->create_table('orderslist1', TRUE);
+		$orderslist1_sql_file = "/var/www/nosh/import/orderslist1.sql";
+		include(APPPATH.'config/database'.EXT);
+		$orderslist1_command = "mysql -u " . $db['default']['username']. " -p". $db['default']['password'] . " nosh < " . $orderslist1_sql_file;
+		system($orderslist1_command);
+		//$orderslist1_csv = "/var/www/nosh/import/peacehealth.csv";
+		//if (($orderslist1_handle = fopen($orderslist1_csv, "r")) !== FALSE) {
+			//while (($orderslist1 = fgetcsv($orderslist1_handle, 0, ";")) !== FALSE) {
+				//if ($orderslist1[0] != '') {
+					//$orderslist1_data = array (
+						//'orders_code' => $orderslist1[0],
+						//'orders_category' => 'Laboratory',
+						//'orders_vendor' => 'PeaceHealth',
+						//'cpt' => ltrim($orderslist1[8]),
+						//'orders_description' => $orderslist1[1],
+						//'result_code' => $orderslist1[2],
+						//'result_name' => $orderslist1[3],
+						//'units' => $orderslist1[9]
+					//);
+					//$this->db->insert('orderslist1', $orderslist1_data);
+				//}
+			//}
+			//fclose($orderslist1_csv);
+		//}
+		$encounters_query = $this->db->get('encounters');
+		if ($encounters_query->num_rows() > 0) {
+			foreach ($encounters_query->result_array() as $encounters_row) {
+				if ($encounters_row['addendum'] == 'n') {
+					$encounters_data = array(
+						'addendum_eid' => $encounters_row['eid']
+					);
+					$this->db->where('eid', $encounters_row['eid']);
+					$this->db->update('encounters', $encounters_data);
+				} else {
+					$this->db->where('encounter_DOS', $encounters_row['encounter_DOS']);
+					$this->db->where('pid', $encounters_row['pid']);
+					$this->db->where('addendum', 'n');
+					$encounters_query1 = $this->db->get('encounters');
+					if ($encounters_query1->num_rows() > 0) {
+						$encounters_row1 = $encounters_query1->row_array();
+						$encounters_data1 = array(
+							'addendum_eid' => $encounters_row1['eid']
+						); 
+						$this->db->where('eid', $encounters_row['eid']);
+						$this->db->update('encounters', $encounters_data1);
+					}
+				}
+			}
+		}
+		if (!$this->db->field_exists('test_reference','tests')) {
+			$tests_definition = array(
+				'test_reference' => array('type' => 'LONGTEXT'),
+				'test_flags' => array('type' => 'VARCHAR', 'constraint' => 100),
+				'test_provider_id' => array('type' => 'BIGINT', 'constraint' => 20),
+				'test_unassigned' => array('type' => 'LONGTEXT'),
+				'test_from' => array('type' => 'LONGTEXT'),
+				'test_type' => array('type' => 'VARCHAR', 'constraint' => 255),
+				'practice_id' => array('type' => 'INT', 'constraint' => 11)
+			);
+			$this->dbforge->add_column('tests', $tests_definition);
+		}
+		if (!$this->db->field_exists('peacehealth_username','providers')) {
+			$providers_definition = array(
+				'peacehealth_id' => array('type' => 'VARCHAR', 'constraint' => 100)
+			);
+			$this->dbforge->add_column('providers', $providers_definition);
+		}
+		if (!$this->db->field_exists('read','messaging')) {
+			$messaging_definition = array(
+				'read' => array('type' => 'VARCHAR', 'constraint' => 4),
+				'tests_id' => array('type' => 'INT', 'constraint' => 11)
+			);
+			$this->dbforge->add_column('messaging', $messaging_definition);
+		}
+		$version_data = array(
+			'version' => '1.7.2'
+		);
+		$this->db->update('practiceinfo', $version_data);
+	}
+	
 	function run()
 	{
 		$this->load->dbforge();
 		$this->load->database();
+		if (!$this->db->field_exists('practice_id','tests')) {
+			$tests_definition = array(
+				'practice_id' => array('type' => 'INT', 'constraint' => 11)
+			);
+			$this->dbforge->add_column('tests', $tests_definition);
+		}
 	}
 }
 

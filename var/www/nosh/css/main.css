@@ -348,7 +348,22 @@ ul.ui-autocomplete.ui-menu {
 	line-height: 1.5;
 }
 
-.ui-dialog{
+.ui-dialog {
 	position:absolute;
 	overflow:hidden
+}
+
+.mybold td {
+	font-weight : bold !important
+}
+
+.myAltRowClass { 
+	color: red; 
+	background-image: none; 
+}
+
+.wrapper {
+	margin-left: auto;
+	margin-right: auto;
+	width: 790px;
 }

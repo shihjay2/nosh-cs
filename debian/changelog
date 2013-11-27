@@ -1,4 +1,31 @@
-nosh-cs (1.7.1-0ubuntu10) precise; urgency=low
+nosh-cs (1.7.2-0ubuntu1) precise; urgency=low
+
+  * New Feature - Tagging features available for Messages, Telephone Messages, and Encounters.
+  * New Feature - Ability to save CPT favorites and default units for a specific CPT code.
+  * New Feature - Ability to search for active supplements in super query.
+  * New Feature - Ability to view and chart electronically downloaded lab results.
+  * New Feature - Direct interface with PeaceHealth Labs.
+  * New Feature - Patient reminders automatically sent upon creation or change of a future appointment.
+  * Update - Reworked code to allow for more than 1 practice in a NOSH instance. 
+  * Update - Ability to enter new password whenever a new user is added.
+  * Update - Clicking on a grid header will open and close the grid instead of just clicking the arrow.
+  * Update - Orders summary now includes specific instructions for supplement orders.
+  * Update - Provider signature editor incorporated in provider user configuration dialog in dashboard.
+  * Update - Reduced reduantant search entries for medication dosages when performing autocomplete.
+  * Fixed - Error with billing compiling when there is an empty procedure CPT code.
+  * Fixed - Error with saving bills under Assistant user level.
+  * Fixed - Some printing errors when no billing is assigned for an encounter.
+  * Fixed - CPT grid not loading correctly in configuration when Billing tab is opened in encounters.
+  * Fixed - Super query not searching active medications or issues.
+  * Fixed - Addendum encounters keep reappearing when encounter initiated by assistant user.
+  * Fixed - Some large batch HCFA-1500's with numerous CPT codes were not printing properly.
+  * Fixed - Billing elements not saved properly with PHP error codes with numerous CPT codes and diagnoses codes.
+  * Fixed - Display and button alignments of ROS and PE dialogs not compatible with certain browsers and devices.
+  * Fixed - Dashboard page not logging out after 30 minutes of inactivity.
+
+ -- Michael Shihjay Chen <shihjay2@gmail.com>  Wed, 27 Nov 2013 10:45:38 -0700
+ 
+ nosh-cs (1.7.1-0ubuntu10) precise; urgency=low
 
   * Fixed - Signatures and logos not always showing up on PDF's.
 

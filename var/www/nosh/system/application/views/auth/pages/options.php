@@ -64,8 +64,8 @@
 		<h3><a href="#">CPT</a></h3>
 		<div>
 			Search: <input type="text" size="50" id="search_all_cpt" class="text ui-widget-content ui-corner-all" onkeydown="doSearch(arguments[0]||event)"/><br><br> 
-			<table id="cpt_list" class="scroll" cellpadding="0" cellspacing="0"></table>
-			<div id="cpt_list_pager" class="scroll" style="text-align:center;"></div><br>
+			<table id="cpt_list_config" class="scroll" cellpadding="0" cellspacing="0"></table>
+			<div id="cpt_list_config_pager" class="scroll" style="text-align:center;"></div><br>
 			<button type="button" id="add_cpt">Add CPT Code</button>
 			<button type="button" id="edit_cpt">Edit CPT Code</button>
 			<button type="button" id="delete_cpt">Delete CPT Code</button>
@@ -86,8 +86,8 @@
 		<input type="hidden" name="orderslist_id" id="configuration_orderslist_id"/>
 		<input type="hidden" name="user_id" id="configuration_user_id"/>
 		<input type="hidden" name="orders_category" id="configuration_orders_categrory"/>
-		Order:<br><input type="text" name="orders_description" id="configuration_orders_description" style="width:450px" class="text ui-widget-content ui-corner-all"/><br>
-		CPT Code (optional):<br><input type="text" name="cpt" id="configuration_cpt" style="width:290px" class="text ui-widget-content ui-corner-all"/><br>
+		Order:<br><input type="text" name="orders_description" id="configuration_orders_description" style="width:450px" class="text ui-widget-content ui-corner-all"/><br><br>
+		CPT Code (optional):<br><input type="text" name="cpt" id="configuration_cpt" style="width:290px" class="text ui-widget-content ui-corner-all"/><br><br>
 		<div id="configuration_snomed_div">
 			SNOMED Code (optional):<br><input type="text" name="snomed" id="configuration_snomed" style="width:290px" class="text ui-widget-content ui-corner-all" placeholder="Type a few letters to search or select from hierarchy."/><br><br>
 			SNOMED Database: Click on arrow to expand hierarchy.  Click on item to select code.<br>
@@ -99,9 +99,12 @@
 	<form id="configuration_cpt_form">
 		<input type="hidden" id="configuration_cpt_origin"/>
 		<input type="hidden" name="cpt_id" id="configuration_cpt_id"/>
-		CPT Code:<br><input type="text" name="cpt" id="configuration_cpt_code" style="width:290px" class="text ui-widget-content ui-corner-all"/><br>
-		Description:<br><textarea name="cpt_description" id="configuration_cpt_description" style="width:400px" rows="5" class="text ui-widget-content ui-corner-all"/><br>
-		Charge:<br>$<input type="text" name="cpt_charge" id="configuration_charge" style="width:290px" class="text ui-widget-content ui-corner-all"/>
+		<input type="hidden" name="cpt_relate_id" id="configuration_cpt_relate_id"/>
+		CPT Code:<br><input type="text" name="cpt" id="configuration_cpt_code" style="width:290px" class="text ui-widget-content ui-corner-all"/><br><br>
+		Description:<br><textarea name="cpt_description" id="configuration_cpt_description" style="width:400px" rows="5" class="text ui-widget-content ui-corner-all"/><br><br>
+		Charge:<br>$<input type="text" name="cpt_charge" id="configuration_charge" style="width:290px" class="text ui-widget-content ui-corner-all"/><br><br>
+		Default Unit(s):<br><input type="text" name="unit" id="configuration_unit" style="width:290px" class="text ui-widget-content ui-corner-all"/><br><br>
+		Favorite:<select name="favorite" id="configuration_favorite" class="text ui-widget-content ui-corner-all forms_main"></select>
 	</form>
 </div>
 <div id="configuration_patient_forms_dialog" title="">
@@ -418,6 +421,9 @@
 										if (type1 == "Cardiopulmonary") {
 											var type = "cp";
 										}
+										if (type1 == "Referral") {
+											var type = "ref";
+										}
 										if (node == -1) {
 											url = "<?php echo site_url('search/snomed_parent/');?>/" + type;
 										} else {
@@ -545,22 +551,25 @@
 	}
 	function gridReload(){ 
 		var mask = jQuery("#search_all_cpt").val();
-		jQuery("#cpt_list").setGridParam({url:"<?php echo site_url('start/cpt_list');?>/"+mask,page:1}).trigger("reloadGrid");
+		jQuery("#cpt_list_config").setGridParam({url:"<?php echo site_url('start/cpt_list');?>/"+mask,page:1}).trigger("reloadGrid");
 	}
-	jQuery("#cpt_list").jqGrid({
+	jQuery("#cpt_list_config").jqGrid({
 		url:"<?php echo site_url('start/cpt_list');?>",
 		datatype: "json",
 		mtype: "POST",
-		colNames:['ID','CPT Code','Description','Charge'],
+		colNames:['ID','Relate ID','CPT Code','Description','Charge','Favorite','Unit'],
 		colModel:[
 			{name:'cpt_id',index:'cpt_id',width:1,hidden:true},
+			{name:'cpt_relate_id',index:'cpt_relate_id',width:1,hidden:true, editrules : {edithidden:true}},
 			{name:'cpt',index:'cpt',width:100,editable:true,editrules:{required:true},formoptions:{elmsuffix:"(*)"}},
 			{name:'cpt_description',index:'cpt_description',width:350,editable:true,editrules:{required:true},edittype:"textarea",editoptions:{rows:"4",cols:"50"},formoptions:{elmsuffix:"(*)"}},
 			{name:'cpt_charge',index:'cpt_charge',width:100,editable:true,editrules:{required:true},formoptions:{elmsuffix:"(*)"}},
+			{name:'favorite',index:'favorite',width:1,hidden:true},
+			{name:'unit',index:'unit',width:1,hidden:true}
 		],
 		rowNum:10,
 		rowList:[10,20,30],
-		pager: jQuery('#cpt_list_pager'),
+		pager: jQuery('#cpt_list_config_pager'),
 		sortname: 'cpt',
 	 	viewrecords: true,
 	 	sortorder: "asc",
@@ -568,16 +577,18 @@
 	 	emptyrecords:"No CPT codes",
 	 	height: "100%",
 	 	jsonReader: { repeatitems : false, id: "0" }
-	}).navGrid('#cpt_list_pager',{edit:false,add:false,del:false});
+	}).navGrid('#cpt_list_config_pager',{edit:false,add:false,del:false});
 	$("#add_cpt").button().click(function(){
 		$("#configuration_cpt_form").clearForm();
+		$("#configuration_unit").val('1');
+		$("#configuration_favorite").val('0');
 		$('#configuration_cpt_dialog').dialog('open');
 		$('#configuration_cpt_dialog').dialog('option', 'title', "Add CPT Code");
 	});
 	$("#edit_cpt").button().click(function(){
-		var item = jQuery("#cpt_list").getGridParam('selrow');
+		var item = jQuery("#cpt_list_config").getGridParam('selrow');
 		if(item){ 
-			jQuery("#cpt_list").GridToForm(item,"#configuration_cpt_form");
+			jQuery("#cpt_list_config").GridToForm(item,"#configuration_cpt_form");
 			$('#configuration_cpt_dialog').dialog('open');
 			$('#configuration_cpt_dialog').dialog('option', 'title', "Edit CPT Code");
 		} else {
@@ -585,14 +596,14 @@
 		}
 	});
 	$("#delete_cpt").button().click(function(){
-		var item = jQuery("#cpt_list").getGridParam('selrow');
+		var item = jQuery("#cpt_list_config").getGridParam('selrow');
 		if(item){
 			$.ajax({
 				type: "POST",
 				url: "<?php echo site_url('start/delete_cpt');?>",
 				data: "cpt_id=" + item,
 				success: function(data){
-					jQuery("#cpt_list").trigger("reloadGrid");
+					jQuery("#cpt_list_config").trigger("reloadGrid");
 				}
 			});
 		} else {
@@ -602,7 +613,7 @@
 	$("#configuration_cpt_dialog").dialog({ 
 		bgiframe: true, 
 		autoOpen: false, 
-		height: 300, 
+		height: 400, 
 		width: 800, 
 		draggable: false,
 		resizable: false,
@@ -626,7 +637,7 @@
 						dataType: 'json',
 						success: function(data){
 							$.jGrowl(data.message);
-							jQuery("#cpt_list").trigger("reloadGrid");
+							jQuery("#cpt_list_config").trigger("reloadGrid");
 							var origin = $("#configuration_cpt_origin").val();
 							var cpt = $("#configuration_cpt_code").val();
 							if (origin != "") {
@@ -665,6 +676,7 @@
 			$('#configuration_cpt_dialog').dialog('option', 'title', "");
 		}
 	});
+	$("#configuration_favorite").addOption({"0":"No","1":"Yes"});
 	jQuery("#patient_forms_list").jqGrid({
 		url:"<?php echo site_url('start/patient_forms_list');?>",
 		datatype: "json",
@@ -917,6 +929,7 @@
 			$("#patient_forms_template_div_options").html('');
 			$("#configuration_patient_forms_fieldtype").val('');
 			$("#patient_forms_template_surround_div").show();
+			$("#configuration_patient_forms_label").focus();
 		} else {
 			$.jGrowl("Finish editing current form element!");
 		}

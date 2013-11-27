@@ -91,6 +91,9 @@
 				<table cellspacing="0" cellpadding="3">
 					<tbody>
 						<tr>
+							<td colspan="3">Select existing patient to copy contact information:<br><input type="text" id="menu_autocomplete_patient" style="width:560px" class="text ui-widget-content ui-corner-all"/></td>
+						</tr>
+						<tr>
 							<td colspan="3">Address:<br><input type="text" name="address" id="menu_address" style="width:560px" class="text ui-widget-content ui-corner-all"/></td>
 						</tr>
 						<tr>
@@ -436,7 +439,24 @@
 			}
 		}
 	});
-	$("#demographics_accordion").accordion();
+	$("#demographics_accordion").accordion({
+		activate: function (event, ui) {
+			var id = ui.newPanel[0].id;
+			$("#" + id + " .text").first().focus();
+		}
+	});
+	$("#demographics_accordion .ui-accordion-content").each(function(){
+		$(this).find(".text").last().on('keydown', function(e) {
+			if (e.which == 9) {
+				if (!e.shiftKey) {
+					var active = $("#demographics_accordion").accordion("option", "active");
+					if (active < 3) {
+						$("#demographics_accordion").accordion("option", "active", active + 1);
+					}
+				}
+			}
+		});
+	});
 	$("#guardian_import").button().click(function(){
 		$('#menu_guardian_address').val($('#menu_address').val());
 		$('#menu_guardian_city').val($('#menu_city').val());
@@ -647,6 +667,36 @@
 		},
 		close: function(event, ui) {
 			$("#edit_menu_insurance_main_form").clearForm();
+		}
+	});
+	$("#menu_autocomplete_patient").autocomplete({
+		source: function (req, add){
+			$.ajax({
+				url: "<?php echo site_url('search/demographics_copy');?>",
+				dataType: "json",
+				type: "POST",
+				data: req,
+				success: function(data){
+					if(data.response =='true'){
+						add(data.message);
+					}				
+				}
+			});
+		},
+		minLength: 1,
+		select: function( event, ui ) {
+			$("#menu_address").val(ui.item.address);
+			$("#menu_city").val(ui.item.city);
+			$("#menu_state").val(ui.item.state);
+			$("#menu_zip").val(ui.item.zip);
+			$("#menu_phone_home").val(ui.item.phone_home);
+			$("#menu_phone_work").val(ui.item.phone_work);
+			$("#menu_phone_cell").val(ui.item.phone_cell);
+			$("#menu_email").val(ui.item.email);
+			$("#menu_emergency_contact").val(ui.item.emergency_contact);
+			$("#menu_emergency_phone").val(ui.item.emergency_phone);
+			$("#menu_reminder_method").val(ui.item.reminder_method);
+			$("#menu_cell_carrier").val(ui.item.cell_carrier);
 		}
 	});
 	$("#menu_address").autocomplete({

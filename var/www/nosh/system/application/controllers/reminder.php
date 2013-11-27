@@ -32,10 +32,11 @@ class Reminder extends Application
 					$id = $row['provider_id'];
 					$appt_id = $row['appt_id'];
 					$startdate = date("F j, Y, g:i a", $row['start']);
-					$query0 = $this->db->query("SELECT displayname FROM users WHERE id=$id");
+					$query0 = $this->db->query("SELECT * FROM users WHERE id=$id");
 					foreach ($query0->result_array() as $row0) {
 						$displayname = $row0['displayname'];
-						$query2 = $this->db->query("SELECT * FROM practiceinfo WHERE practice_id=1");
+						$practice_id = $row0['practice_id'];
+						$query2 = $this->db->query("SELECT * FROM practiceinfo WHERE practice_id=$practice_id");
 						foreach ($query2->result_array() as $row2) {
 							$phone = $row2['phone'];
 							if ($row['reminder_method'] == 'Cellular Phone') {
@@ -76,13 +77,16 @@ class Reminder extends Application
 				$j++;
 			}
 		}
-		$updox = $this->check_extension('updox_extension');
-		if ($updox) {
-			$this->updox_sync();
-		}
-		$rcopia = $this->check_extension('rcopia_extension');
-		if ($rcopia) {
-			$this->rcopia_sync();
+		$query3 = $this->db->query("SELECT * FROM practiceinfo");
+		foreach ($query3->result_array(); as $practice_row) {
+			$updox = $this->check_extension('updox_extension', $practice_row['practice_id']);
+			if ($updox) {
+				$this->updox_sync($practice_row['practice_id']);
+			}
+			$rcopia = $this->check_extension('rcopia_extension', $practice_row['practice_id']);
+			if ($rcopia) {
+				$this->rcopia_sync($practice_row['practice_id']);
+			}
 		}
 		$arr = "Number of appointments: " . $j . "<br>";
 		$arr .= "Number of appointment reminders sent: " . $i;
@@ -90,8 +94,9 @@ class Reminder extends Application
 		exit (0);
 	}
 	
-	function check_extension($extension)
+	function check_extension($extension, $practice_id)
 	{
+		$this->db->where('practice_id', $practice_id);
 		$result = $this->db->get('practiceinfo')->row_array();
 		if ($result[$extension] == 'y') {
 			return TRUE;
@@ -100,9 +105,9 @@ class Reminder extends Application
 		}
 	}
 	
-	function updox_sync()
+	function updox_sync($practice_id)
 	{
-		$result = $this->practiceinfo_model->get()->row_array();
+		$result = $this->practiceinfo_model->get($practice_id)->row_array();
 		$dir = $result['documents_dir'] . 'updox/';
 		$files = scandir($dir);
 		$count = count($files);
@@ -162,9 +167,10 @@ class Reminder extends Application
 		echo $count;
 	}
 	
-	function rcopia_sync()
+	function rcopia_sync($practice_id)
 	{
 		// Update Notification
+		$this->db->where('practice_id', $practice_id);
 		$row0 = $this->db->get('practiceinfo')->row_array();
 		if ($row0['rcopia_update_notification_lastupdate'] == "") {
 			$datestring = "%m/%d/%Y %H:%i:%s";
@@ -175,7 +181,7 @@ class Reminder extends Application
 		$xml0 = "<Request><Command>update_notification</Command>";
 		$xml0 .= "<LastUpdateDate>" . $date0 . "</LastUpdateDate>";
 		$xml0 .= "</Request></RCExtRequest>";
-		$result0 = $this->rcopia($xml0);
+		$result0 = $this->rcopia($xml0, $practice_id);
 		$response0 = new SimpleXMLElement($result0);
 		if ($response0->Response->Status == "error") {
 			$description0 = $response0->Response->Error->Text . "";
@@ -183,7 +189,8 @@ class Reminder extends Application
 				'action' => 'update_notification',
 				'pid' => '0',
 				'extensions_name' => 'rcopia',
-				'description' => $description0
+				'description' => $description0,
+				'practice_id' => $practice_id
 			);
 			$this->db->insert('extensions_log', $data0a);
 		} else {
@@ -246,7 +253,8 @@ class Reminder extends Application
 							'body' => $body,
 							'patient_name' => $patient_name,
 							'status' => 'Sent',
-							'mailbox' => $provider_row['id']
+							'mailbox' => $provider_row['id'],
+							'practice_id' => $practice_id
 						);
 						$this->db->insert('messages', $data_message);
 					}
@@ -255,7 +263,7 @@ class Reminder extends Application
 			$data_update = array(
 				'rcopia_update_notification_lastupdate' => $last_update_date
 			);
-			$this->db->where('practice_id', '1');
+			$this->db->where('practice_id', $practice_id);
 			$this->db->update('practiceinfo', $data_update);
 		}
 		
@@ -283,7 +291,7 @@ class Reminder extends Application
 				$xml1 .= "<State>" . $row1['state'] . "</State>";
 				$xml1 .= "<Zip>" . $row1['zip'] . "</Zip>";
 				$xml1 .= "</Patient></PatientList></Request></RCExtRequest>";
-				$result1 = $this->rcopia($xml1);
+				$result1 = $this->rcopia($xml1, $practice_id);
 				$response1 = new SimpleXMLElement($result1);
 				$status1 = $response1->Response->PatientList->Patient->Status . "";
 				if ($status1 == "error") {
@@ -292,7 +300,8 @@ class Reminder extends Application
 						'action' => 'send_patient',
 						'pid' => $row1['pid'],
 						'extensions_name' => 'rcopia',
-						'description' => $description1
+						'description' => $description1,
+						'practice_id' => $practice_id
 					);
 					$this->db->insert('extensions_log', $data1a);
 				} else {
@@ -322,7 +331,7 @@ class Reminder extends Application
 				$xml2 .= "<Reaction>" . $row2['allergies_reaction'] . "</Reaction>";
 				$xml2 .= "<OnsetDate>" . $da_final . "</OnsetDate>";
 				$xml2 .= "</Allergy></AllergyList></Request></RCExtRequest>";
-				$result2 = $this->rcopia($xml2);
+				$result2 = $this->rcopia($xml2, $practice_id);
 				$response2 = new SimpleXMLElement($result2);
 				$status2 = $response2->Response->AllergyList->Allergy->Status . "";
 				if ($status2 == "error") {
@@ -331,18 +340,19 @@ class Reminder extends Application
 						'action' => 'send_allergy',
 						'pid' => $row2['pid'],
 						'extensions_name' => 'rcopia',
-						'description' => $description2
+						'description' => $description2,
+						'practice_id' => $practice_id
 					);
 					$this->db->insert('extensions_log', $data2a);
 					if ($description2 == "Can find neither name, Rcopia ID, or NDC ID for drug.") {
 						$data2c['rcopia_sync'] = 'ye';
-						$this->db->where('pid',$row2['pid']);
+						$this->db->where('allergies_id',$row2['allergies_id']);
 						$this->db->update('allergies',$data2c);
 						$this->audit_model->update();
 					}
 				} else {
 					$data2b['rcopia_sync'] = 'y';
-					$this->db->where('pid',$row2['pid']);
+					$this->db->where('allergies_id',$row2['allergies_id']);
 					$this->db->update('allergies',$data2b);
 					$this->audit_model->update();
 				}
@@ -414,7 +424,7 @@ class Reminder extends Application
 				$xml3 .= "<StartDate>" . $dm_final . "</StartDate>";
 				$xml3 .= "<StopDate>" . $dn_final . "</StopDate>";
 				$xml3 .= "</Medication></MedicationList></Request></RCExtRequest>";
-				$result3 = $this->rcopia($xml3);
+				$result3 = $this->rcopia($xml3, $practice_id);
 				$response3 = new SimpleXMLElement($result3);
 				$status3 = $response3->Response->MedicationList->Medication->Status . "";
 				if ($status3 == "error") {
@@ -423,12 +433,13 @@ class Reminder extends Application
 						'action' => 'send_medication',
 						'pid' => $row3['pid'],
 						'extensions_name' => 'rcopia',
-						'description' => $description3
+						'description' => $description3,
+						'practice_id' => $practice_id
 					);
 					$this->db->insert('extensions_log', $data3a);
 				} else {
 					$data3b['rcopia_sync'] = 'y';
-					$this->db->where('pid',$row3['pid']);
+					$this->db->where('rxl_id',$row3['rxl_id']);
 					$this->db->update('rx_list',$data3b);
 					$this->audit_model->update();
 				}
@@ -450,7 +461,7 @@ class Reminder extends Application
 				$xml4 .= "<Code>" . $code . "</Code>";
 				$xml4 .= "<Description>" . $di[0] . "</Description>";
 				$xml4 .= "</Problem></ProblemList></Request></RCExtRequest>";
-				$result4 = $this->rcopia($xml4);
+				$result4 = $this->rcopia($xml4, $practice_id);
 				$response4 = new SimpleXMLElement($result4);
 				$status4 = $response4->Response->ProblemList->Problem->Status . "";
 				if ($status4 == "error") {
@@ -459,13 +470,14 @@ class Reminder extends Application
 						'action' => 'send_problem',
 						'pid' => $row4['pid'],
 						'extensions_name' => 'rcopia',
-						'description' => $description4
+						'description' => $description4,
+						'practice_id' => $practice_id
 					);
 					$this->db->insert('extensions_log', $data4a);
 				} else {
 					$data4b['rcopia_sync'] = 'y';
-					$this->db->where('pid',$row4['pid']);
-					$this->db->update('allergies',$data4b);
+					$this->db->where('issue_id',$row4['issue_id']);
+					$this->db->update('issues',$data4b);
 					$this->audit_model->update();
 				}
 			}
@@ -489,7 +501,7 @@ class Reminder extends Application
 				$xml5 .= "<Reaction>" . $row5['allergies_reaction'] . "</Reaction>";
 				$xml5 .= "<OnsetDate>" . $dda_final . "</OnsetDate>";
 				$xml5 .= "</Allergy></AllergyList></Request></RCExtRequest>";
-				$result5 = $this->rcopia($xml5);
+				$result5 = $this->rcopia($xml5, $practice_id);
 				$response5 = new SimpleXMLElement($result5);
 				$status5 = $response5->Response->AllergyList->Allergy->Status . "";
 				if ($status5 == "error") {
@@ -498,7 +510,8 @@ class Reminder extends Application
 						'action' => 'delete_allergy',
 						'pid' => $row5['pid'],
 						'extensions_name' => 'rcopia',
-						'description' => $description5
+						'description' => $description5,
+						'practice_id' => $practice_id
 					);
 					$this->db->insert('extensions_log', $data5a);
 					$data5b['rcopia_sync'] = 'y';
@@ -507,7 +520,7 @@ class Reminder extends Application
 					$this->audit_model->update();
 				} else {
 					$data5b['rcopia_sync'] = 'y';
-					$this->db->where('pid',$row5['pid']);
+					$this->db->where('allergies_id',$row5['allergies_id']);
 					$this->db->update('allergies',$data5b);
 					$this->audit_model->update();
 				}
@@ -578,7 +591,7 @@ class Reminder extends Application
 				$xml6 .= "<StartDate>" . $ddm_final . "</StartDate>";
 				$xml6 .= "<StopDate>" . $ddn_final . "</StopDate>";
 				$xml6 .= "</Medication></MedicationList></Request></RCExtRequest>";
-				$result6 = $this->rcopia($xml6);
+				$result6 = $this->rcopia($xml6, $practice_id);
 				$response6 = new SimpleXMLElement($result6);
 				$status6 = $response6->Response->MedicationList->Medication->Status . "";
 				if ($status6 == "error") {
@@ -587,7 +600,8 @@ class Reminder extends Application
 						'action' => 'delete_medication',
 						'pid' => $row6['pid'],
 						'extensions_name' => 'rcopia',
-						'description' => $description6
+						'description' => $description6,
+						'practice_id' => $practice_id
 					);
 					$this->db->insert('extensions_log', $data6a);
 					$data6b['rcopia_sync'] = 'y';
@@ -596,7 +610,7 @@ class Reminder extends Application
 					$this->audit_model->update();
 				} else {
 					$data6b['rcopia_sync'] = 'y';
-					$this->db->where('pid',$row6['pid']);
+					$this->db->where('rxl_id',$row6['rxl_id']);
 					$this->db->update('rx_list',$data6b);
 					$this->audit_model->update();
 				}
@@ -618,7 +632,7 @@ class Reminder extends Application
 				$xml7 .= "<Code>" . $code1 . "</Code>";
 				$xml7 .= "<Description>" . $ddi[0] . "</Description>";
 				$xml7 .= "</Problem></ProblemList></Request></RCExtRequest>";
-				$result7 = $this->rcopia($xml7);
+				$result7 = $this->rcopia($xml7, $practice_id);
 				$response7 = new SimpleXMLElement($result7);
 				$status7 = $response7->Response->ProblemList->Problem->Status . "";
 				if ($status7 == "error") {
@@ -627,7 +641,8 @@ class Reminder extends Application
 						'action' => 'delete_problem',
 						'pid' => $row7['pid'],
 						'extensions_name' => 'rcopia',
-						'description' => $description7
+						'description' => $description7,
+						'practice_id' => $practice_id
 					);
 					$this->db->insert('extensions_log', $data7a);
 					$data7b['rcopia_sync'] = 'y';
@@ -636,7 +651,7 @@ class Reminder extends Application
 					$this->audit_model->update();
 				} else {
 					$data7b['rcopia_sync'] = 'y';
-					$this->db->where('pid',$row7['pid']);
+					$this->db->where('issue_id',$row7['issue_id']);
 					$this->db->update('issues',$data7b);
 					$this->audit_model->update();
 				}
@@ -645,9 +660,9 @@ class Reminder extends Application
 		
 	}
 	
-	function rcopia($command)
+	function rcopia($command, $practice_id)
 	{
-		$practice = $this->practiceinfo_model->get()->row_array();
+		$practice = $this->practiceinfo_model->get($practice_id)->row_array();
 		$apiVendor = $practice['rcopia_apiVendor'];
 		$apiPractice = $practice['rcopia_apiPractice'];
 		$apiPass = $practice['rcopia_apiPass'];
@@ -681,17 +696,243 @@ class Reminder extends Application
 		return $result;
 	}
 	
-	function rcopia_check()
+	function get_results()
 	{
-		$date = now();
-		$datestring = "%m/%d/%Y %H:%i:%s";
-		$date1 = mdate($datestring, $date);
-		$row0 = $this->db->get('practiceinfo')->row_array();
-		$xml0 = "<Request><Command>update_notification</Command>";
-		$xml0 .= "<LastUpdateDate>" . $row0['rcopia_update_notification_lastupdate'] . "</LastUpdateDate>";
-		$xml0 .= "</Request></RCExtRequest>";
-		$result0 = $this->rcopia($xml0);
-		echo $result0;
+		$dir = '/srv/ftp/shared/import/';
+		$files = scandir($dir);
+		$count = count($files);
+		for ($i = 2; $i < $count; $i++) {
+			$line = $files[$i];
+			$file = $dir . $line;
+			$hl7 = file_get_contents($file);
+			$hl7_lines = explode("\n", $hl7);
+			$results = array();
+			$j = 0;
+			foreach ($hl7_lines as $line) {
+				$line_section = explode("|", $line);
+				if ($line_section[0] == "MSH") {
+					if (strpos($line_section[4], "LAB") !== FALSE) {
+						$test_type = "Laboratory";
+					} else {
+						$test_type = "Imaging";
+					}
+				}
+				if ($line_section[0] == "PID") {
+					$name_section = explode("^", $line_section[5]);
+					$lastname = $name_section[0];
+					$firstname = $name_section[1];
+					$year = substr($line_section[7], 0, 4);
+					$month = substr($line_section[7], 4, 2);
+					$day = substr($line_section[7], 6, 2);
+					$dob = $year . "-" . $month . "-" . $day . " 00:00:00";
+					$sex = strtolower($line_section[8]);
+				}
+				if ($line_section[0] == "ORC") {
+					$provider_section = explode("^", $line_section[12]);
+					$provider_lastname = $provider_section[1];
+					$provider_firstname = $provider_section[2];
+					$provider_id = $provider_section[0];
+					$practice_section = explode("^", $line_section[17]);
+					$practice_lab_id = $practice_section[0];
+				}
+				if ($line_section[0] == "OBX") {
+					$test_name_section = explode("^", $line_section[3]);
+					$results[$j]['test_name'] = $test_name_section[1];
+					$results[$j]['test_result'] = $line_section[5];
+					$results[$j]['test_units'] = $line_section[6];
+					$results[$j]['test_reference'] = $line_section[7];
+					$results[$j]['test_flags'] = $line_section[8];
+					$year1 = substr($line_section[14], 0, 4);
+					$month1 = substr($line_section[14], 4, 2);
+					$day1 = substr($line_section[14], 6, 2);
+					$hour1 = substr($line_section[14], 8, 2);
+					$minute1 = substr($line_section[14], 10, 2);
+					$results[$j]['test_datetime'] = $year1 . "-" . $month1 . "-" . $day1 . " " . $hour1 . ":" . $minute1 .":00";
+					$j++;
+				}
+				if ($line_section[0] == "NTE") {
+					$from = $line_section[3];
+				}
+			}
+			$this->db->where('peacehealth_id', $practice_lab_id);
+			$practice_query = $this->db->get('practiceinfo');
+			if ($practice_query->num_rows() > 0) {
+				$cmd = 'rm ' . $file;
+				exec($cmd);
+				exit (0);
+			} else {
+				$practice_row = $practice_query->row_array();
+				$practice_id = $practice_row['practice_id'];
+			}
+			$this->db->select('users.lastname, users.firstname, users.title, users.id');
+			$this->db->from('users');
+			$this->db->join('providers', 'providers.id=users.id');
+			$this->db->where('providers.peacehealth_id', $provider_id);
+			$provider_query = $this->db->get();
+			if ($provider_query->num_rows() > 0) {
+				$provider_row = $provider_query->row_array();
+				$provider_id = $provider_row['id'];
+			} else {
+				$provider_id = '';
+			}
+			$this->db->where('lastname', $lastname);
+			$this->db->where('firstname', $firstname);
+			$this->db->where('DOB', $dob);
+			$this->db->where('sex', $sex);
+			$patient_query = $this->db->get('demographics');
+			if ($patient_query->num_rows() > 0) {
+				$patient_row = $patient_query->row_array();
+				$messages_pid = $patient_row['pid'];
+				$this->db->select('firstname, lastname, DOB');
+				$this->db->where('pid', $messages_pid);
+				$patient_row = $this->db->get('demographics')->row_array();
+				$dob_message = mdate("%m/%d/%Y", strtotime($patient_row['DOB']));
+				$patient_name =  $patient_row['lastname'] . ', ' . $patient_row['firstname'] . ' (DOB: ' . $dob_message . ') (ID: ' . $pid . ')';
+				$tests = 'y';
+				$test_desc = "";
+				$k = 0;
+				foreach ($results as $results_row) {
+					$test_data = array(
+						'pid' => $patient_row['pid'],
+						'test_name' => $results_row['test_name'],
+						'test_result' => $results_row['test_result'],
+						'test_units' => $results_row['test_units'],
+						'test_reference' => $results_row['test_reference'],
+						'test_flags' => $results_row['test_flags'],
+						'test_from' => $from,
+						'test_datetime' => $results_row['test_datetime'],
+						'test_type' => $test_type,
+						'test_provider_id' => $provider_id,
+						'practice_id' => $practice_id
+					);
+					$this->db->insert('tests', $test_data);
+					$this->audit_model->add();
+					if ($k == 0) {
+						$test_desc .= $results_row['test_name'];
+					} else {
+						$test_desc .= ", " . $results_row['test_name'];
+					}
+					$k++;
+				}
+				$practice_row = $this->practiceinfo_model->get($practice_id)->row_array();
+				$directory = $practice_row['documents_dir'] . $pid;
+				$file_path = $directory . '/tests_' . now() . '.pdf';
+				$html = $this->page_intro('Test Results');
+				$html .= $this->page_results($pid, $results, $patient_name);
+				$this->load->library('mpdf');
+				$this->mpdf=new mpdf('','Letter',0,'',26,26,26,26,9,9,'P');
+				$this->mpdf->useOnlyCoreFonts = true;
+				$this->mpdf->shrink_tables_to_fit=1;
+				$this->mpdf->AddPage();
+				$this->mpdf->SetHTMLFooter($footer,'O');
+				$this->mpdf->SetHTMLFooter($footer,'E');
+				$this->mpdf->WriteHTML($html);
+				$this->mpdf->SetTitle('Document Generated by NOSH ChartingSystem');
+				$this->mpdf->debug = true;
+				$this->mpdf->Output($file_path,'F');
+				while(!file_exists($file_path)) {
+					sleep(2);
+				}
+				$documents_date = mdate("%Y-%m-%d %H:%i:%s", now());
+				$test_desc = 'Test results for ' . $patient_name;
+				$pages_data = array(
+					'documents_url' => $file_path,
+					'pid' => $pid,
+					'documents_type' => $test_type,
+					'documents_desc' => $test_desc,
+					'documents_from' => $from,
+					'documents_date' => $documents_date
+				);			
+				$documents_id = $this->chart_model->addDocuments($pages_data);
+				$this->audit_model->add();
+			} else {
+				$messages_pid = '';
+				$patient_name = "Unknown patient: " . $lastname . ", " . $firstname . ", DOB: " . $month . "/" . $day . "/" . $year;
+				$tests = 'unk';
+				foreach ($results as $results_row) {
+					$test_data = array(
+						'test_name' => $results_row['test_name'],
+						'test_result' => $results_row['test_result'],
+						'test_units' => $results_row['test_units'],
+						'test_reference' => $results_row['test_reference'],
+						'test_flags' => $results_row['test_flags'],
+						'test_unassigned' => $patient_name,
+						'test_from' => $from,
+						'test_datetime' => $results_row['test_datetime'],
+						'test_type' => $test_type,
+						'test_provider_id' => $provider_id,
+						'practice_id' => $practice_id
+					);
+					$this->db->insert('tests', $test_data);
+					$this->audit_model->add();
+				}
+				$documents_id = '';
+			}
+			$subject = "Test results for " . $patient_name;
+			$body = "Test results for " . $patient_name . "\n\n";
+			foreach ($results as $results_row1) {
+				$body .= $results_row1['test_name'] . ": " . $results_row1['test_result'] . ", Units: " . $results_row1['test_units'] . ", Normal reference range: " . $results_row1['test_reference'] . ", Date: " . $results_row1['test_datetime'] . "\n";
+			}
+			$body .= "\n" . $from;
+			if ($tests="unk") {
+				$body .= "\n" . "Patient is unknown to the system.  Please reconcile this test result in your dashboard.";
+			}
+			if ($provider_id != '') {
+				$provider_name = $provider_row['firstname'] . " " . $provider_row['lastname'] . ", " . $provider_row['title'] . " (" . $provider_id . ")";
+				$data_message = array(
+					'pid' => $pid,
+					'message_to' => $provider_name,
+					'message_from' => $provider_row['id'],
+					'subject' => $subject,
+					'body' => $body,
+					'patient_name' => $patient_name,
+					'status' => 'Sent',
+					'mailbox' => $provider_id,
+					'practice_id' => $practice_id,
+					'documents_id' => $documents_id
+				);
+				$this->db->insert('messages', $data_message);
+			}
+			$cmd = 'rm ' . $file;
+			exec($cmd);
+		}
+		echo $count;
+	}
+	
+	function page_intro($title, $practice_id)
+	{
+		$practice = $this->practiceinfo_model->get($practice_id)->row_array();
+		$data['practiceName'] = $practice['practice_name'];
+		$data['website'] = $practice['website'];
+		$data['practiceInfo'] = $practice['street_address1'];
+		if ($practice['street_address2'] != '') {
+			$data['practiceInfo'] .= ', ' . $practice['street_address2'];
+		}
+		$data['practiceInfo'] .= '<br />';
+		$data['practiceInfo'] .= $practice['city'] . ', ' . $practice['state'] . ' ' . $practice['zip'] . '<br />';
+		$data['practiceInfo'] .= 'Phone: ' . $practice['phone'] . ', Fax: ' . $practice['fax'] . '<br />';
+		if ($practice['practice_logo'] != '') {
+			$logo = str_replace("/var/www/","http://localhost/", $practice['practice_logo']);
+			$data['practiceLogo'] = "<img src='" . $logo . "' border='0'>";
+		} else {
+			$data['practiceLogo'] = '<br><br><br><br><br>';
+		}
+		$data['title'] = $title;
+		return $this->load->view('auth/pages/intro_page', $data, TRUE);
+	}
+	
+	function page_results($pid, $results, $patient_name)
+	{
+		$body = '';
+		$body .= "<br>Test results for " . $patient_name . "<br><br>";
+		$body .= "<table><tr><th>Date</th><th>Test</th><th>Result</th><th>Units</th><th>Normal reference range</th><th>Flags</th></tr>";
+		foreach ($results as $results_row1) {
+			$body .= "<tr><td>" . $results_row1['test_datetime'] . "</td><td>" . $results_row1['test_name'] . "</td><td>" . $results_row1['test_result'] . "</td><td>" . $results_row1['test_units'] . "</td><td>" . $results_row1['test_reference'] . "</td><td>" . $results_row1['test_flags'] . "</td></tr>";
+			$from = $results_row1['test_from'];
+		}
+		$body .= "</table><br>" . $from;
+		$body .= '</body></html>';
+		return $body;
 	}
 }
 /* End of file: reminder.php */

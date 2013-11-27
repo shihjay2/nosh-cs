@@ -17,7 +17,8 @@ class Audit_model extends Model {
 			'pid' => $this->session->userdata('pid'),
 			'group_id' =>  $this->session->userdata('group_id'),
 			'action' => 'Add',
-			'query' => $this->db->last_query()
+			'query' => $this->db->last_query(),
+			'practice_id' => $this->session->userdata('practice_id')
 		);
 		$this->db->insert('audit', $audit);
 		
@@ -33,7 +34,8 @@ class Audit_model extends Model {
 			'pid' => $this->session->userdata('pid'),
 			'group_id' =>  $this->session->userdata('group_id'),
 			'action' => 'Update',
-			'query' => $this->db->last_query()
+			'query' => $this->db->last_query(),
+			'practice_id' => $this->session->userdata('practice_id')
 		);
 		$this->db->insert('audit', $audit);
 	}
@@ -48,7 +50,8 @@ class Audit_model extends Model {
 			'pid' => $this->session->userdata('pid'),
 			'group_id' =>  $this->session->userdata('group_id'),
 			'action' => 'Delete',
-			'query' => $this->db->last_query()
+			'query' => $this->db->last_query(),
+			'practice_id' => $this->session->userdata('practice_id')
 		);
 		$this->db->insert('audit', $audit);
 	}

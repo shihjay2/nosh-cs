@@ -30,7 +30,8 @@ class Chartmenu extends Application
 			redirect('start');
 		}
 		$user_id = $this->session->userdata('user_id');
-		$practice_info = $this->practiceinfo_model->get();
+		$practice_id = $this->session->userdata('practice_id');
+		$practice_info = $this->practiceinfo_model->get($practice_id);
 		$row1 = $practice_info->row();
 		$data['default_pos'] = $row1->default_pos_id;
 		$this->auth->view('billing/chart/main', $data);
@@ -40,7 +41,8 @@ class Chartmenu extends Application
 	
 	function page_intro($title)
 	{
-		$practice = $this->practiceinfo_model->get()->row_array();
+		$practice_id = $this->session->userdata('practice_id');
+		$practice = $this->practiceinfo_model->get($practice_id)->row_array();
 		$data['practiceName'] = $practice['practice_name'];
 		$data['website'] = $practice['website'];
 		$data['practiceInfo'] = $practice['street_address1'];
@@ -164,7 +166,8 @@ class Chartmenu extends Application
 			$fax_data = array(
 				'user' => $this->session->userdata('displayname'),
 				'faxsubject' => $type . ' for ' . $demo_row['firstname'] . ' ' . $demo_row['lastname'],
-				'faxcoverpage' => $coverpage
+				'faxcoverpage' => $coverpage,
+				'practice_id' => $this->session->userdata('practice_id')
 			);
 			$job_id = $this->fax_model->addFax($fax_data);
 			$fax_directory = '/var/www/nosh/sentfax/' . $job_id;
@@ -217,6 +220,7 @@ class Chartmenu extends Application
 				$faxnumbers .= $row['faxnumber'];
 			}
 		}
+		$this->db->where('practice_id', $this->session->userdata('practice_id'));
 		$practice_row = $this->db->get('practiceinfo')->row_array();
 		$faxnumber_array = explode(",", $faxnumbers);
 		$faxnumber_to = array();
@@ -272,7 +276,8 @@ class Chartmenu extends Application
 			'ready_to_send' => '1',
 			'senddate' => $senddate,
 			'faxdraft' => '0',
-			'attempts' => '0'
+			'attempts' => '0',
+			'success' => '1'
 		);
 		$this->fax_model->updateFax($job_id, $fax_update_data);
 		$this->email->send();
@@ -417,12 +422,13 @@ class Chartmenu extends Application
 	
 	function encounters()
 	{
+		$practice_id = $this->session->userdata('practice_id');
 		$pid = $this->session->userdata('pid');
 		$page = $this->input->post('page');
 		$limit = $this->input->post('rows');
 		$sidx = $this->input->post('sidx');
 		$sord = $this->input->post('sord');
-		$query = $this->db->query("SELECT * FROM encounters WHERE pid=$pid AND addendum='n'");
+		$query = $this->db->query("SELECT * FROM encounters WHERE pid=$pid AND addendum='n' AND practice_id=$practice_id");
 		$count = $query->num_rows(); 
 		if($count > 0) { 
 			$total_pages = ceil($count/$limit); 
@@ -432,7 +438,7 @@ class Chartmenu extends Application
 		if ($page > $total_pages) $page=$total_pages;
 		$start = $limit*$page - $limit;
 		if($start < 0) $start = 0;
-		$query1 = $this->db->query("SELECT * FROM encounters WHERE pid=$pid AND addendum='n' ORDER BY $sidx $sord LIMIT $start , $limit");
+		$query1 = $this->db->query("SELECT * FROM encounters WHERE pid=$pid AND addendum='n' AND practice_id=$practice_id ORDER BY $sidx $sord LIMIT $start , $limit");
 		$response['page'] = $page;
 		$response['total'] = $total_pages;
 		$response['records'] = $count;
@@ -446,6 +452,7 @@ class Chartmenu extends Application
 	
 	function demographics_list()
 	{
+		$practice_id = $this->session->userdata('practice_id');
 		$pid = $this->session->userdata('pid');
 		$query = $this->db->query("SELECT * FROM demographics WHERE pid=$pid");
 		$result = '<strong>Demographics:</strong>';
@@ -914,89 +921,6 @@ class Chartmenu extends Application
 		echo json_encode($response);
 		exit( 0 );
 	}
-	
-	function edit_issue()
-	{
-		$pid = $this->session->userdata('pid');
-		if ($pid == FALSE) {
-			echo "Close Chart";
-			exit (0);
-		}
-		$date = strtotime($this->input->post('issue_date_active'));
-		$datestring = "%Y-%m-%d %H:%i:%s";
-		$date_active = mdate($datestring, $date);	
-		$data = array(
-			'issue' => $this->input->post('issue'),
-			'issue_date_active' => $date_active,
-			'issue_date_inactive' => '',
-			'issue_provider' => $this->session->userdata('displayname'),
-			'pid' => $pid
-		);	
-		if($this->input->post('issue_id') == '') {
-			$add = $this->chart_model->addIssue($data);
-			$this->audit_model->add();
-			if ($add) {
-				echo "Issue added!";
-				exit (0);
-			} else {
-				echo "Error adding issue!";
-				exit (0);
-			}
-		} else {
-			$update = $this->chart_model->updateIssue($this->input->post('issue_id'), $data);
-			$this->audit_model->update();
-			echo "Issue updated!";
-			exit (0);
-		}
-	}
-	
-	function inactivate_issue()
-	{
-		$pid = $this->session->userdata('pid');
-		if ($pid == FALSE) {
-			echo "Close Chart";
-			exit (0);
-		}
-		$date = now();
-		$datestring = "%Y-%m-%d %H:%i:%s";
-		$date_inactive = mdate($datestring, $date);
-		$data = array(
-			'issue_date_inactive' => $date_inactive
-		);
-		$update = $this->chart_model->updateIssue($this->input->post('issue_id'), $data);
-		$this->audit_model->update();
-		echo "Issue inactivated!";
-		exit (0);
-	}
-	
-	function delete_issue()
-	{
-		$pid = $this->session->userdata('pid');
-		if ($pid == FALSE) {
-			echo "Close Chart";
-			exit (0);
-		}
-		$this->chart_model->deleteIssue($this->input->post('issue_id'));
-		$this->audit_model->delete();
-		echo "Issue deleted!";
-		exit (0);
-	}
-	
-	function reactivate_issue()
-	{
-		$pid = $this->session->userdata('pid');
-		if ($pid == FALSE) {
-			echo "Close Chart";
-			exit (0);
-		}
-		$data = array(
-			'issue_date_inactive' => ''
-		);
-		$update = $this->chart_model->updateIssue($this->input->post('issue_id'), $data);
-		$this->audit_model->update();
-		echo "Issue reactivated!";
-		exit (0);
-	}
 
 	// --------------------------------------------------------------------
 
@@ -1204,7 +1128,7 @@ class Chartmenu extends Application
 	function page_medication_list()
 	{
 		$pid = $this->session->userdata('pid');	
-		$practice = $this->practiceinfo_model->get()->row();
+		$practice = $this->practiceinfo_model->get($this->session->userdata('practice_id'))->row();
 		$data['practiceName'] = $practice->practice_name;
 		$data['website'] = $practice->website;
 		$data['practiceInfo'] = $practice->street_address1;
@@ -1345,98 +1269,6 @@ class Chartmenu extends Application
 		exit( 0 );
 	}
 	
-	function edit_supplement()
-	{
-		$pid = $this->session->userdata('pid');
-		if ($pid == FALSE) {
-			$result['message'] = 'Close Chart';
-			echo json_encode($result);
-			exit (0);
-		}
-		$date = strtotime($this->input->post('sup_date_active'));
-		$datestring = "%Y-%m-%d %H:%i:%s";
-		$date_active = mdate($datestring, $date);
-		$data = array(
-			'sup_supplement' => $this->input->post('sup_supplement'),
-			'sup_dosage' => $this->input->post('sup_dosage'),
-			'sup_dosage_unit' => $this->input->post('sup_dosage_unit'),
-			'sup_sig' => $this->input->post('sup_sig'),
-			'sup_route' => $this->input->post('sup_route'),
-			'sup_frequency' => $this->input->post('sup_frequency'),
-			'sup_instructions' => $this->input->post('sup_instructions'),
-			'sup_reason' => $this->input->post('sup_reason'),
-			'sup_date_active' => $date_active,
-			'sup_date_inactive' => '',
-			'sup_provider' => $this->session->userdata('displayname'),
-			'pid' => $pid
-		);
-		if($this->input->post('sup_id') == '') {
-			$add = $this->chart_model->addSupplement($data);
-			$this->audit_model->add();
-			if ($add) {
-				$result = array(
-					'message' => 'Supplement added!',
-					'medtext' => $this->input->post('sup_supplement') . ' ' . $this->input->post('sup_dosage') . ' ' . $this->input->post('sup_dosage_unit') . ', ' . $this->input->post('sup_sig') . ' ' . $this->input->post('sup_route') . ' ' . $this->input->post('sup_frequency') . ' for ' . $this->input->post('sup_reason')
-				);
-			} else {
-				$result['message'] = "Error adding supplement!";
-			}
-		} else {
-			$update = $this->chart_model->updateSupplement($this->input->post('sup_id'), $data);
-			$this->audit_model->update();
-			$result = array(
-				'message' => 'Supplement updated!',
-				'medtext' => $this->input->post('sup_supplement') . ' ' . $this->input->post('sup_dosage') . ' ' . $this->input->post('sup_dosage_unit') . ', ' . $this->input->post('sup_sig') . ' ' . $this->input->post('sup_route') . ' ' . $this->input->post('sup_frequency') . ' for ' . $this->input->post('sup_reason')
-			);
-		}
-		echo json_encode($result);
-		exit (0);
-	}
-	
-	function inactivate_supplement()
-	{
-		$sup_id = $this->input->post('sup_id');
-		$this->db->where('sup_id', $sup_id);
-		$query = $this->db->get('sup_list');
-		$row = $query->row_array();
-		$result['medtext'] =  $row['sup_supplement'] . ' ' . $row['sup_dosage'] . ' ' . $row['sup_dosage_unit'] . ', ' . $row['sup_sig'] . ' ' . $row['sup_route'] . ' ' . $row['sup_frequency'] . ' for ' . $row['sup_reason'];
-		$date = now();
-		$datestring = "%Y-%m-%d %H:%i:%s";
-		$date_inactive = mdate($datestring, $date);
-		$data = array(
-			'sup_date_inactive' => $date_inactive
-		);
-		$update = $this->chart_model->updateSupplement($sup_id, $data);
-		$this->audit_model->update();
-		$result['message'] = "Supplement inactivated!";
-		echo json_encode($result);
-		exit (0);
-	}
-	
-	function delete_supplement()
-	{
-		$this->chart_model->deleteSupplement($this->input->post('sup_id'));
-		$this->audit_model->delete();
-		echo "Supplement deleted!";
-	}
-
-	function reactivate_supplement()
-	{
-		$sup_id = $this->input->post('sup_id');
-		$this->db->where('sup_id', $sup_id);
-		$query = $this->db->get('sup_list');
-		$row = $query->row_array();
-		$result['medtext'] =  $row['sup_supplement'] . ' ' . $row['sup_dosage'] . ' ' . $row['sup_dosage_unit'] . ', ' . $row['sup_sig'] . ' ' . $row['sup_route'] . ' ' . $row['sup_frequency'] . ' for ' . $row['sup_reason'];
-		$data = array(
-			'sup_date_inactive' => '0000-00-00 00:00:00'
-		);
-		$update = $this->chart_model->updateSupplement($sup_id, $data);
-		$this->audit_model->update();
-		$result['message'] = "Supplement reactivated!";
-		echo json_encode($result);
-		exit (0);
-	}
-	
 	// --------------------------------------------------------------------
 	
 	function allergies_list()
@@ -1511,72 +1343,6 @@ class Chartmenu extends Application
 		exit( 0 );
 	}
 	
-	function edit_allergy()
-	{
-		$pid = $this->session->userdata('pid');
-		if ($pid == FALSE) {
-			$result['message'] = 'Close Chart';
-			echo json_encode($result);
-			exit (0);
-		}	
-		$date = strtotime($this->input->post('allergies_date_active'));
-		$datestring = "%Y-%m-%d %H:%i:%s";
-		$date_active = mdate($datestring, $date);	
-		$data = array(
-			'allergies_med' => $this->input->post('allergies_med'),
-			'allergies_reaction' => $this->input->post('allergies_reaction'),
-			'allergies_date_active' => $date_active,
-			'allergies_date_inactive' => '',
-			'allergies_provider' => $this->session->userdata('displayname'),
-			'pid' => $pid
-		);	
-		if($this->input->post('allergies_id') == '') {
-			$add = $this->chart_model->addAllergy($data);
-			$this->audit_model->add();
-			if ($add) {
-				$result['message'] = "Allergy added!";
-			} else {
-				$result['message'] = "Error adding allergy!";
-			}
-		} else {
-			$update = $this->chart_model->updateAllergy($this->input->post('allergies_id'), $data);
-			$this->audit_model->update();
-			$result['message'] = "Allergy updated!";
-		}
-		echo json_encode($result);
-			exit (0);
-	}
-	
-	function inactivate_allergy()
-	{
-		$date = now();
-		$datestring = "%Y-%m-%d %H:%i:%s";
-		$date_inactive = mdate($datestring, $date);
-		$data = array(
-			'allergies_date_inactive' => $date_inactive
-		);
-		$update = $this->chart_model->updateAllergy($this->input->post('allergies_id'), $data);
-		$this->audit_model->update();
-		echo "Allergy inactivated!";
-	}
-	
-	function delete_allergy()
-	{
-		$this->chart_model->deleteAllergy($this->input->post('allergies_id'));
-		$this->audit_model->delete();
-		echo "Allergy deleted!";
-	}
-
-	function reactivate_allergy()
-	{
-		$data = array(
-			'allergies_date_inactive' => ''
-		);
-		$update = $this->chart_model->updateAllergy($this->input->post('allergies_id'), $data);
-		$this->audit_model->update();
-		echo "Allergy reactivated!";
-	}
-
 	// --------------------------------------------------------------------
 
 	function immunizations_list()
@@ -1640,392 +1406,16 @@ class Chartmenu extends Application
 		exit( 0 );
 	}
 	
-	function edit_immunization()
-	{
-		$pid = $this->session->userdata('pid');
-		if ($pid == FALSE) {
-			$result['message'] = 'Close Chart';
-			echo json_encode($result);
-			exit (0);
-		}
-		$date = strtotime($this->input->post('imm_date'));
-		$datestring = "%Y-%m-%d %H:%i:%s";
-		$date_active = mdate($datestring, $date);
-		if ($this->input->post('imm_expiration')=='') {
-			$date_expiration = '';
-		} else {
-			$date1 = strtotime($this->input->post('imm_expiration'));
-			$date_expiration = mdate($datestring, $date1);	
-		}	
-		if ($this->input->post('imm_elsewhere')=='Yes') {
-			$imm_elsewhere = 'Yes';
-		} else {
-			$imm_elsewhere = 'No';
-		}	
-		$data = array(
-			'imm_immunization' => $this->input->post('imm_immunization'),
-			'imm_sequence' => $this->input->post('imm_sequence'),
-			'imm_body_site' => $this->input->post('imm_body_site'),
-			'imm_route' => $this->input->post('imm_route'),
-			'imm_dosage' => $this->input->post('imm_dosage'),
-			'imm_dosage_unit' => $this->input->post('imm_dosage_unit'),
-			'imm_lot' => $this->input->post('imm_lot'),
-			'imm_expiration' => $date_expiration,
-			'imm_date' => $date_active,
-			'imm_elsewhere' => $imm_elsewhere,
-			'imm_vis' => '',
-			'imm_manufacturer' => $this->input->post('imm_manufacturer'),
-			'imm_provider' => $this->session->userdata('displayname'),
-			'imm_cvxcode' => $this->input->post('imm_cvxcode'),
-			'pid' => $pid,
-			'eid' => ''
-		);	
-		if($this->input->post('imm_id') == '') {
-			$add = $this->chart_model->addImmunization($data);
-			$this->audit_model->add();
-			if ($add) {
-				$result['message'] = "Immunization added!";
-			} else {
-				$result['message'] = "Error adding immunization!";
-			}
-		} else {
-			$update = $this->chart_model->updateImmunization($this->input->post('imm_id'), $data);
-			$this->audit_model->update();
-			$result['message'] = "Immunization updated!";
-		}
-		echo json_encode($result);
-		exit (0);
-	}
-	
-	function edit_immunization1()
-	{
-		$pid = $this->session->userdata('pid');
-		if ($pid == FALSE) {
-			$result['message'] = 'Close Chart';
-			echo json_encode($result);
-			exit (0);
-		}
-		$date = strtotime($this->input->post('imm_date'));
-		$datestring = "%Y-%m-%d %H:%i:%s";
-		$date_active = mdate($datestring, $date);	
-		$date1 = strtotime($this->input->post('imm_expiration'));
-		$date_expiration = mdate($datestring, $date1);	
-		$medtext = '';
-		if ($this->input->post('imm_vis')=='Yes') {
-			$imm_vis = 'Yes';
-			$medtext .= 'Consent obtained and CDC Vaccine Information Sheet (VIS) given to patient/caregiver.';
-		} else {
-			$imm_vis = '';
-		}
-		$eid = $this->session->userdata('eid');
-		$data = array(
-			'imm_immunization' => $this->input->post('imm_immunization'),
-			'imm_sequence' => $this->input->post('imm_sequence'),
-			'imm_body_site' => $this->input->post('imm_body_site'),
-			'imm_route' => $this->input->post('imm_route'),
-			'imm_dosage' => $this->input->post('imm_dosage'),
-			'imm_dosage_unit' => $this->input->post('imm_dosage_unit'),
-			'imm_lot' => $this->input->post('imm_lot'),
-			'imm_expiration' => $date_expiration,
-			'imm_date' => $date_active,
-			'imm_elsewhere' => 'No',
-			'imm_vis' => $imm_vis,
-			'imm_manufacturer' => $this->input->post('imm_manufacturer'),
-			'imm_provider' => $this->session->userdata('displayname'),
-			'imm_cvxcode' => $this->input->post('imm_cvxcode'),
-			'pid' => $pid,
-			'eid' => $eid,
-			'cpt' => $this->input->post('cpt')
-		);	
-		$medtext .= '<br>' . $this->input->post('imm_immunization') . '; Sequence: ' . $this->input->post('imm_sequence') . '; Dosage: ' . $this->input->post('imm_dosage') . ' ' . $this->input->post('imm_dosage_unit') . ' ' . $this->input->post('imm_route') . ' administered to the ' . $this->input->post('imm_body_site');
-		$medtext .= '<br>Manufacturer: ' . $this->input->post('imm_manufacturer') . '; Lot number: ' . $this->input->post('imm_lot') . '; Expiration date: ' . $this->input->post('imm_expiration');
-		if($this->input->post('imm_id') == '') {
-			$add = $this->chart_model->addImmunization($data);
-			$this->audit_model->add();
-			if ($add) {
-				$vaccine_id = $this->input->post('vaccine_id');
-				$this->db->select('quantity');
-				$this->db->where('vaccine_id', $vaccine_id);
-				$inventory_query = $this->db->get('vaccine_inventory');
-				$inventory_result = $inventory_query->row_array();
-				$quantity = $inventory_result['quantity'];
-				$quantity = $quantity - 1;
-				$inventory_data = array(
-					'quantity' => $quantity
-				);
-				$this->db->where('vaccine_id', $vaccine_id);
-				$this->db->update('vaccine_inventory', $inventory_data);
-				$result =  array(
-					'message' => "Immunization added!",
-					'medtext' => $medtext
-				);
-			} else {
-				$result['message'] = "Error adding immunization!";
-			}		
-		} else {
-			$update = $this->chart_model->updateImmunization($this->input->post('imm_id'), $data);
-			$this->audit_model->update();
-			$result =  array(
-				'message' => "Immunization updated!",
-				'medtext' => $medtext
-			);
-		}
-		echo json_encode($result);
-		exit (0);
-	}
-	
-	function delete_immunization()
-	{
-		$this->chart_model->deleteImmunization($this->input->post('imm_id'));
-		$this->audit_model->delete();
-		echo "Immunization deleted!";
-	}
-	
-	function get_imm_notes()
-	{
-		$pid = $this->session->userdata('pid');
-		$this->db->select('imm_notes');
-		$this->db->where('pid', $pid);
-		$result = $this->db->get('demographics')->row_array();
-		if (is_null($result['imm_notes']) || $result['imm_notes'] == '') {
-			echo "";
-		} else {
-			echo nl2br($result['imm_notes']) . '<br><br>';
-		}
-		exit( 0 );
-	}
-	
-	function edit_imm_notes()
-	{
-		$pid = $this->session->userdata('pid');
-		if ($pid == FALSE) {
-			echo "Close Chart";
-			exit (0);
-		}
-		$data = array(
-			'imm_notes' => $this->input->post('imm_notes')
-		);
-		$this->demographics_model->update($pid, $data);
-		$this->audit_model->update();
-		echo "Immunization notes updated!";
-		exit( 0 );
-	}
-	
-	function consent_immunizations()
-	{
-		$pid = $this->session->userdata('pid');
-		$demographics = $this->demographics_model->get($pid);
-		$row = $demographics->row(); 
-		$name = $row->firstname . ' ' . $row->lastname;
-		$datestring = "%M %d, %Y";
-		$date = mdate($datestring);
-		$pdfinfo = array(
-			'name' => $name,
-			'vaccine_list' => $this->input->post('vaccine_list'),
-			'date' => $date
-		);
-		$input = '/var/www/nosh/vaccine_consent.pdf';
-		$user_id = $this->session->userdata('user_id');
-		$output = "/var/www/nosh/vaccine_consent_output_" . $user_id . ".pdf";
-		$data='<?xml version="1.0" encoding="UTF-8"?>'."\n".
-			'<xfdf xmlns="http://ns.adobe.com/xfdf/" xml:space="preserve">'."\n".
-			'<fields>'."\n";
-		foreach($pdfinfo as $field => $val) {
-			$data.='<field name="'.$field.'">'."\n";
-			if(is_array($val)) {
-				foreach($val as $opt)
-					$data.='<value>'.$opt.'</value>'."\n";
-			} else {
-				$data.='<value>'.$val.'</value>'."\n";
-			}
-			$data.='</field>'."\n";
-		}
-		$data.='</fields>'."\n".
-			'<ids original="'.md5($input).'" modified="'.time().'" />'."\n".
-			'<f href="'.$input.'" />'."\n".
-			'</xfdf>'."\n";		
-		$xfdf_fn= '/var/www/nosh/temp.xfdf';
-		$xfp= fopen( $xfdf_fn, 'w' );
-		if( $xfp ) {
-		   fwrite( $xfp, $data );
-		   fclose( $xfp );
-		} else {
-			$result_message = 'Error making xfdf!';
-			echo $result_message;
-			exit (0);
-		}		
-		$commandpdf = "pdftk " . $input . " fill_form " . $xfdf_fn . " output " . $output;
-		$commandpdf1 = escapeshellcmd($commandpdf);
-		exec($commandpdf1);
-		if (file_exists($output)) {
-			echo "OK";
-		} else {
-			echo "Error generating consent!";
-		}
-	}
-	
-	function print_consent()
-	{
-		$user_id = $this->session->userdata('user_id');
-		$file_path = "/var/www/nosh/vaccine_consent_output_" . $user_id . ".pdf";
-		if ($fp = fopen ($file_path, "r")) {
-			$file_info = pathinfo($file_path);
-			$file_name = $file_info["basename"];
-			$file_size = filesize($file_path);
-			$file_extension = strtolower($file_info["extension"]);	 
-			if($file_extension!='pdf') {
-				die('LOGGED! bad extension');
-			}
-			ob_start();
-			header('Content-type: application/pdf');
-			header('Content-Disposition: attachment; filename="'.$file_name.'"');
-			header("Content-length: $file_size");
-			ob_end_flush(); 
-			while(!feof($fp)) {
-				$file_buffer = fread($fp, 2048);
-				echo $file_buffer;
-			}
-			fclose($fp);
-			unlink($file_path);
-			exit();
-		} else {
-			die('LOGGED! bad file '.$file_path);
-		}
-	}
-	
-	function page_immunization_list()
-	{
-		$pid = $this->session->userdata('pid');	
-		$practice = $this->practiceinfo_model->get()->row();
-		$data['practiceName'] = $practice->practice_name;
-		$data['website'] = $practice->website;
-		$data['practiceInfo'] = $practice->street_address1;
-		if ($practice->street_address2 != '') {
-			$data['practiceInfo'] .= ', ' . $practice->street_address2;
-		}
-		$data['practiceInfo'] .= '<br />';
-		$data['practiceInfo'] .= $practice->city . ', ' . $practice->state . ' ' . $practice->zip . '<br />';
-		$data['practiceInfo'] .= 'Phone: ' . $practice->phone . ', Fax: ' . $practice->fax . '<br />';
-		$patient = $this->demographics_model->get($pid)->row_array();
-		$body = 'Immunizations for ' . $patient['firstname'] . ' ' . $patient['lastname'] . ':<br />';
-		$query = $this->db->query("SELECT * FROM immunizations WHERE pid=$pid ORDER BY imm_immunization ASC, imm_sequence ASC");
-		if ($query->num_rows() > 0) {
-			$body .= '<ul>';
-			foreach ($query->result_array() as $row) {
-				if ($row['imm_sequence'] == '1') {
-					$sequence = 'first';
-				}
-				if ($row['imm_sequence'] == '2') {
-					$sequence = 'second';
-				}
-				if ($row['imm_sequence'] == '3') {
-					$sequence = 'third';
-				}
-				if ($row['imm_sequence'] == '4') {
-					$sequence = 'fourth';
-				}
-				if ($row['imm_sequence'] == '5') {
-					$sequence = 'fifth';
-				}
-				$date1 = human_to_unix($row['imm_date']);
-				$date = date('F jS, Y', $date1);
-				$body .= '<li>' . $row['imm_immunization'] . ', ' . $sequence . ', given on ' . $date . '</li>';
-			}
-			$body .= '</ul>';
-		} else {
-			$body .= 'None.';
-		}
-		$body .= '<br />Printed by ' . $this->session->userdata['displayname'] . '.';
-		$data['letter'] = $body;
-		return $this->load->view('auth/pages/billing/chart/letter_page',$data, TRUE);
-	}
-	
-	function print_immunization_list()
-	{
-		ini_set('memory_limit','196M');
-		$html = $this->page_immunization_list();
-		$user_id = $this->session->userdata('user_id');
-		$file_path = "/var/www/nosh/imm_list_" . now() . "_" . $user_id . ".pdf";
-		$this->load->library('mpdf');
-		$this->mpdf->useOnlyCoreFonts = true;
-		$this->mpdf->WriteHTML($html);
-		$this->mpdf->SetTitle('Document Generated by NOSH ChartingSystem');
-		$this->mpdf->debug = true;
-		$this->mpdf->Output($file_path,'F');
-		while(!file_exists($file_path)) {
-			sleep(2);
-		}
-		if ($fp = fopen ($file_path, "r")) {
-			$file_info = pathinfo($file_path);
-			$file_name = $file_info["basename"];
-			$file_size = filesize($file_path);
-			$file_extension = strtolower($file_info["extension"]);	 
-			if($file_extension!='pdf') {
-				die('LOGGED! bad extension');
-			}
-			ob_start();
-			header('Content-type: application/pdf');
-			header('Content-Disposition: attachment; filename="'.$file_name.'"');
-			header("Content-length: $file_size");
-			ob_end_flush(); 
-			while(!feof($fp)) {
-				$file_buffer = fread($fp, 2048);
-				echo $file_buffer;
-			}
-			fclose($fp);
-			unlink($file_path);
-			exit();
-		} else {
-			die('LOGGED! bad file '.$file_path);
-		}
-	}
-	
-	function csv_immunization()
-	{
-		$this->load->helper('download');
-		$pid = $this->session->userdata('pid');
-		$this->db->select('immunizations.pid,demographics.lastname,demographics.firstname,demographics.DOB,demographics.sex,demographics.address,demographics.city,demographics.state,demographics.zip,demographics.phone_home,immunizations.imm_cvxcode,immunizations.imm_elsewhere,immunizations.imm_date,immunizations.imm_lot,immunizations.imm_manufacturer,insurance.insurance_plan_name', FALSE);
-		$this->db->from('immunizations');
-		$this->db->join('demographics', 'demographics.pid=immunizations.pid');
-		$this->db->join('insurance', 'insurance.pid=immunizations.pid');
-		$this->db->where('immunizations.pid', $pid);
-		$this->db->where('insurance.insurance_plan_active', 'Yes');
-		$this->db->where('insurance.insurance_order', 'Primary');
-		$query = $this->db->get();
-		$csv = '';
-		if ($query->num_rows() > 0 ) {
-			$result = $query->result_array();
-			$csv .= "PatientID,Last,First,BirthDate,Gender,PatientAddress,City,State,Zip,Phone,ImmunizationCVX,OtherClinic,DateGiven,LotNumber,Manufacturer,InsuredPlanName";
-			foreach ($result as $row) {
-				$dob = human_to_unix($row['DOB']);
-				$row['DOB'] = date('m/d/Y', $dob);
-				$date2 = human_to_unix($row['imm_date']);
-				$row['imm_date'] = date('m/d/Y', $date2);
-				$row['sex'] = strtoupper($row['sex']);
-				if ($row['imm_elsewhere'] == 'Yes') {
-					$row['imm_elsewhere'] = $row['imm_date'];
-				} else {
-					$row['imm_elsewhere'] = '';
-				}
-				$csv .= "\n";
-				$csv .= implode(',', $row);
-			}
-		}
-		$date = now();
-		$date1 = date('Ymd', $date);
-		$name = $date1 . '_immunization.txt';
-		force_download($name, $csv);		
-	}
-	
 	// --------------------------------------------------------------------
 
 	function alerts_list()
 	{
 		$pid = $this->session->userdata('pid');
+		$practice_id = $this->session->userdata('practice_id');
 		$d1 = now();
 		$d1 = $d1 + 1209600;
 		$date_active = date('Y-m-d H:i:s', $d1);	
-		$query = $this->db->query("SELECT * FROM alerts WHERE pid=$pid AND alert_date_active<='$date_active' AND alert_date_complete='0000-00-00 00:00:00' AND alert_reason_not_complete=''");
+		$query = $this->db->query("SELECT * FROM alerts WHERE pid=$pid AND alert_date_active<='$date_active' AND alert_date_complete='0000-00-00 00:00:00' AND alert_reason_not_complete='' AND practice_id=$practice_id");
 		$result = '<strong>Alerts:</strong>';
 		if ($query->num_rows() > 0) {
 			$result .= '<ul>';
@@ -2045,11 +1435,12 @@ class Chartmenu extends Application
 	function alerts()
 	{
 		$pid = $this->session->userdata('pid');
+		$practice_id = $this->session->userdata('practice_id');
 		$page = $this->input->post('page');
 		$limit = $this->input->post('rows');
 		$sidx = $this->input->post('sidx');
 		$sord = $this->input->post('sord');
-		$query = $this->db->query("SELECT * FROM alerts WHERE pid=$pid AND alert_date_complete='0000-00-00 00:00:00' AND alert_reason_not_complete=''");
+		$query = $this->db->query("SELECT * FROM alerts WHERE pid=$pid AND alert_date_complete='0000-00-00 00:00:00' AND alert_reason_not_complete='' AND practice_id=$practice_id");
 		$count = $query->num_rows(); 
 		if($count > 0) { 
 			$total_pages = ceil($count/$limit); 
@@ -2059,7 +1450,7 @@ class Chartmenu extends Application
 		if ($page > $total_pages) $page=$total_pages;
 		$start = $limit*$page - $limit;
 		if($start < 0) $start = 0;
-		$query1 = $this->db->query("SELECT * FROM alerts WHERE pid=$pid AND alert_date_complete='0000-00-00 00:00:00' AND alert_reason_not_complete='' ORDER BY $sidx $sord LIMIT $start , $limit");
+		$query1 = $this->db->query("SELECT * FROM alerts WHERE pid=$pid AND alert_date_complete='0000-00-00 00:00:00' AND alert_reason_not_complete='' AND practice_id=$practice_id ORDER BY $sidx $sord LIMIT $start , $limit");
 		$response['page'] = $page;
 		$response['total'] = $total_pages;
 		$response['records'] = $count;
@@ -2072,11 +1463,12 @@ class Chartmenu extends Application
 	function alerts1()
 	{
 		$pid = $this->session->userdata('pid');
+		$practice_id = $this->session->userdata('practice_id');
 		$page = $this->input->post('page');
 		$limit = $this->input->post('rows');
 		$sidx = $this->input->post('sidx');
 		$sord = $this->input->post('sord');
-		$query = $this->db->query("SELECT * FROM alerts WHERE pid=$pid AND alert_date_complete='0000-00-00 00:00:00' AND alert_reason_not_complete='' AND (alert='Laboratory results pending' OR alert='Radiology results pending' OR alert='Cardiopulmonary results pending')");
+		$query = $this->db->query("SELECT * FROM alerts WHERE pid=$pid AND alert_date_complete='0000-00-00 00:00:00' AND alert_reason_not_complete='' AND practice_id=$practice_id AND (alert='Laboratory results pending' OR alert='Radiology results pending' OR alert='Cardiopulmonary results pending')");
 		$count = $query->num_rows(); 
 		if($count > 0) { 
 			$total_pages = ceil($count/$limit); 
@@ -2086,7 +1478,7 @@ class Chartmenu extends Application
 		if ($page > $total_pages) $page=$total_pages;
 		$start = $limit*$page - $limit;
 		if($start < 0) $start = 0;
-		$query1 = $this->db->query("SELECT * FROM alerts WHERE pid=$pid AND alert_date_complete='0000-00-00 00:00:00' AND alert_reason_not_complete='' AND (alert='Laboratory results pending' OR alert='Radiology results pending' OR alert='Cardiopulmonary results pending') ORDER BY $sidx $sord LIMIT $start , $limit");
+		$query1 = $this->db->query("SELECT * FROM alerts WHERE pid=$pid AND alert_date_complete='0000-00-00 00:00:00' AND alert_reason_not_complete='' AND practice_id=$practice_id AND (alert='Laboratory results pending' OR alert='Radiology results pending' OR alert='Cardiopulmonary results pending') ORDER BY $sidx $sord LIMIT $start , $limit");
 		$response['page'] = $page;
 		$response['total'] = $total_pages;
 		$response['records'] = $count;
@@ -2099,11 +1491,12 @@ class Chartmenu extends Application
 	function alerts_complete()
 	{
 		$pid = $this->session->userdata('pid');
+		$practice_id = $this->session->userdata('practice_id');
 		$page = $this->input->post('page');
 		$limit = $this->input->post('rows');
 		$sidx = $this->input->post('sidx');
 		$sord = $this->input->post('sord');
-		$query = $this->db->query("SELECT * FROM alerts WHERE pid=$pid AND alert_date_complete!='0000-00-00 00:00:00' AND alert_reason_not_complete=''");
+		$query = $this->db->query("SELECT * FROM alerts WHERE pid=$pid AND alert_date_complete!='0000-00-00 00:00:00' AND alert_reason_not_complete='' AND practice_id=$practice_id");
 		$count = $query->num_rows(); 
 		if($count > 0) { 
 			$total_pages = ceil($count/$limit); 
@@ -2113,7 +1506,7 @@ class Chartmenu extends Application
 		if ($page > $total_pages) $page=$total_pages;
 		$start = $limit*$page - $limit;
 		if($start < 0) $start = 0;
-		$query1 = $this->db->query("SELECT * FROM alerts WHERE pid=$pid AND alert_date_complete!='0000-00-00 00:00:00' AND alert_reason_not_complete='' ORDER BY $sidx $sord LIMIT $start , $limit");
+		$query1 = $this->db->query("SELECT * FROM alerts WHERE pid=$pid AND alert_date_complete!='0000-00-00 00:00:00' AND alert_reason_not_complete='' AND practice_id=$practice_id ORDER BY $sidx $sord LIMIT $start , $limit");
 		$response['page'] = $page;
 		$response['total'] = $total_pages;
 		$response['records'] = $count;
@@ -2126,11 +1519,12 @@ class Chartmenu extends Application
 	function alerts_not_complete()
 	{
 		$pid = $this->session->userdata('pid');
+		$practice_id = $this->session->userdata('practice_id');
 		$page = $this->input->post('page');
 		$limit = $this->input->post('rows');
 		$sidx = $this->input->post('sidx');
 		$sord = $this->input->post('sord');
-		$query = $this->db->query("SELECT * FROM alerts WHERE pid=$pid AND alert_date_complete='0000-00-00 00:00:00' AND alert_reason_not_complete!=''");
+		$query = $this->db->query("SELECT * FROM alerts WHERE pid=$pid AND alert_date_complete='0000-00-00 00:00:00' AND alert_reason_not_complete!='' AND practice_id=$practice_id");
 		$count = $query->num_rows(); 
 		if($count > 0) { 
 			$total_pages = ceil($count/$limit); 
@@ -2140,7 +1534,7 @@ class Chartmenu extends Application
 		if ($page > $total_pages) $page=$total_pages;
 		$start = $limit*$page - $limit;
 		if($start < 0) $start = 0;
-		$query1 = $this->db->query("SELECT * FROM alerts WHERE pid=$pid AND alert_date_complete='0000-00-00 00:00:00' AND alert_reason_not_complete!='' ORDER BY $sidx $sord LIMIT $start , $limit");
+		$query1 = $this->db->query("SELECT * FROM alerts WHERE pid=$pid AND alert_date_complete='0000-00-00 00:00:00' AND alert_reason_not_complete!='' AND practice_id=$practice_id ORDER BY $sidx $sord LIMIT $start , $limit");
 		$response['page'] = $page;
 		$response['total'] = $total_pages;
 		$response['records'] = $count;
@@ -2166,7 +1560,8 @@ class Chartmenu extends Application
 			'alert_reason_not_complete' => '',
 			'alert_provider' => $this->input->post('id'),
 			'orders_id' => '',
-			'pid' => $pid
+			'pid' => $pid,
+			'practice_id' => $this->session->userdata('practice_id')
 		);	
 		if($this->input->post('alert_id') == '') {
 			$add = $this->chart_model->addAlert($data);
@@ -2228,10 +1623,11 @@ class Chartmenu extends Application
 	function messages_list()
 	{
 		$pid = $this->session->userdata('pid');
+		$practice_id = $this->session->userdata('practice_id');
 		$d1 = now();
 		$d1 = $d1 + 1209600;
 		$date_active = date('Y-m-d H:i:s', $d1);	
-		$query = $this->db->query("SELECT * FROM t_messages WHERE pid=$pid");
+		$query = $this->db->query("SELECT * FROM t_messages WHERE pid=$pid AND practice_id=$practice_id");
 		$result = '<strong>Number of messages: ';
 		$result .= $query->num_rows() . '</strong>';
 		if ($query->num_rows() > 0) {
@@ -2260,11 +1656,12 @@ class Chartmenu extends Application
 	function messages()
 	{
 		$pid = $this->session->userdata('pid');
+		$practice_id = $this->session->userdata('practice_id');
 		$page = $this->input->post('page');
 		$limit = $this->input->post('rows');
 		$sidx = $this->input->post('sidx');
 		$sord = $this->input->post('sord');
-		$query = $this->db->query("SELECT * FROM t_messages WHERE pid=$pid");
+		$query = $this->db->query("SELECT * FROM t_messages WHERE pid=$pid AND practice_id=$practice_id");
 		$count = $query->num_rows(); 
 		if($count > 0) { 
 			$total_pages = ceil($count/$limit); 
@@ -2274,7 +1671,7 @@ class Chartmenu extends Application
 		if ($page > $total_pages) $page=$total_pages;
 		$start = $limit*$page - $limit;
 		if($start < 0) $start = 0;
-		$query1 = $this->db->query("SELECT * FROM t_messages WHERE pid=$pid ORDER BY $sidx $sord LIMIT $start , $limit");
+		$query1 = $this->db->query("SELECT * FROM t_messages WHERE pid=$pid AND practice_id=$practice_id ORDER BY $sidx $sord LIMIT $start , $limit");
 		$response['page'] = $page;
 		$response['total'] = $total_pages;
 		$response['records'] = $count;
@@ -2295,7 +1692,8 @@ class Chartmenu extends Application
 		$data = array(
 			't_messages_signed' => 'No',
 			't_messages_dos' => $date_active,
-			'pid' => $pid
+			'pid' => $pid,
+			'practice_id' => $this->session->userdata('practice_id')
 		);
 		$add = $this->chart_model->addTMessage($data);
 		echo $add;
@@ -2325,7 +1723,8 @@ class Chartmenu extends Application
 			't_messages_signed' => 'No',
 			't_messages_to' => $this->input->post('t_messages_to'),
 			't_messages_from' => $from,
-			'pid' => $pid
+			'pid' => $pid,
+			'practice_id' => $this->session->userdata('practice_id')
 		);
 		$this->chart_model->updateTMessage($this->input->post('t_messages_id'), $data);
 		$this->audit_model->update();
@@ -2352,7 +1751,8 @@ class Chartmenu extends Application
 				'body' => $this->input->post('t_messages_message'),
 				'status' => 'Sent',
 				't_messages_id' => $this->input->post('t_messages_id'),
-				'mailbox' => $mailbox
+				'mailbox' => $mailbox,
+				'practice_id' => $this->session->userdata('practice_id')
 			);
 			$this->messaging_model->add($data1);
 			$this->audit_model->add();
@@ -2380,7 +1780,8 @@ class Chartmenu extends Application
 			't_messages_signed' => 'Yes',
 			't_messages_to' => '',
 			't_messages_from' => '',
-			'pid' => $pid
+			'pid' => $pid,
+			'practice_id' => $this->session->userdata('practice_id')
 		);
 		
 		if($this->input->post('t_messages_id') == '') {
@@ -2407,12 +1808,15 @@ class Chartmenu extends Application
 		$pid = $this->session->userdata('pid');
 		$this->db->where('pid', $pid);
 		$row = $this->db->get('demographics')->row_array();
-		if ($row['id'] == '') {
+		$this->db->where('pid', $pid);
+		$this->db->where('practice_id', $this->session->userdata('practice_id'));
+		$row_relate = $this->db->get('demographics_relate')->row_array();
+		if ($row_relate['id'] == '') {
 			if ($row['email'] == '') {
 				echo 'No message sent!';
 				exit (0);
 			} else {
-				$this->db->where('practice_id', '1');
+				$this->db->where('practice_id', $this->session->userdata('practice_id'));
 				$row1 = $this->db->get('practiceinfo')->row_array();
 				$displayname = $this->session->userdata('displayname');
 				$message = 'You have new test results available from ' . $displayname . ". Reply to this e-mail at " . $row1['email'] . ' to create a secure account to view your results. After you establish an account, please go to ' . $row1['patient_portal'] . ' to view your results. Only authorized users will be able to access the results.';
@@ -2455,7 +1859,8 @@ class Chartmenu extends Application
 				'subject' => 'Your Test Results',
 				'body' => $body,
 				'status' => 'Sent',
-				'mailbox' => $row['id']
+				'mailbox' => $row_relate['id'],
+				'practice_id' => $this->session->userdata('practice_id')
 			);
 			$message_id = $this->messaging_model->add($data);
 			$this->audit_model->add();
@@ -2468,7 +1873,8 @@ class Chartmenu extends Application
 				'subject' => 'Your Test Results',
 				'body' => $body,
 				'status' => 'Sent',
-				'mailbox' => '0'
+				'mailbox' => '0',
+				'practice_id' => $this->session->userdata('practice_id')
 			);
 			$message_id = $this->messaging_model->add($data1a);
 			$this->audit_model->add();
@@ -2476,7 +1882,7 @@ class Chartmenu extends Application
 				echo 'Internal message sent!';
 				exit (0);
 			} else {
-				$this->db->where('practice_id', '1');
+				$this->db->where('practice_id', $this->session->userdata('practice_id'));
 				$row1 = $this->db->get('practiceinfo')->row_array();
 				$displayname = $this->session->userdata('displayname');
 				$message = 'You have new test results available from ' . $displayname . '.  Please go to ' . $row1['patient_portal'] . 'to view your results. Only authorized users will be able to access the results.';
@@ -2509,7 +1915,7 @@ class Chartmenu extends Application
 		$pid = $this->session->userdata('pid');
 		$this->db->where('pid', $pid);
 		$row = $this->db->get('demographics')->row_array();
-		$practice = $this->practiceinfo_model->get()->row();
+		$practice = $this->practiceinfo_model->get($this->session->userdata('practice_id'))->row();
 		$data['practiceName'] = $practice->practice_name;
 		$data['practiceInfo1'] = $practice->street_address1;
 		if ($practice->street_address2 != '') {
@@ -2532,7 +1938,7 @@ class Chartmenu extends Application
 		ini_set('memory_limit','196M');
 		$pid = $this->session->userdata('pid');
 		$date = now();
-		$query = $this->practiceinfo_model->get();
+		$query = $this->practiceinfo_model->get($this->session->userdata('practice_id'));
 		$result = $query->row_array();
 		$directory = $result['documents_dir'] . $pid;
 		$file_path = $directory . '/letter_' . $date . '.pdf';
@@ -2740,7 +2146,8 @@ class Chartmenu extends Application
 					'alert_reason_not_complete' => '',
 					'alert_provider' => $this->session->userdata('displayname'),
 					'orders_id' => $add,
-					'pid' => $pid
+					'pid' => $pid,
+					'practice_id' => $this->session->userdata('practice_id')
 				);
 				$add1 = $this->chart_model->addAlert($data1);
 				$this->audit_model->add();
@@ -2777,7 +2184,8 @@ class Chartmenu extends Application
 				'alert_date_complete' => '',
 				'alert_reason_not_complete' => '',
 				'alert_provider' => $this->session->userdata('displayname'),
-				'pid' => $pid
+				'pid' => $pid,
+				'practice_id' => $this->session->userdata('practice_id')
 			);
 			$this->chart_model->updateAlert($alert_id, $data1);
 			$this->audit_model->update();
@@ -2961,7 +2369,8 @@ class Chartmenu extends Application
 					'alert_reason_not_complete' => '',
 					'alert_provider' => $this->session->userdata('displayname'),
 					'orders_id' => $add,
-					'pid' => $pid
+					'pid' => $pid,
+					'practice_id' => $this->session->userdata('practice_id')
 				);
 				$add1 = $this->chart_model->addAlert($data1);
 				$this->audit_model->add();
@@ -2998,7 +2407,8 @@ class Chartmenu extends Application
 				'alert_date_complete' => '',
 				'alert_reason_not_complete' => '',
 				'alert_provider' => $this->session->userdata('displayname'),
-				'pid' => $pid
+				'pid' => $pid,
+				'practice_id' => $this->session->userdata('practice_id')
 			);
 			$this->chart_model->updateAlert($alert_id, $data1);
 			$this->audit_model->update();
@@ -3182,7 +2592,8 @@ class Chartmenu extends Application
 					'alert_reason_not_complete' => '',
 					'alert_provider' => $this->session->userdata('displayname'),
 					'orders_id' => $add,
-					'pid' => $pid
+					'pid' => $pid,
+					'practice_id' => $this->session->userdata('practice_id')
 				);
 				$add1 = $this->chart_model->addAlert($data1);
 				$this->audit_model->add();
@@ -3219,7 +2630,8 @@ class Chartmenu extends Application
 				'alert_date_complete' => '',
 				'alert_reason_not_complete' => '',
 				'alert_provider' => $this->session->userdata('displayname'),
-				'pid' => $pid
+				'pid' => $pid,
+				'practice_id' => $this->session->userdata('practice_id')
 			);
 			$this->chart_model->updateAlert($alert_id, $data1);
 			$this->audit_model->update();
@@ -3286,7 +2698,8 @@ class Chartmenu extends Application
 			'fax' => $this->input->post('fax'),
 			'comments' => $this->input->post('comments'),
 			'ordering_id' => $this->input->post('ordering_id'),
-			'specialty' => $this->input->post('specialty')
+			'specialty' => $this->input->post('specialty'),
+			'npi' => $this->input->post('npi')
 		);	
 		if($this->input->post('address_id') == '') {
 			$add = $this->contact_model->addContact($data);
@@ -3450,7 +2863,8 @@ class Chartmenu extends Application
 					'alert_reason_not_complete' => '',
 					'alert_provider' => $this->session->userdata('displayname'),
 					'orders_id' => $add,
-					'pid' => $pid
+					'pid' => $pid,
+					'practice_id' => $this->session->userdata('practice_id')
 				);
 				$add1 = $this->chart_model->addAlert($data1);
 				$this->audit_model->add();
@@ -3487,7 +2901,8 @@ class Chartmenu extends Application
 				'alert_date_complete' => '',
 				'alert_reason_not_complete' => '',
 				'alert_provider' => $this->session->userdata('displayname'),
-				'pid' => $pid
+				'pid' => $pid,
+				'practice_id' => $this->session->userdata('practice_id')
 			);
 			$this->chart_model->updateAlert($alert_id, $data1);
 			$this->audit_model->update();
@@ -3569,7 +2984,7 @@ class Chartmenu extends Application
 		$this->db->where('address_id', $address_id);
 		$query1 = $this->db->get('addressbook');
 		$data['address'] = $query1->row();
-		$practice = $this->practiceinfo_model->get()->row();
+		$practice = $this->practiceinfo_model->get($this->session->userdata('practice_id'))->row();
 		$data['practiceName'] = $practice->practice_name;
 		$data['website'] = $practice->website;
 		$data['practiceInfo'] = $practice->street_address1;
@@ -4015,7 +3430,7 @@ class Chartmenu extends Application
 	function documents_upload()
 	{
 		$pid = $this->session->userdata('pid');
-		$query = $this->practiceinfo_model->get();
+		$query = $this->practiceinfo_model->get($this->session->userdata('practice_id'));
 		$result = $query->row_array();
 		$directory = $result['documents_dir'] . $pid;	
 		$config['upload_path'] = $directory;
@@ -4182,12 +3597,13 @@ class Chartmenu extends Application
 	
 	function billing_encounters()
 	{
+		$practice_id = $this->session->userdata('practice_id');
 		$pid = $this->session->userdata('pid');
 		$page = $this->input->post('page');
 		$limit = $this->input->post('rows');
 		$sidx = $this->input->post('sidx');
 		$sord = $this->input->post('sord');
-		$query = $this->db->query("SELECT * FROM encounters WHERE pid=$pid AND addendum='n'");
+		$query = $this->db->query("SELECT * FROM encounters WHERE pid=$pid AND addendum='n' AND practice_id=$practice_id");
 		$count = $query->num_rows(); 
 		if($count > 0) { 
 			$total_pages = ceil($count/$limit); 
@@ -4197,7 +3613,7 @@ class Chartmenu extends Application
 		if ($page > $total_pages) $page=$total_pages;
 		$start = $limit*$page - $limit;
 		if($start < 0) $start = 0;
-		$query1 = $this->db->query("SELECT * FROM encounters WHERE pid=$pid AND addendum='n' ORDER BY $sidx $sord LIMIT $start , $limit");
+		$query1 = $this->db->query("SELECT * FROM encounters WHERE pid=$pid AND addendum='n' AND practice_id=$practice_id ORDER BY $sidx $sord LIMIT $start , $limit");
 		$response['page'] = $page;
 		$response['total'] = $total_pages;
 		$response['records'] = $count;
@@ -4229,12 +3645,13 @@ class Chartmenu extends Application
 	
 	function billing_other()
 	{
+		$practice_id = $this->session->userdata('practice_id');
 		$pid = $this->session->userdata('pid');
 		$page = $this->input->post('page');
 		$limit = $this->input->post('rows');
 		$sidx = $this->input->post('sidx');
 		$sord = $this->input->post('sord');
-		$query = $this->db->query("SELECT * FROM billing_core WHERE pid=$pid AND eid='0' AND payment='0'");
+		$query = $this->db->query("SELECT * FROM billing_core WHERE pid=$pid AND eid='0' AND payment='0' AND practice_id=$practice_id");
 		$count = $query->num_rows(); 
 		if($count > 0) { 
 			$total_pages = ceil($count/$limit); 
@@ -4244,7 +3661,7 @@ class Chartmenu extends Application
 		if ($page > $total_pages) $page=$total_pages;
 		$start = $limit*$page - $limit;
 		if($start < 0) $start = 0;
-		$query1 = $this->db->query("SELECT * FROM billing_core WHERE pid=$pid AND eid='0' AND payment='0' ORDER BY $sidx $sord LIMIT $start , $limit");
+		$query1 = $this->db->query("SELECT * FROM billing_core WHERE pid=$pid AND eid='0' AND payment='0' AND practice_id=$practice_id ORDER BY $sidx $sord LIMIT $start , $limit");
 		$response['page'] = $page;
 		$response['total'] = $total_pages;
 		$response['records'] = $count;
@@ -4414,7 +3831,8 @@ class Chartmenu extends Application
 			'dos_f' => $this->input->post('dos_f'),
 			'dos_t' => $this->input->post('dos_t'),
 			'payment' => '0',
-			'billing_group' => $billing_group
+			'billing_group' => $billing_group,
+			'practice_id' => $this->session->userdata('practice_id')
 		);
 							
 		if ($count > 0) {		
@@ -4449,7 +3867,7 @@ class Chartmenu extends Application
 		}
 		$this->encounters_model->deleteBilling($eid);
 		$this->audit_model->delete();
-		$practiceInfo = $this->practiceinfo_model->get()->row();
+		$practiceInfo = $this->practiceinfo_model->get($this->session->userdata('practice_id'))->row();
 		$encounterInfo = $this->encounters_model->getEncounter($eid)->row();
 		$demographics = $this->demographics_model->get($pid);
 		$row = $demographics->row();
@@ -4678,11 +4096,25 @@ class Chartmenu extends Application
 			$bill_Box10CP = 'No';
 		}
 		$provider = $encounterInfo->encounter_provider;
-		if ($encounterInfo->referring_provider != '') {
-			$referring_provider = $encounterInfo->referring_provider;
-			$bill_Box17 = $this->string_format($referring_provider, 26);
+		if ($encounterInfo->referring_provider != 'Primary Care Provider' || $encounterInfo->referring_provider != '') {
+			$bill_Box17 = $this->string_format($encounterInfo->referring_provider, 26);
+			$bill_Box17A = $this->string_format($encounterInfo->referring_provider_npi, 17);
 		} else {
-			$bill_Box17 = $this->string_format("", 26);
+			if ($encounterInfo->referring_provider != 'Primary Care Provider') {
+				$bill_Box17 = $this->string_format('', 26);
+				$bill_Box17A = $this->string_format('', 17);
+			} else {
+				$bill_Box17 = $this->string_format($provider, 26);
+				$this->db->select('id');
+				$this->db->where('displayname', $provider);
+				$user_id = $this->db->get('users')->row()->id;
+				$this->db->select('npi');
+				$this->db->where('id', $user_id);
+				$query4 = $this->db->get('providers');
+				$result4 = $query4->row();
+				$npi = $result4->npi;
+				$bill_Box17A = $this->string_format($npi, 17);
+			}
 		}
 		if ($result2['insurance_box_31'] == 'n') {
 			$bill_Box31 = $this->string_format($provider, 21);
@@ -4694,15 +4126,6 @@ class Chartmenu extends Application
 		}
 		$bill_Box33B = $this->string_format($provider, 29);
 		$pos = $encounterInfo->encounter_location;
-		$this->db->select('id');
-		$this->db->where('displayname', $provider);
-		$user_id = $this->db->get('users')->row()->id;
-		$this->db->select('npi');
-		$this->db->where('id', $user_id);
-		$query4 = $this->db->get('providers');
-		$result4 = $query4->row();
-		$npi = $result4->npi;
-		$bill_Box17A = $this->string_format("", 17);
 		$bill_Box25 = $practiceInfo->tax_id;
 		$bill_Box25 = $this->string_format($bill_Box25, 15);
 		$bill_Box26 = $this->string_format($pid, 14);	
@@ -5136,9 +4559,10 @@ class Chartmenu extends Application
 				$cpt_final[$i]['cpt_charge1'] = $cpt_final[$i]['cpt_charge'];
 				$cpt_final[$i]['cpt_charge'] = $this->string_format($cpt_final[$i]['cpt_charge'], 8);
 				$cpt_final[$i]['npi'] = $this->string_format($npi, 11);
+				$cpt_final[$i]['icd_pointer'] =  $this->string_format($cpt_final[$i]['icd_pointer'], 4);
 				$i++;
 			}
-			if ($num_rows5 < 6) {
+			if ($num_rows7 < 6) {
 				$array['dos_f'] = $this->string_format('', 8);
 				$array['dos_t'] = $this->string_format('', 8);
 				$array['pos'] = $this->string_format('', 5);
@@ -5149,6 +4573,7 @@ class Chartmenu extends Application
 				$array['cpt_charge1'] = '0';
 				$array['cpt_charge'] = $this->string_format('', 8);
 				$array['npi'] = $this->string_format('', 11);
+				$array['icd_pointer'] =  $this->string_format('', 4);
 				$cpt_final = array_pad($cpt_final, 6, $array);
 			}
 			$bill_Box28 = $cpt_final[0]['cpt_charge1'] * $cpt_final[0]['unit1'] + $cpt_final[1]['cpt_charge1'] * $cpt_final[1]['unit1'] + $cpt_final[2]['cpt_charge1'] * $cpt_final[2]['unit1'] + $cpt_final[3]['cpt_charge1'] * $cpt_final[3]['unit1'] + $cpt_final[4]['cpt_charge1'] * $cpt_final[4]['unit1'] + $cpt_final[5]['cpt_charge1'] * $cpt_final[5]['unit1'];
@@ -5316,6 +4741,7 @@ class Chartmenu extends Application
 					$array1['cpt_charge1'] = '0';
 					$array1['cpt_charge'] = $this->string_format('', 8);
 					$array1['npi'] = $this->string_format('', 11);
+					$array1['icd_pointer'] =  $this->string_format('', 4);
 					$cpt_final = array_pad($cpt_final, 6, $array1);
 				}
 				$bill_Box28 = $cpt_final[0]['cpt_charge1'] * $cpt_final[0]['unit1'] + $cpt_final[1]['cpt_charge1'] * $cpt_final[1]['unit1'] + $cpt_final[2]['cpt_charge1'] * $cpt_final[2]['unit1'] + $cpt_final[3]['cpt_charge1'] * $cpt_final[3]['unit1'] + $cpt_final[4]['cpt_charge1'] * $cpt_final[4]['unit1'] + $cpt_final[5]['cpt_charge1'] * $cpt_final[5]['unit1'];
@@ -5564,7 +4990,7 @@ class Chartmenu extends Application
 		}
 		$this->db->where('pid', $pid);
 		$row = $this->db->get('demographics')->row_array();
-		$practice = $this->practiceinfo_model->get()->row();
+		$practice = $this->practiceinfo_model->get($this->session->userdata('practice_id'))->row();
 		$data['practiceName'] = $practice->practice_name;
 		$data['practiceInfo1'] = $practice->street_address1;
 		if ($practice->street_address2 != '') {
@@ -5693,7 +5119,7 @@ class Chartmenu extends Application
 		}
 		$this->db->where('pid', $pid);
 		$row = $this->db->get('demographics')->row_array();
-		$practice = $this->practiceinfo_model->get()->row();
+		$practice = $this->practiceinfo_model->get($this->session->userdata('practice_id'))->row();
 		$data['practiceName'] = $practice->practice_name;
 		$data['practiceInfo1'] = $practice->street_address1;
 		if ($practice->street_address2 != '') {
@@ -5866,15 +5292,16 @@ class Chartmenu extends Application
 				if($file_extension!='pdf') {
 					die('LOGGED! bad extension');
 				}
-				ob_start();
+				//ob_start();
 				header('Content-type: application/pdf');
 				header('Content-Disposition: attachment; filename="'.$file_name.'"');
-				header("Content-length: $file_size");
-				ob_end_flush(); 
-				while(!feof($fp)) {
-					$file_buffer = fread($fp, 2048);
-					echo $file_buffer;
-				}
+				readfile($file_path);
+				//header("Content-length: $file_size");
+				//ob_end_flush(); 
+				//while(!feof($fp)) {
+					//$file_buffer = fread($fp, 2048);
+					//echo $file_buffer;
+				//}
 				fclose($fp);
 				unlink($file_path);
 				exit();
@@ -5974,7 +5401,8 @@ class Chartmenu extends Application
 			'pid' => $pid,
 			'dos_f' => $this->input->post('dos_f'),
 			'payment' => $this->input->post('payment'),
-			'payment_type' => $this->input->post('payment_type')
+			'payment_type' => $this->input->post('payment_type'),
+			'practice_id' => $this->session->userdata('practice_id')
 		);
 		if ($count > 0) {		
 			$this->chart_model->updateBillingCore($id, $data);
@@ -6077,7 +5505,8 @@ class Chartmenu extends Application
 			'cpt_charge' => $this->input->post('cpt_charge'),
 			'reason' => $this->input->post('reason'),
 			'unit' => '1',
-			'payment' => '0'
+			'payment' => '0',
+			'practice_id' => $this->session->userdata('practice_id')
 		);
 		if ($count > 0) {		
 			$this->chart_model->updateBillingCore($id, $data);
@@ -6146,8 +5575,9 @@ class Chartmenu extends Application
 	
 	function total_balance()
 	{
+		$practice_id = $this->session->userdata('practice_id');
 		$pid = $this->session->userdata('pid');
-		$query1 = $this->db->query("SELECT * FROM encounters WHERE pid=$pid AND addendum='n'");
+		$query1 = $this->db->query("SELECT * FROM encounters WHERE pid=$pid AND addendum='n' AND practice_id=$practice_id");
 		$i = 0;
 		if ($query1->num_rows() > 0) {
 			$balance1 = 0;
@@ -6170,7 +5600,7 @@ class Chartmenu extends Application
 		} else {
 			$balance1 = 0;
 		}
-		$query2 = $this->db->query("SELECT * FROM billing_core WHERE pid=$pid AND eid='0' AND payment='0'");
+		$query2 = $this->db->query("SELECT * FROM billing_core WHERE pid=$pid AND eid='0' AND payment='0' AND practice_id=$practice_id");
 		$j = 0;
 		$charge2 = 0;
 		$payment2 = 0;
@@ -6191,9 +5621,9 @@ class Chartmenu extends Application
 			$balance2 = 0;
 		}
 		$total_balance = $balance1 + $balance2;
-		$this->db->select('billing_notes');
 		$this->db->where('pid', $pid);
-		$result = $this->db->get('demographics')->row_array();
+		$this->db->where('practice_id', $practice_id);
+		$result = $this->db->get('demographics_notes')->row_array();
 		if (is_null($result['billing_notes']) || $result['billing_notes'] == '') {
 			$billing_notes = "None.";
 		} else {
@@ -6206,9 +5636,9 @@ class Chartmenu extends Application
 	function get_billing_notes()
 	{
 		$pid = $this->session->userdata('pid');
-		$this->db->select('billing_notes');
 		$this->db->where('pid', $pid);
-		$result = $this->db->get('demographics')->row_array();
+		$this->db->where('practice_id', $this->session->userdata('practice_id'));
+		$result = $this->db->get('demographics_notes')->row_array();
 		if (is_null($result['billing_notes']) || $result['billing_notes'] == '') {
 			echo "";
 		} else {
@@ -6227,7 +5657,9 @@ class Chartmenu extends Application
 		$data = array(
 			'billing_notes' => $this->input->post('billing_notes')
 		);
-		$this->demographics_model->update($pid, $data);
+		$this->db->where('pid', $pid);
+		$this->db->where('practice_id', $this->session->userdata('practice_id'));
+		$this->db->update('demographics_notes', $data);
 		$this->audit_model->update();
 		echo "Billing notes updated!";
 		exit( 0 );
@@ -6237,12 +5669,13 @@ class Chartmenu extends Application
 
 	function records_release()
 	{
+		$practice_id = $this->session->userdata('practice_id');
 		$pid = $this->session->userdata('pid');
 		$page = $this->input->post('page');
 		$limit = $this->input->post('rows');
 		$sidx = $this->input->post('sidx');
 		$sord = $this->input->post('sord');
-		$query = $this->db->query("SELECT * FROM hippa WHERE pid=$pid AND other_hippa_id='0'");
+		$query = $this->db->query("SELECT * FROM hippa WHERE pid=$pid AND other_hippa_id='0' AND practice_id=$practice_id");
 		$count = $query->num_rows();
 		if($count > 0) { 
 			$total_pages = ceil($count/$limit); 
@@ -6252,7 +5685,7 @@ class Chartmenu extends Application
 		if ($page > $total_pages) $page=$total_pages;
 		$start = $limit*$page - $limit;
 		if($start < 0) $start = 0;
-		$query1 = $this->db->query("SELECT * FROM hippa WHERE pid=$pid AND other_hippa_id='0' ORDER BY $sidx $sord LIMIT $start , $limit");
+		$query1 = $this->db->query("SELECT * FROM hippa WHERE pid=$pid AND other_hippa_id='0' AND practice_id=$practice_id ORDER BY $sidx $sord LIMIT $start , $limit");
 		$response['page'] = $page;
 		$response['total'] = $total_pages;
 		$response['records'] = $count;
@@ -6278,7 +5711,8 @@ class Chartmenu extends Application
 			'hippa_reason' => $this->input->post('hippa_reason'),
 			'hippa_provider' => $this->input->post('hippa_provider'),
 			'hippa_role' => $this->input->post('hippa_role'),
-			'other_hippa_id' => 0
+			'other_hippa_id' => 0,
+			'practice_id' => $this->session->userdata('practice_id')
 		);
 		if ($this->input->post('hippa_id') != '') {
 			$id = $this->input->post('hippa_id');
@@ -6370,7 +5804,8 @@ class Chartmenu extends Application
 		$data = array(
 			'documents_id' => $this->input->post('documents_id'),
 			'other_hippa_id' => $this->input->post('hippa_id'),
-			'pid' => $pid
+			'pid' => $pid,
+			'practice_id' => $this->session->userdata('practice_id')
 		);
 		$this->db->insert('hippa', $data);
 		$this->audit_model->add();
@@ -6383,7 +5818,8 @@ class Chartmenu extends Application
 		$data = array(
 			'eid' => $this->input->post('eid'),
 			'other_hippa_id' => $this->input->post('hippa_id'),
-			'pid' => $pid
+			'pid' => $pid,
+			'practice_id' => $this->session->userdata('practice_id')
 		);
 		$this->db->insert('hippa', $data);
 		$this->audit_model->add();
@@ -6396,7 +5832,8 @@ class Chartmenu extends Application
 		$data = array(
 			't_messages_id' => $this->input->post('t_messages_id'),
 			'other_hippa_id' => $this->input->post('hippa_id'),
-			'pid' => $pid
+			'pid' => $pid,
+			'practice_id' => $this->session->userdata('practice_id')
 		);
 		$this->db->insert('hippa', $data);
 		$this->audit_model->add();
@@ -6405,7 +5842,7 @@ class Chartmenu extends Application
 	
 	function print_chart($hippa_id, $fax = '')
 	{
-		$query = $this->practiceinfo_model->get();
+		$query = $this->practiceinfo_model->get($this->session->userdata('practice_id'));
 		$result = $query->row_array();
 		$pid = $this->session->userdata('pid');
 		$directory = $result['documents_dir'] . $pid . "/print_" . $hippa_id;
@@ -6441,6 +5878,7 @@ class Chartmenu extends Application
 		$this->db->where('pid', $pid);
 		$this->db->where('encounter_signed', 'Yes');
 		$this->db->where('addendum', 'n');
+		$this->db->where('practice_id', $this->session->userdata('practice_id'));
 		$this->db->order_by('encounter_DOS', 'desc');
 		$query1 = $this->db->get('encounters');
 		if ($query1->num_rows() > 0) {
@@ -6451,6 +5889,7 @@ class Chartmenu extends Application
 		}
 		$this->db->where('pid', $pid);
 		$this->db->where('t_messages_signed', 'Yes');
+		$this->db->where('practice_id', $this->session->userdata('practice_id'));
 		$this->db->order_by('t_messages_dos', 'desc');
 		$query2 = $this->db->get('t_messages');
 		if ($query2->num_rows() > 0) {
@@ -6531,7 +5970,8 @@ class Chartmenu extends Application
 	
 	function print_chart1($hippa_id, $fax = '')
 	{
-		$query = $this->practiceinfo_model->get();
+		$practice_id = $this->session->userdata('practice_id');
+		$query = $this->practiceinfo_model->get($this->session->userdata('practice_id'));
 		$result = $query->row_array();
 		$pid = $this->session->userdata('pid');
 		$directory = $result['documents_dir'] . $pid . "/print_" . $hippa_id;
@@ -6653,7 +6093,8 @@ class Chartmenu extends Application
 	
 	function print_chart2($hippa_id, $fax = '')
 	{
-		$query = $this->practiceinfo_model->get();
+		$practice_id = $this->session->userdata('practice_id');
+		$query = $this->practiceinfo_model->get($this->session->userdata('practice_id'));
 		$result = $query->row_array();
 		$pid = $this->session->userdata('pid');
 		$directory = $result['documents_dir'] . $pid . "/print_" . $hippa_id;
@@ -6688,14 +6129,14 @@ class Chartmenu extends Application
 		$end = now();
 		$start = $end - 31556926;
 		$html = $this->page_intro('Medical Records');
-		$query1 = $this->db->query("SELECT * FROM encounters WHERE pid=$pid AND UNIX_TIMESTAMP(encounter_DOS)>=$start AND UNIX_TIMESTAMP(encounter_DOS)<=$end AND encounter_signed='Yes' AND addendum='n' ORDER BY encounter_DOS DESC");
+		$query1 = $this->db->query("SELECT * FROM encounters WHERE pid=$pid AND UNIX_TIMESTAMP(encounter_DOS)>=$start AND UNIX_TIMESTAMP(encounter_DOS)<=$end AND encounter_signed='Yes' AND addendum='n' AND practice_id=$practice_id ORDER BY encounter_DOS DESC");
 		if ($query1->num_rows() > 0) {
 			$html .= '<table width="100%"><tr><th style="background-color: gray;color: #FFFFFF;">ENCOUNTERS</th></tr></table>';
 			foreach ($query1->result_array() as $row1) {
 				$html .= $this->encounters_view($row1['eid']);
 			}
 		}
-		$query2 = $this->db->query("SELECT * FROM t_messages WHERE pid=$pid AND UNIX_TIMESTAMP(t_messages_dos)>=$start AND UNIX_TIMESTAMP(t_messages_dos)<=$end AND t_messages_signed='Yes' ORDER BY t_messages_dos DESC");
+		$query2 = $this->db->query("SELECT * FROM t_messages WHERE pid=$pid AND UNIX_TIMESTAMP(t_messages_dos)>=$start AND UNIX_TIMESTAMP(t_messages_dos)<=$end AND t_messages_signed='Yes' AND practice_id=$practice_id ORDER BY t_messages_dos DESC");
 		if ($query2->num_rows() > 0) {
 			$html .= '<pagebreak /><table width="100%"><tr><th style="background-color: gray;color: #FFFFFF;">MESSAGES</th></tr></table>';
 			foreach ($query2->result_array() as $row2) {
@@ -6772,7 +6213,7 @@ class Chartmenu extends Application
 	
 	function compile_chart($hippa_id)
 	{
-		$query = $this->practiceinfo_model->get();
+		$query = $this->practiceinfo_model->get($this->session->userdata('practice_id'));
 		$result = $query->row_array();
 		$pid = $this->session->userdata('pid');
 		$directory = $result['documents_dir'] . $pid . "/print_" . $hippa_id;
@@ -6913,7 +6354,7 @@ class Chartmenu extends Application
 		$data['date_signed'] = date('F jS, Y; h:i A', $date_signed1);
 		$data['age1'] = $encounterInfo['encounter_age'];
 		$data['encounter_cc'] = nl2br($encounterInfo['encounter_cc']);
-		$practiceInfo = $this->practiceinfo_model->get()->row_array();
+		$practiceInfo = $this->practiceinfo_model->get($this->session->userdata('practice_id'))->row_array();
 		$hpiInfo = $this->encounters_model->getHPI($eid)->row_array();
 		if ($hpiInfo) {
 			$data['hpi'] = '<br><h4>History of Present Illness:</h4><p class="view">';
@@ -7676,12 +7117,13 @@ class Chartmenu extends Application
 	
 	function print_encounters()
 	{
+		$practice_id = $this->session->userdata('practice_id');
 		$pid = $this->session->userdata('pid');
 		$page = $this->input->post('page');
 		$limit = $this->input->post('rows');
 		$sidx = $this->input->post('sidx');
 		$sord = $this->input->post('sord');
-		$query = $this->db->query("SELECT * FROM encounters WHERE pid=$pid AND encounter_signed='Yes' AND addendum='n'");
+		$query = $this->db->query("SELECT * FROM encounters WHERE pid=$pid AND encounter_signed='Yes' AND addendum='n' AND practice_id=$practice_id");
 		$count = $query->num_rows(); 
 		if($count > 0) { 
 			$total_pages = ceil($count/$limit); 
@@ -7691,7 +7133,7 @@ class Chartmenu extends Application
 		if ($page > $total_pages) $page=$total_pages;
 		$start = $limit*$page - $limit;
 		if($start < 0) $start = 0;
-		$query1 = $this->db->query("SELECT * FROM encounters WHERE pid=$pid AND encounter_signed='Yes' AND addendum='n' ORDER BY $sidx $sord LIMIT $start , $limit");
+		$query1 = $this->db->query("SELECT * FROM encounters WHERE pid=$pid AND encounter_signed='Yes' AND addendum='n' AND practice_id=$practice_id ORDER BY $sidx $sord LIMIT $start , $limit");
 		$response['page'] = $page;
 		$response['total'] = $total_pages;
 		$response['records'] = $count;
@@ -7719,7 +7161,7 @@ class Chartmenu extends Application
 		}
 		$data['age1'] = $encounterInfo['encounter_age'];
 		$data['encounter_cc'] = nl2br($encounterInfo['encounter_cc']);	
-		$practiceInfo = $this->practiceinfo_model->get()->row_array();
+		$practiceInfo = $this->practiceinfo_model->get($this->session->userdata('practice_id'))->row_array();
 		$data['practiceName'] = $practiceInfo['practice_name'];
 		$data['website'] = $practiceInfo['website'];
 		$data['practiceInfo'] = $practiceInfo['street_address1'];
@@ -8494,12 +7936,13 @@ class Chartmenu extends Application
 	
 	function print_messages()
 	{
+		$practice_id = $this->session->userdata('practice_id');
 		$pid = $this->session->userdata('pid');
 		$page = $this->input->post('page');
 		$limit = $this->input->post('rows');
 		$sidx = $this->input->post('sidx');
 		$sord = $this->input->post('sord');
-		$query = $this->db->query("SELECT * FROM t_messages WHERE pid=$pid AND t_messages_signed='Yes'");
+		$query = $this->db->query("SELECT * FROM t_messages WHERE pid=$pid AND t_messages_signed='Yes' AND practice_id=$practice_id");
 		$count = $query->num_rows(); 
 		if($count > 0) { 
 			$total_pages = ceil($count/$limit); 
@@ -8509,7 +7952,7 @@ class Chartmenu extends Application
 		if ($page > $total_pages) $page=$total_pages;
 		$start = $limit*$page - $limit;
 		if($start < 0) $start = 0;
-		$query1 = $this->db->query("SELECT * FROM t_messages WHERE pid=$pid AND t_messages_signed='Yes' ORDER BY $sidx $sord LIMIT $start , $limit");
+		$query1 = $this->db->query("SELECT * FROM t_messages WHERE pid=$pid AND t_messages_signed='Yes' AND practice_id=$practice_id ORDER BY $sidx $sord LIMIT $start , $limit");
 		$response['page'] = $page;
 		$response['total'] = $total_pages;
 		$response['records'] = $count;
@@ -8535,7 +7978,7 @@ class Chartmenu extends Application
 	function import_ccr()
 	{
 		$pid = $this->session->userdata('pid');
-		$query = $this->practiceinfo_model->get();
+		$query = $this->practiceinfo_model->get($this->session->userdata('practice_id'));
 		$result = $query->row_array();
 		$directory = $result['documents_dir'] . $pid;	
 		$config['upload_path'] = $directory;
@@ -8729,21 +8172,23 @@ class Chartmenu extends Application
 	{
 		$this->load->helper('download');
 		$pid = $this->session->userdata('pid');
+		$practice_id = $this->session->userdata('practice_id');
 		if ($type == 'queue') {
-			$query1 = $this->db->query("SELECT * FROM hippa JOIN encounters ON hippa.eid=encounters.eid WHERE hippa.other_hippa_id=$hippa_id AND hippa.eid IS NOT NULL ORDER BY encounters.encounter_DOS DESC");
+			$query1 = $this->db->query("SELECT * FROM hippa JOIN encounters ON hippa.eid=encounters.eid WHERE hippa.other_hippa_id=$hippa_id AND hippa.eid IS NOT NULL AND hippa.practice_id=$practice_id ORDER BY encounters.encounter_DOS DESC");
 		}
 		if ($type == 'all') {
 			$pid = $this->session->userdata('pid');
 			$this->db->where('pid', $pid);
 			$this->db->where('encounter_signed', 'Yes');
 			$this->db->where('addendum', 'n');
+			$this->db->where('practice_id', $practice_id);
 			$this->db->order_by('encounter_DOS', 'desc');
 			$query1 = $this->db->get('encounters');
 		}
 		if ($type == '1year') {
 			$end = now();
 			$start = $end - 31556926;
-			$query1 = $this->db->query("SELECT * FROM encounters WHERE pid=$pid AND UNIX_TIMESTAMP(encounter_DOS)>=$start AND UNIX_TIMESTAMP(encounter_DOS)<=$end AND encounter_signed='Yes' AND addendum='n' ORDER BY encounter_DOS DESC");
+			$query1 = $this->db->query("SELECT * FROM encounters WHERE pid=$pid AND UNIX_TIMESTAMP(encounter_DOS)>=$start AND UNIX_TIMESTAMP(encounter_DOS)<=$end AND encounter_signed='Yes' AND addendum='n' AND practice_id=$practice_id ORDER BY encounter_DOS DESC");
 		}
 		$ccda = '';
 		$ccda_name = now() . '_ccda.xml';
@@ -8760,7 +8205,7 @@ class Chartmenu extends Application
 		$this->load->library('APIBaseClass');
 		$this->load->library('rxNormApi');
 		$ccda = file_get_contents('/var/www/nosh/ccda.xml');
-		$practice_info = $this->practiceinfo_model->get()->row_array();
+		$practice_info = $this->practiceinfo_model->get($this->session->userdata('practice_id'))->row_array();
 		$ccda = str_replace('?practice_name?', $practice_info['practice_name'], $ccda);
 		$date_format = "YmdHisO";
 		$ccda = str_replace('?effectiveTime?', date($date_format), $ccda);
@@ -9363,6 +8808,33 @@ class Chartmenu extends Application
 			$orders_file = str_replace('?orders_random_id1?', $orders_random_id1, $orders_file3);
 		}
 		return $orders_file;
+	}
+	
+	function tests()
+	{
+		$pid = $this->session->userdata('pid');
+		$page = $this->input->post('page');
+		$limit = $this->input->post('rows');
+		$sidx = $this->input->post('sidx');
+		$sord = $this->input->post('sord'); 
+		$query = $this->db->query("SELECT * FROM tests WHERE pid=$pid");
+		$count = $query->num_rows(); 
+		if($count > 0) { 
+			$total_pages = ceil($count/$limit); 
+		} else { 
+			$total_pages = 0; 
+		}
+		if ($page > $total_pages) $page=$total_pages;
+		$start = $limit*$page - $limit;
+		if($start < 0) $start = 0;
+		$query1 = $this->db->query("SELECT * FROM tests WHERE pid=$pid ORDER BY $sidx $sord LIMIT $start , $limit");
+		$response['page'] = $page;
+		$response['total'] = $total_pages;
+		$response['records'] = $count;
+		$records = $query1->result_array();
+		$response['rows'] = $records;
+		echo json_encode($response);
+		exit( 0 );
 	}
 }
 /* End of file: chartmenu.php */

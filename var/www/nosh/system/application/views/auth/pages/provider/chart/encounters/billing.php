@@ -43,7 +43,7 @@
 		<table>
 				<tr>
 					<td>CPT Code:</td>
-					<td><input type="text" name="cpt" id="billing_cpt" style="width:200px" class="text ui-widget-content ui-corner-all"/> <button type="button" id="cpt_helper">CPT Helper</button><button type="button" id="cpt_link">CPT Editor</button></td>
+					<td><input type="text" name="cpt" id="billing_cpt" style="width:200px" class="text ui-widget-content ui-corner-all"/> <button type="button" id="cpt_favorites">CPT Favorites</button><button type="button" id="cpt_helper">CPT Helper</button><button type="button" id="cpt_link">CPT Editor</button></td>
 				</tr>
 				<tr>
 					<td>Charge:</td>
@@ -150,6 +150,51 @@
 		modal: true,
 		draggable: false,
 		resizable: false,
+		open: function() {
+			$("#billing_cpt").catcomplete({
+				source: function (req, add){
+					$.ajax({
+						url: "<?php echo site_url('search/cpt1');?>",
+						dataType: "json",
+						type: "POST",
+						data: req,
+						success: function(data){
+							if(data.response =='true'){
+								add(data.message);
+							} else {
+								var addterm = [{"label": req.term + ": Select to add CPT to database.", "value":"*/add/*", "value1": req.term, "category":"New CPT Code"}];
+								add(addterm);
+							}
+						}
+					});
+				},
+				minLength: 3,
+				select: function(event, ui){
+					if (ui.item.value == "*/add/*") {
+						$("#configuration_cpt_form").clearForm();
+						if (ui.item.value1.length > 5) {
+							$("#configuration_cpt_description").val(ui.item.value1);
+						} else {
+							$("#configuration_cpt_code").val(ui.item.value1);
+						}
+						$('#configuration_cpt_origin').val("billing_cpt");
+						$('#configuration_cpt_dialog').dialog('open');
+						$('#configuration_cpt_dialog').dialog('option', 'title', "Add CPT Code");
+					} else {
+						$("#billing_cpt_charge").val(ui.item.charge);
+						$("#billing_unit").val(ui.item.unit);
+					}
+				},
+				change: function (event, ui) {
+					if(!ui.item){
+						$.jGrowl("CPT code must be selected from the database!");
+						$("#billing_cpt").addClass("ui-state-error");
+					} else {
+						$("#billing_cpt").removeClass("ui-state-error");
+					}
+				}
+			});
+		},
 		buttons: {
 			'Save': function() {
 				var a = $("#billing_icd");
@@ -388,47 +433,8 @@
 			$.jGrowl("Please select row to remove!");
 		}
 	});
-	$("#billing_cpt").autocomplete({
-		source: function (req, add){
-			$.ajax({
-				url: "<?php echo site_url('search/cpt1');?>",
-				dataType: "json",
-				type: "POST",
-				data: req,
-				success: function(data){
-					if(data.response =='true'){
-						add(data.message);
-					} else {
-						var addterm = [{"label": req.term + ": Select to add CPT to database.", "value":"*/add/*", "value1": req.term}];
-						add(addterm);
-					}
-				}
-			});
-		},
-		minLength: 3,
-		select: function(event, ui){
-			if (ui.item.value == "*/add/*") {
-				$("#configuration_cpt_form").clearForm();
-				if (ui.item.value1.length > 5) {
-					$("#configuration_cpt_description").val(ui.item.value1);
-				} else {
-					$("#configuration_cpt_code").val(ui.item.value1);
-				}
-				$('#configuration_cpt_origin').val("billing_cpt");
-				$('#configuration_cpt_dialog').dialog('open');
-				$('#configuration_cpt_dialog').dialog('option', 'title', "Add CPT Code");
-			} else {
-				$("#billing_cpt_charge").val(ui.item.charge);
-			}
-		},
-		change: function (event, ui) {
-			if(!ui.item){
-				$.jGrowl("CPT code must be selected from the database!");
-				$("#billing_cpt").addClass("ui-state-error");
-			} else {
-				$("#billing_cpt").removeClass("ui-state-error");
-			}
-		}
+	$("#cpt_favorites").button().click(function(){
+		$("#billing_cpt").catcomplete("search", "***");
 	});
 	$("#cpt_helper").button({
 		icons: {

@@ -14,9 +14,9 @@ $(document).ready(function() {
 		inactivity: 3600000,
 		noconfirm: 10000,
 		alive_url: '<?php echo site_url("provider/chartmenu");?>',
-		redirect_url: '<?php echo site_url("start");?>',
+		redirect_url: '<?php echo site_url("logout");?>',
 		logout_url: '<?php echo site_url("logout");?>',
-		sessionAlive: 300000
+		sessionAlive: false
 	});
 	$("#encounter_location").val("<?php echo $default_pos;?>");
 	$("#encounter_location").autocomplete({
@@ -41,13 +41,14 @@ $(document).ready(function() {
 	$("#encounter_date").val(currentDate);
 	$("#encounter_date").datepicker({showOn: 'button', buttonImage: '<?php echo base_url()."images/calendar.gif";?>', buttonImageOnly: true});
 	$("#encounter_time").val(currentTime);
-	$("#encounter_role").addOption({"":"","Primary Care Provider":"Primary Care Provider","Consulting Provider":"Consulting Provider","Referring Provider":"Referring Provider"},false).change(function(){
+	$("#encounter_role").addOption({"":"Choose Provider Role","Primary Care Provider":"Primary Care Provider","Consulting Provider":"Consulting Provider","Referring Provider":"Referring Provider"},false).change(function(){
 		if ($(this).val() == "Consulting Provider" || $(this).val() == "Referring Provider") {
-			$("#referring_provider").show();
+			$("#referring_provider_div").show();
 		} else {
-			$("#referring_provider").hide().val('');
+			$("#referring_provider_div").hide().val('');
 		}
 	});
+	$("#referring_provider_npi").mask("9999999999");
 	$("#referring_provider").autocomplete({
 		source: function (req, add){
 			$.ajax({
@@ -62,7 +63,10 @@ $(document).ready(function() {
 				}
 			});
 		},
-		minLength: 3
+		minLength: 3,
+		select: function(event, ui){
+			$("#referring_provider_npi").val(ui.item.npi);
+		}
 	});
 	$("#encounter_cc").val('');
 	$("#encounter_condition_work").addOption({"":"","No":"No","Yes":"Yes"},false);
@@ -94,7 +98,7 @@ $(document).ready(function() {
 		bgiframe: true, 
 		autoOpen: false, 
 		height: 500, 
-		width: 500, 
+		width: 600, 
 		modal: true,
 		overlay: {
 			backgroundColor: '#000',
@@ -108,7 +112,7 @@ $(document).ready(function() {
 					$("#encounter_copay").html(data);
 				}
 			});
-			$("#referring_provider").hide();
+			$("#referring_provider_div").hide();
 		},
 		buttons: {
 			'Add Encounter': function() {
@@ -187,6 +191,17 @@ $(document).ready(function() {
 		$("#encounter_condition_auto").val('No');
 		$("#encounter_condition_other").val('No');
 	});
+	function t_messages_tags() {
+		var id = $("#t_messages_id").val();
+		$.ajax({
+			type: "POST",
+			url: "<?php echo site_url('search/get_tags/t_messages_id');?>" + "/" + id,
+			dataType: "json",
+			success: function(data){
+				$("#t_messages_tags").tagit("fill",data);
+			}
+		});
+	}
 	$("#new_message").click(function() {
 		$("#edit_message_form").clearForm();
 		$.ajax({
@@ -203,6 +218,9 @@ $(document).ready(function() {
 		$("#messages_list_dialog").dialog('open');
 		$("#edit_message_fieldset").show('fast');
 		$("#t_messages_subject").focus();
+		$("#message_view").html('');
+		t_messages_tags();
+		$("#messages_main_dialog").dialog('open');
 	});
 	$("#new_letter").click(function() {
 		$("#letter_dialog").dialog('open');
@@ -455,54 +473,32 @@ $(document).ready(function() {
 </div>
 <div id="new_encounter_dialog" title="New Encounter">
 	<form name="new_encounter_form" id="new_encounter_form">
-		<table>
-			<tr>
-				<td><label for="encounter_date">Date of Service</label></td>
-				<td colspan="2"><input type="text" name="encounter_date" id="encounter_date" class="text ui-widget-content ui-corner-all" /></td>
-			</tr>
-			<tr>
-				<td><label for="encounter_time">Time of Service</label></td>
-				<td colspan="2"><input type="text" name="encounter_time" id="encounter_time" class="text ui-widget-content ui-corner-all" /></td>
-			</tr>
-			<tr>
-				<td><label for="encounter_type">Encounter Type</label></td>
-				<td colspan="2"><select name="encounter_type" id="encounter_type" class="text ui-widget-content ui-corner-all"></select></td>
-			</tr>
-			<tr>
-				<td><label for="encounter_location">Encounter Location</label></td>
-				<td colspan="2"><input type="text" name="encounter_location" id="encounter_location" class="text ui-widget-content ui-corner-all" /></td>
-			</tr>
-			<tr>
-				<td><label for="encounter_role">Provider Role</label></td>
-				<td><select name="encounter_role" id="encounter_role" class="text ui-widget-content ui-corner-all"></select></td>
-				<td><input type="text" name="referring_provider" id="referring_provider" size="21" class="text ui-widget-content ui-corner-all" placeholder="Referring Provider" /></td>
-			</tr>
-			<tr>
-				<td><label for="encounter_cc">Chief Complaint</label></td>
-				<td colspan="2"><input type="text" name="encounter_cc" id="encounter_cc" size="42" class="text ui-widget-content ui-corner-all" /></td>
-			</tr>
-			<tr>
-				<td><label for="encounter_condition">Condition Related To</label></td>
-				<td colspan="2"><input type="text" name="encounter_condition" id="encounter_condition" size="42" class="text ui-widget-content ui-corner-all" /></td>
-			</tr>
-			<tr>
-				<td><label for="encounter_condition_work">Condition Related To Work</label></td>
-				<td colspan="2"><select name="encounter_condition_work" id="encounter_condition_work" class="text ui-widget-content ui-corner-all"></select></td>
-			</tr>
-			<tr>
-				<td><label for="encounter_condition_auto">Condition Related To Auto Accident</label></td>
-				<td><select name="encounter_condition_auto" id="encounter_condition_auto" class="text ui-widget-content ui-corner-all"></select></td>
-				<td><select name="encounter_condition_auto_state" id="encounter_condition_auto_state" class="text ui-widget-content ui-corner-all"></select></td>
-			</tr>
-			<tr>
-				<td><label for="encounter_condition_other">Condition Related To Other Accident</label></td>
-				<td colspan="2"><select name="encounter_condition_other" id="encounter_condition_other" class="text ui-widget-content ui-corner-all"></select></td>
-			</tr>
-			<tr>
-				<td>Insurance information:</td>
-				<td colspan="2"><div id="encounter_copay"></div></td>
-			</tr>
-		</table>
+		<div style="width:490px">
+			<div style="float:left;margin:5px"><label for="encounter_date">Date of Service</label><br><input type="text" name="encounter_date" id="encounter_date" style="width:140px" class="text ui-widget-content ui-corner-all" /></div>
+			<div style="float:left;margin:5px"><label for="encounter_time">Time of Service</label><br><input type="text" name="encounter_time" id="encounter_time" style="width:140px" class="text ui-widget-content ui-corner-all" /></div>
+			<div style="float:left;margin:5px"><label for="encounter_location">Encounter Location</label><br><input type="text" name="encounter_location" id="encounter_location" style="width:140px" class="text ui-widget-content ui-corner-all" /></div>
+		</div>
+		<div style="width:490px;float:left;margin:5px"><label for="encounter_type">Encounter Type</label><br><select name="encounter_type" id="encounter_type" class="text ui-widget-content ui-corner-all"></select></div>
+		<div style="width:490px">
+			<div style="float:left;margin:5px"><label for="encounter_role">Provider Role</label><br><select name="encounter_role" id="encounter_role" class="text ui-widget-content ui-corner-all"></select></div>
+			<div id="referring_provider_div">
+				<div style="float:left;margin:5px"><label for="referring_provider">Referring Provider</label><br><input type="text" name="referring_provider" id="referring_provider" style="width:164px" class="text ui-widget-content ui-corner-all"/></div>
+				<div style="float:left;margin:5px"><label for="referring_provider_npi">Referring Provider NPI</label><br><input type="text" name="referring_provider_npi" id="referring_provider_npi" style="width:140px" class="text ui-widget-content ui-corner-all"/></div>
+			</div>
+		</div>
+		<div style="width:490px;float:left">
+			<div style="float:left;margin:5px"><label for="encounter_cc">Chief Complaint</label><br><input type="text" name="encounter_cc" id="encounter_cc" style="width:390px" class="text ui-widget-content ui-corner-all" /></div>
+		</div>
+		<div style="width:490px;float:left;margin:5px">
+			<strong>Condtion Related To:</strong><br>
+			<label for="encounter_condition_work">Work: </label><select name="encounter_condition_work" id="encounter_condition_work" class="text ui-widget-content ui-corner-all"></select><br>
+			<label for="encounter_condition_auto">Auto Accident: </label><select name="encounter_condition_auto" id="encounter_condition_auto" class="text ui-widget-content ui-corner-all"></select><select name="encounter_condition_auto_state" id="encounter_condition_auto_state" class="text ui-widget-content ui-corner-all"></select><br>
+			<label for="encounter_condition_other">Other Accident: </label><select name="encounter_condition_other" id="encounter_condition_other" class="text ui-widget-content ui-corner-all"></select><br>
+			<label for="encounter_condition">Other: </label><input type="text" name="encounter_condition" id="encounter_condition" style="width:300px" class="text ui-widget-content ui-corner-all" />
+		</div>
+		<div style="width:490px;float:left;margin:5px">
+			<strong>Insurance information:</strong><br><div id="encounter_copay"></div></div>
+		</div>
 	</form>
 </div>
 <div id="new_import_dialog" title="Import New Documents">

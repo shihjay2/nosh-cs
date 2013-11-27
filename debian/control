@@ -10,7 +10,7 @@ Homepage: http://noshemr.wordpress.com
 
 Package: nosh-cs
 Architecture: any
-Depends: mysql-server, apache2, php5, php5-mysql, php5-imap, php5-mcrypt, php5-imagick, php5-gd, php5-cli, php5-curl, php5-common, libapache2-mod-php5, libdbi-perl, libdbd-mysql-perl, libssh2-1-dev, libssh2-php, php-soap, php-pear, imagemagick, pdftk
+Depends: mysql-server, apache2, php5, php5-mysql, php5-imap, php5-mcrypt, php5-imagick, php5-gd, php5-cli, php5-curl, php5-common, libapache2-mod-php5, libdbi-perl, libdbd-mysql-perl, libssh2-1-dev, libssh2-php, php-soap, php-pear, imagemagick, pdftk, openssh-server
 Description: New Open Source Health ChartingSystem
  The NOSH ChartingSystem provides electronic medical records, personal health records, prescription writing,
  insurance billing, growth charts, vaccine management, and preventative services reminders specifically

@@ -5,9 +5,9 @@ $(document).ready(function() {
 		inactivity: 3600000,
 		noconfirm: 10000,
 		alive_url: '<?php echo site_url("billing/billing");?>',
-		redirect_url: '<?php echo site_url("start");?>',
+		redirect_url: '<?php echo site_url("logout");?>',
 		logout_url: '<?php echo site_url("logout");?>',
-		sessionAlive: 300000
+		sessionAlive: false
 	});
 	jQuery("#submit_list").jqGrid({
 		url:"<?php echo site_url('billing/billing/submit_list/');?>",
@@ -2315,6 +2315,133 @@ $(document).ready(function() {
 		$("#configuration_dialog").dialog('open');
 		$("#configuration_accordion").accordion("option", "active", 7);
 	});
+	$("#financial_query_type").addOption({"":"Choose query type","payment_type":"Payment type","cpt":"CPT Codes"}).change(function(){
+		var a = $("#financial_query_type").val();
+		if (a == "payment_type") {
+			$.ajax({
+				type: "POST",
+				url: "<?php echo site_url('search/query_payment_type_list');?>",
+				dataType: "json",
+				success: function(data){
+					$("#financial_query_variables").removeOption(/./);
+					$("#financial_query_variables").addOption(data, false).trigger("liszt:updated");
+				}
+			});
+			$.ajax({
+				type: "POST",
+				url: "<?php echo site_url('search/query_year_list');?>",
+				dataType: "json",
+				success: function(data){
+					$("#financial_query_year").removeOption(/./);
+					$("#financial_query_year").addOption(data, false).trigger("liszt:updated");
+				}
+			});
+		}
+		if (a == "cpt") {
+			$.ajax({
+				type: "POST",
+				url: "<?php echo site_url('search/query_cpt_list');?>",
+				dataType: "json",
+				success: function(data){
+					$("#financial_query_variables").removeOption(/./);
+					$("#financial_query_variables").addOption(data, false).trigger("liszt:updated");
+				}
+			});
+			$.ajax({
+				type: "POST",
+				url: "<?php echo site_url('search/query_year_list');?>",
+				dataType: "json",
+				success: function(data){
+					$("#financial_query_year").removeOption(/./);
+					$("#financial_query_year").addOption(data, false).trigger("liszt:updated");
+				}
+			});
+		}
+		if (a == "") {
+			$("#financial_query_variables").removeOption(/./).trigger("liszt:updated");
+			$("#financial_query_year").removeOption(/./).trigger("liszt:updated");
+
+		}
+	});
+	$("#financial_query_type").val('');
+	$("#financial_query_variables").chosen();
+	$("#financial_query_year").chosen();
+	$("#financial_query_submit").button().click(function(){
+		var a = $("#financial_query_type");
+		var b = $("#financial_query_variables");
+		var c = $("#financial_query_year");
+		var bValid = true;
+		bValid = bValid && checkEmpty(a,"Search");
+		bValid = bValid && checkEmpty(b,"Variables");
+		bValid = bValid && checkEmpty(c,"Year");
+		if (bValid) {
+			var json_result = $("#financial_query_form").serializeObject();
+			jQuery("#financial_query_results").jqGrid('GridUnload');
+			jQuery("#financial_query_results").jqGrid({
+				url:"<?php echo site_url('search/financial_query/');?>",
+				datatype: "json",
+				postData: json_result,
+				mtype: "POST",
+				colNames:['ID','Date','Last Name','First Name','Amount','Type'],
+				colModel:[
+					{name:'billing_core_id',index:'billing_core_id',width:1,hidden:true},
+					{name:'dos_f',index:'dos_f',width:150,formatter:'date',formatoptions:{srcformat:"m/d/y", newformat: "ISO8601Short"}},
+					{name:'lastname',index:'lastname',width:150,sortable:false},
+					{name:'firstname',index:'firstname',width:150,sortable:false},
+					{name:'amount',index:'amount',width:150,sortable:false},
+					{name:'type',index:'type',width:150,sortable:false}
+				],
+				rowNum:10,
+				rowList:[10,20,30],
+				pager: jQuery('#financial_query_results_pager'),
+				sortname: 'dos_f',
+				viewrecords: true,
+				sortorder: "desc",
+				caption:"Search Results",
+				height: "100%",
+				jsonReader: { repeatitems : false, id: "0" }
+			}).navGrid('#financial_query_results_pager',{search:false,edit:false,add:false,del:false});
+		}
+	});
+	$("#financial_query_reset").button().click(function(){
+		$("#financial_query_form").clearForm();
+		$("#financial_query_type").val('');
+		jQuery("#financial_query_results").jqGrid('GridUnload');
+		$("#financial_query_year").removeOption(/./).trigger("liszt:updated");
+		$("#financial_query_variables").removeOption(/./).trigger("liszt:updated");
+	});
+	$("#financial_query_print").button().click(function(){
+		var a = $("#financial_query_type");
+		var b = $("#financial_query_variables");
+		var c = $("#financial_query_year");
+		var bValid = true;
+		bValid = bValid && checkEmpty(a,"Search");
+		bValid = bValid && checkEmpty(b,"Variables");
+		bValid = bValid && checkEmpty(c,"Year");
+		if (bValid) {
+			var json_result = $("#financial_query_form").serializeObject();
+			var print_ready = false;
+			var id_doc = "";
+			$.ajax({
+				type: "POST",
+				url: "<?php echo site_url('search/financial_query_print');?>",
+				data: json_result,
+				dataType: "json",
+				async: false,
+				success: function(data){
+					if (data.message == 'OK') {
+						print_ready = true;
+						id_doc = data.id_doc;
+					} else {
+						$.jGrowl(data.message);
+					}
+				}
+			});
+			if (print_ready == true) {
+				window.open("<?php echo site_url('search/financial_query_print1');?>/" + id_doc);
+			}
+		}
+	});
 });
 </script>
 <div id="heading2"></div>
@@ -2356,7 +2483,22 @@ $(document).ready(function() {
 					<table id="monthly_stats" class="scroll" cellpadding="0" cellspacing="0"></table>
 					<div id="monthly_stats_pager" class="scroll" style="text-align:center;"></div><br>
 					<table id="yearly_stats" class="scroll" cellpadding="0" cellspacing="0"></table>
-					<div id="yearly_stats_pager" class="scroll" style="text-align:center;"></div>
+					<div id="yearly_stats_pager" class="scroll" style="text-align:center;"></div><br>
+					<form id="financial_query_form">
+						<fieldset class="ui-corner-all">
+							<legend>Query</legend>
+							<div id="financial_query_div">
+								<table>
+									<tr><td>Search:</td><td><select name="type" id="financial_query_type" class="text ui-widget-content ui-corner-all"></select></td></tr>
+									<tr><td>Variables:</td><td><select name="variables[]" multiple="multiple"  style="width:400px" id="financial_query_variables"></select></td></tr>
+									<tr><td>Year:</td><td><select name="year[]" multiple="multiple"style="width:400px"  id="financial_query_year"></select></td></tr>
+								</table>
+							</div><br>
+							<input type="button" id="financial_query_submit" value="Submit Query"/> <input type="button" id="financial_query_print" value="Print Results"/> <input type="button" id="financial_query_reset" value="Reset Query"/> <br><br>
+							<table id="financial_query_results" class="scroll" cellpadding="0" cellspacing="0"></table>
+							<div id="financial_query_results_pager" class="scroll" style="text-align:center;"></div><br>
+						</fieldset><br><br>
+					</form>
 				</div>
 			</div>	
 		</div>

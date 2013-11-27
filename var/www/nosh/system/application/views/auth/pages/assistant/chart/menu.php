@@ -95,6 +95,9 @@
 				<table cellspacing="0" cellpadding="3">
 					<tbody>
 						<tr>
+							<td colspan="3">Select existing patient to copy contact information:<br><input type="text" id="menu_autocomplete_patient" style="width:560px" class="text ui-widget-content ui-corner-all"/></td>
+						</tr>
+						<tr>
 							<td colspan="3">Address:<br><input type="text" name="address" id="menu_address" style="width:560px" class="text ui-widget-content ui-corner-all"/></td>
 						</tr>
 						<tr>
@@ -289,7 +292,7 @@
 			<button type="button" id="sign_message">Sign</button>
 			<button type="button" id="cancel_message">Cancel</button>
 			<button type="button" id="delete_message">Delete</button>
-			<hr />
+			<hr class="ui-state-default"/>
 			<table>
 				<tbody>
 					<tr>
@@ -308,7 +311,7 @@
 						<td valign="top">
 							<button type="button" id="message_telephone">Phone</button><br>
 							<button type="button" id="message_rx">RX</button><br>
-							<button type="button" id="message_sup">Supplement</button><br>
+							<button type="button" id="message_sup">Supplements</button><br>
 							<button type="button" id="message_lab">Lab</button><br>
 							<button type="button" id="message_rad">Imaging</button><br>
 							<button type="button" id="message_cp">Cardiopulmonary</button><br>
@@ -529,6 +532,7 @@
 </div>
 <div id="documents_list_dialog" title="Documents" style="font-size: 0.9em">
 	<button type="button" id="menu_new_letter">New Letter</button>
+	<button type="button" id="menu_tests">Test Results</button>
 	<hr />
 	<table id="labs" class="scroll" cellpadding="0" cellspacing="0"></table>
 	<div id="pager8" class="scroll" style="text-align:center;"></div> 
@@ -589,6 +593,14 @@
 	<button type="button" id="save_document">Save</button><br>
 	<div id="embedURL"></div>
 </div>
+<div id="tests_dialog" title="Test Results">
+	Search: <input type="text" size="50" id="search_all_tests" class="text ui-widget-content ui-corner-all" onkeydown="doSearch1(arguments[0]||event)"/><br><br> 
+	<table id="tests_list" class="scroll" cellpadding="0" cellspacing="0"></table>
+	<div id="tests_list_pager" class="scroll" style="text-align:center;"></div><br>
+	<button type="button" id="chart_results">Chart Selected Results</button>
+	<div id="chart_loading" style="display: block;float: right;"><img src="<?php echo base_url().'images/indicator.gif';?>"> Loading graph...</div><br><br>
+	<div id="tests_container" style="width: 750px; height: 550px; margin: 0 auto"></div>
+</div>
 <div id="prevention_list_dialog" title="Prevention Recommendations" style="font-size: 0.9em">
 	<div id="prevention_load"><img src="<?php echo base_url().'images/indicator.gif';?>"> Loading...</div>
 	<div id="prevention_items"></div>
@@ -634,7 +646,24 @@
 			}
 		}
 	});
-	$("#demographics_accordion").accordion();
+	$("#demographics_accordion").accordion({
+		activate: function (event, ui) {
+			var id = ui.newPanel[0].id;
+			$("#" + id + " .text").first().focus();
+		}
+	});
+	$("#demographics_accordion .ui-accordion-content").each(function(){
+		$(this).find(".text").last().on('keydown', function(e) {
+			if (e.which == 9) {
+				if (!e.shiftKey) {
+					var active = $("#demographics_accordion").accordion("option", "active");
+					if (active < 3) {
+						$("#demographics_accordion").accordion("option", "active", active + 1);
+					}
+				}
+			}
+		});
+	});
 	$("#guardian_import").button().click(function(){
 		$('#menu_guardian_address').val($('#menu_address').val());
 		$('#menu_guardian_city').val($('#menu_city').val());
@@ -845,6 +874,36 @@
 		},
 		close: function(event, ui) {
 			$("#edit_menu_insurance_main_form").clearForm();
+		}
+	});
+	$("#menu_autocomplete_patient").autocomplete({
+		source: function (req, add){
+			$.ajax({
+				url: "<?php echo site_url('search/demographics_copy');?>",
+				dataType: "json",
+				type: "POST",
+				data: req,
+				success: function(data){
+					if(data.response =='true'){
+						add(data.message);
+					}				
+				}
+			});
+		},
+		minLength: 1,
+		select: function( event, ui ) {
+			$("#menu_address").val(ui.item.address);
+			$("#menu_city").val(ui.item.city);
+			$("#menu_state").val(ui.item.state);
+			$("#menu_zip").val(ui.item.zip);
+			$("#menu_phone_home").val(ui.item.phone_home);
+			$("#menu_phone_work").val(ui.item.phone_work);
+			$("#menu_phone_cell").val(ui.item.phone_cell);
+			$("#menu_email").val(ui.item.email);
+			$("#menu_emergency_contact").val(ui.item.emergency_contact);
+			$("#menu_emergency_phone").val(ui.item.emergency_phone);
+			$("#menu_reminder_method").val(ui.item.reminder_method);
+			$("#menu_cell_carrier").val(ui.item.cell_carrier);
 		}
 	});
 	$("#menu_address").autocomplete({
@@ -3856,6 +3915,199 @@
 	$("#menu_new_letter").click(function() {
 		$("#letter_dialog").dialog('open');
 	});
+	$("#menu_tests").button({
+		icons: {
+			primary: "ui-icon-image"
+		}
+	});
+	$("#menu_tests").click(function() {
+		$("#tests_dialog").dialog('open');
+	});
+	$("#tests_dialog").dialog({ 
+		bgiframe: true, 
+		autoOpen: false, 
+		height: 500, 
+		width: 800,
+		open: function(event, ui) {
+			$("#chart_loading").hide();
+			jQuery("#tests_list").jqGrid('GridUnload');
+			jQuery("#tests_list").jqGrid({
+				url:"<?php echo site_url('assistant/chartmenu/tests/');?>",
+				datatype: "json",
+				mtype: "POST",
+				colNames:['ID','Date','Test','Result','Unit','Normal','Flags','Type'],
+				colModel:[
+					{name:'tests_id',index:'tests_id',width:1,hidden:true},
+					{name:'test_datetime',index:'test_datetime',width:100,formatter:'date',formatoptions:{srcformat:"ISO8601Long", newformat: "ISO8601Short"}},
+					{name:'test_name',index:'test_name',width:310},
+					{name:'test_result',index:'test_result',width:120},
+					{name:'test_units',index:'test_units',width:50},
+					{name:'test_reference',index:'test_reference',width:100},
+					{name:'test_flags',index:'test_flags',width:50,
+						cellattr: function (rowId, val, rawObject, cm, rdata) {
+							if (rawObject.test_flags == "L") {
+								var response = "Below low normal";
+							}
+							if (rawObject.test_flags == "H") {
+								var response = "Above high normal";
+							}
+							if (rawObject.test_flags == "LL") {
+								var response = "Below low panic limits";
+							}
+							if (rawObject.test_flags == "HH") {
+								var response = "Above high panic limits";
+							}
+							if (rawObject.test_flags == "<") {
+								var response = "Below absolute low-off instrument scale";
+							}
+							if (rawObject.test_flags == ">") {
+								var response = "Above absolute high-off instrument scale";
+							}
+							if (rawObject.test_flags == "N") {
+								var response = "Normal";
+							}
+							if (rawObject.test_flags == "A") {
+								var response = "Abnormal";
+							}
+							if (rawObject.test_flags == "AA") {
+								var response = "Very abnormal";
+							}
+							if (rawObject.test_flags == "U") {
+								var response = "Significant change up";
+							}
+							if (rawObject.test_flags == "D") {
+								var response = "Significant change down";
+							}
+							if (rawObject.test_flags == "B") {
+								var response = "Better";
+							}
+							if (rawObject.test_flags == "W") {
+								var response = "Worse";
+							}
+							if (rawObject.test_flags == "S") {
+								var response = "Susceptible";
+							}
+							if (rawObject.test_flags == "R") {
+								var response = "Resistant";
+							}
+							if (rawObject.test_flags == "I") {
+								var response = "Intermediate";
+							}
+							if (rawObject.test_flags == "MS") {
+								var response = "Moderately susceptible";
+							}
+							if (rawObject.test_flags == "VS") {
+								var response = "Very susceptible";
+							}
+							if (rawObject.test_flags == "") {
+								var response = "";
+							}
+							return 'title="' + response + '"';
+						}
+					},
+					{name:'test_type',index:'test_type',width:1,hidden:true}
+				],
+				rowNum:10,
+				rowList:[10,20,30],
+				pager: jQuery('#tests_list_pager'),
+				sortname: 'test_datetime',
+			 	viewrecords: true,
+			 	sortorder: "desc",
+			 	caption:"Test Results",
+			 	height: "100%",
+			 	gridview: true,
+			 	rowattr: function (rd) {
+					if (rd.test_flags == "HH" || rd.test_flags == "LL" || rd.test_flags == "H" || rd.test_flags == "L") {
+						return {"class": "myAltRowClass"};
+					}
+				},
+				jsonReader: { repeatitems : false, id: "0" }
+			}).navGrid('#tests_list_pager',{search:false,edit:false,add:false,del:false});
+			$("#chart_results").button().click(function() {
+				var item = jQuery("#tests_list").getGridParam('selrow');
+				if (item) {
+					$("#chart_loading").show();
+					var options = {
+						chart: {
+							renderTo: 'tests_container',
+							defaultSeriesType: 'line',
+							marginRight: 130,
+							marginBottom: 50,
+							width: 750
+						},
+						title: {
+							text: '',
+							x: -20
+						},
+						xAxis: {
+							title: {
+								text: ''
+							},
+							type: 'datetime'
+						},
+						yAxis: {
+							title: {
+								text: ''
+							},
+							plotLines: [{
+								value: 0,
+								width: 1,
+								color: '#808080'
+							}]
+						},
+						legend: {
+							layout: 'vertical',
+							align: 'right',
+							verticalAlign: 'top',
+							x: -10,
+							y: 100,
+							borderWidth: 0
+						},
+						series: [
+							{type: 'line', data: []}
+						],
+						credits: {
+							href: 'http://noshemr.wordpress.com',
+							text: 'NOSH ChartingSystem'
+						}
+					};
+					$.ajax({
+						type: "POST",
+						url: "<?php echo site_url('assistant/chartmenu/chart_test');?>/" + item,
+						dataType: "json",
+						success: function(data){
+							options.title.text = data.title;
+							options.xAxis.title.text = data.xaxis;
+							options.yAxis.title.text = data.yaxis;
+							options.series[0].name = data.name;
+							newData = [];
+							for (i in data.patient) {
+								newData.push( [ new Date(data.patient[i][0]).getTime(), parseFloat(data.patient[i][1]) ] );
+							}
+							options.series[0].data = newData;
+							var chart = new Highcharts.Chart(options);
+							$("#chart_loading").hide();
+						}
+					});
+				} else {
+					$.jGrowl('Choose item to chart!');
+				}
+			});
+		},
+		close: function (event, ui) {
+			$("#tests_container").html('');
+		}
+	});
+	var timeoutHnd1;
+	function doSearch1(ev){ 
+		if(timeoutHnd1) 
+			clearTimeout(timeoutHnd1);
+			timeoutHnd1 = setTimeout(gridReload1,500);
+	}
+	function gridReload1(){ 
+		var mask = jQuery("#search_all_tests").val();
+		jQuery("#tests_list").setGridParam({url:"<?php echo site_url('assistant/chartmenu/tests');?>/"+mask,page:1}).trigger("reloadGrid");
+	}
 	//Prevention
 	$("#prevention_list_dialog").dialog({ 
 		bgiframe: true, 

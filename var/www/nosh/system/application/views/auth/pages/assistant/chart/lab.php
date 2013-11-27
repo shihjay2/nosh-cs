@@ -15,8 +15,8 @@
 	<div id="messages_lab_edit_fields">
 		<button type="button" id="messages_lab_save">Save</button>
 		<button type="button" id="messages_lab_cancel">Cancel</button>
-		Provider: <select id ="messages_lab_provider_list" name="encounter_provider" class="text ui-widget-content ui-corner-all"></select>
-		<div style="float:right;" "id="messages_lab_status"></div>
+		Provider: <select id ="messages_lab_provider_list" name="id" class="text ui-widget-content ui-corner-all"></select>
+		<div style="float:right;" id="messages_lab_status"></div>
 		<hr class="ui-state-default"/>
 		<input type="hidden" name="orders_id" id="messages_lab_orders_id"/>
 		<input type="hidden" name="t_messages_id" id="messages_lab_t_messages_id"/>
@@ -80,7 +80,8 @@
 							<td colspan="3">Comments:<br><input type="text" name="comments" id="messages_lab_location_comments" style="width:500px" class="text ui-widget-content ui-corner-all"/></td>
 						</tr>
 						<tr>
-							<td colspan="3" valign="top">Provider/Clinic Identity:<br><input type="text" name="ordering_id" id="messages_lab_location_ordering_id" style="width:500px" class="text ui-widget-content ui-corner-all"/></td>
+							<td>Provider/Clinic Identity:<br><input type="text" name="ordering_id" id="messages_lab_location_ordering_id" style="width:164px" class="text ui-widget-content ui-corner-all"/></td>
+							<td colspan="2">Electronic Order Interface (optional)<br><select name="electronic_order" id="messages_lab_location_electronic_order" class="text ui-widget-content ui-corner-all"></select></td>
 						</tr>
 					</table>
 				</div>
@@ -118,7 +119,7 @@
 	<div id="messages_lab_action_fieldset" style="display:none">
 		<div id="messages_lab_choice"></div><br>
 		<input type="button" id="messages_print_lab" value="Print" class="messages_lab_button"/> 
-		<!--<input type="button" id="messages_electronic_lab" value="Electronic" class="messages_lab_button"/>--> 
+		<input type="button" id="messages_electronic_lab" value="Electronic" class="messages_lab_button"/>
 		<input type="button" id="messages_fax_lab" value="Fax" class="messages_lab_button"/>
 		<input type="button" id="messages_done_lab" value="Done" class="messages_lab_button"/> 
 	</div>
@@ -228,28 +229,35 @@
 					var insurance_group = jQuery("#messages_lab_insurance_grid").getCell(id,'insurance_group');
 					var insurance_insu_lastname = jQuery("#messages_lab_insurance_grid").getCell(id,'insurance_insu_lastname');
 					var insurance_insu_firstname = jQuery("#messages_lab_insurance_grid").getCell(id,'insurance_insu_firstname');
-					var text = insurance_plan_name + '; ID: ' + insurance_id_num;
-					if(insurance_group != ''){
-						text += "; Group: " + insurance_group;
-					}
-					text += "; " + insurance_insu_lastname + ", " + insurance_insu_firstname;
-					var old = $("#messages_lab_insurance").val();
-					if(old){
-						var pos = old.lastIndexOf('\n');
-						if (pos == -1) {
-							var old1 = old + '\n';
-						} else {
-							var a = old.slice(pos);
-							if (a == '') {
-								var old1 = old;
-							} else {
-								var old1 = old + '\n';
+					var address_id = jQuery("#messages_lab_insurance_grid").getCell(id,'address_id');
+					$.ajax({
+						url: "<?php echo site_url('search/payor_id');?>/" + address_id,
+						type: "POST",
+						success: function(data){
+							var text = insurance_plan_name + '; Payor ID: ' + data + '; ID: ' + insurance_id_num;
+							if(insurance_group != ''){
+								text += "; Group: " + insurance_group;
 							}
+							text += "; " + insurance_insu_lastname + ", " + insurance_insu_firstname;
+							var old = $("#messages_lab_insurance").val();
+							if(old){
+								var pos = old.lastIndexOf('\n');
+								if (pos == -1) {
+									var old1 = old + '\n';
+								} else {
+									var a = old.slice(pos);
+									if (a == '') {
+										var old1 = old;
+									} else {
+										var old1 = old + '\n';
+									}
+								}
+							} else {
+								var old1 = '';
+							}
+							$("#messages_lab_insurance").val(old1+text);
 						}
-					} else {
-						var old1 = '';
-					}
-					$("#messages_lab_insurance").val(old1+text);
+					});
 				},
 			 	jsonReader: { repeatitems : false, id: "0" }
 			}).navGrid('#messages_lab_insurance_pager',{search:false,edit:false,add:false,del:false});
@@ -267,7 +275,7 @@
 				}
 			});
 			$.ajax({
-				url: "<?php echo site_url('search/providers');?>",
+				url: "<?php echo site_url('search/providers1');?>",
 				dataType: "json",
 				type: "POST",
 				success: function(data){
@@ -477,6 +485,7 @@
 	$("#messages_lab_location_state").addOption({"AL":"Alabama","AK":"Alaska","AS":"America Samoa","AZ":"Arizona","AR":"Arkansas","CA":"California","CO":"Colorado","CT":"Connecticut","DE":"Delaware","DC":"District of Columbia","FM":"Federated States of Micronesia","FL":"Florida","GA":"Georgia","GU":"Guam","HI":"Hawaii","ID":"Idaho","IL":"Illinois","IN":"Indiana","IA":"Iowa","KS":"Kansas","KY":"Kentucky","LA":"Louisiana","ME":"Maine","MH":"Marshall Islands","MD":"Maryland","MA":"Massachusetts","MI":"Michigan","MN":"Minnesota","MS":"Mississippi","MO":"Missouri","MT":"Montana","NE":"Nebraska","NV":"Nevada","NH":"New Hampshire","NJ":"New Jersey","NM":"New Mexico","NY":"New York","NC":"North Carolina","ND":"North Dakota","OH":"Ohio","OK":"Oklahoma","OR":"Oregon","PW":"Palau","PA":"Pennsylvania","PR":"Puerto Rico","RI":"Rhode Island","SC":"South Carolina","SD":"South Dakota","TN":"Tennessee","TX":"Texas","UT":"Utah","VT":"Vermont","VI":"Virgin Island","VA":"Virginia","WA":"Washington","WV":"West Virginia","WI":"Wisconsin","WY":"Wyoming"}, false);
 	$("#messages_lab_location_phone").mask("(999) 999-9999");
 	$("#messages_lab_location_fax").mask("(999) 999-9999");
+	$("#messages_lab_location_electronic_order").addOption({"":"Select Electronic Order Interface","PeaceHealth":"PeaceHealth Labs"});
 	$("#messages_lab_insurance_client").click(function(){
 		var text = "Bill Client";
 		var old = $("#messages_lab_insurance").val();
@@ -507,7 +516,7 @@
 		var order = $("#messages_lab_orders");
 		var codes = $("#messages_lab_codes");
 		var location = $("#messages_lab_location");
-		var insurance = $("#messages_lab_insurance")
+		var insurance = $("#messages_lab_insurance");
 		var bValid = true;
 		bValid = bValid && checkEmpty(order,"Tests");
 		bValid = bValid && checkEmpty(codes,"Diagnosis Codes");
@@ -525,7 +534,7 @@
 			$.ajax({
 				type: "POST",
 				url: "<?php echo site_url('assistant/chartmenu/add_lab_order');?>",
-				data: "orders_labs=" + a + "&orders_labs_icd=" + b + "&address_id=" + c + "&t_messages_id=" + d + "&orders_id=" + e + "&orders_insurance=" + f + "&orders_labs_obtained=" + g + "&provider=" + h,
+				data: "orders_labs=" + a + "&orders_labs_icd=" + b + "&address_id=" + c + "&t_messages_id=" + d + "&orders_id=" + e + "&orders_insurance=" + f + "&orders_labs_obtained=" + g + "&id=" + h,
 				dataType: "json",
 				success: function(data){
 					$.jGrowl(data.message);
@@ -637,7 +646,24 @@
 		}
 	});
 	$("#messages_electronic_lab").click(function(){
-		$.jGrowl('Future feature!');
+		var lab = $("#messages_lab_orders_id");
+		var bValid = true;
+		bValid = bValid && checkEmpty(lab,"Lab Order");
+		if (bValid) {
+			var order_id = $("#messages_lab_orders_id").val();
+			if(order_id){
+				$.ajax({
+					type: "POST",
+					url: "<?php echo site_url('assistant/chartmenu/electronic_orders');?>",
+					data: "orders_id=" + order_id,
+					success: function(data){
+						$.jGrowl(data);
+					}
+				});
+			} else {
+				$.jGrowl("Please complete the form");
+			}
+		}
 	});
 	$("#messages_fax_lab").click(function(){
 		var lab = $("#messages_lab_orders_id");
@@ -754,6 +780,9 @@
 						$("#messages_lab_location_phone").val(data.phone);
 						$("#messages_lab_location_fax").val(data.fax);
 						$("#messages_lab_location_address_id").val(data.address_id);
+						$("#messages_lab_location_comments").val(data.comments);
+						$("#messages_lab_location_ordering_id").val(data.ordering_id);
+						$("#messages_lab_location_electronic_order").val(data.electronic_order);
 					}
 				});
 			} else {
@@ -777,10 +806,11 @@
 					var i = $("#messages_lab_location_address_id").val();
 					var j = $("#messages_lab_location_comments").val();
 					var k = $("#messages_lab_location_ordering_id").val();
+					var l = $("#messages_lab_location_electronic_order").val();
 					$.ajax({
 						type: "POST",
 						url: "<?php echo site_url('assistant/chartmenu/edit_lab_provider');?>",
-						data: "facility=" + a + "&street_address1=" + b + "&street_address2=" + c + "&city=" + d + "&state=" + e + "&zip=" + f + "&phone=" + g + "&fax=" + h + "&address_id=" + i + "&comments=" + j + "&ordering_id=" + k,
+						data: "facility=" + a + "&street_address1=" + b + "&street_address2=" + c + "&city=" + d + "&state=" + e + "&zip=" + f + "&phone=" + g + "&fax=" + h + "&address_id=" + i + "&comments=" + j + "&ordering_id=" + k + "&electronic_order=" + l,
 						dataType: "json",
 						success: function(data){
 							$.jGrowl(data.message);

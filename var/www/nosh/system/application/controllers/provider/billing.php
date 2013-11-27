@@ -28,11 +28,12 @@ class Billing extends Application
 	
 	function submit_list()
 	{
+		$practice_id = $this->session->userdata('practice_id');
 		$page = $this->input->post('page');
 		$limit = $this->input->post('rows');
 		$sidx = $this->input->post('sidx');
 		$sord = $this->input->post('sord');
-		$query = $this->db->query("SELECT * FROM encounters JOIN demographics ON encounters.pid=demographics.pid WHERE encounters.bill_submitted!='Done' AND encounters.addendum='n'");
+		$query = $this->db->query("SELECT * FROM encounters JOIN demographics ON encounters.pid=demographics.pid WHERE encounters.bill_submitted!='Done' AND encounters.addendum='n' AND encounters.practice_id=$practice_id");
 		$count = $query->num_rows(); 
 		if($count > 0) { 
 			$total_pages = ceil($count/$limit); 
@@ -42,7 +43,7 @@ class Billing extends Application
 		if ($page > $total_pages) $page=$total_pages;
 		$start = $limit*$page - $limit;
 		if($start < 0) $start = 0;
-		$query1 = $this->db->query("SELECT * FROM encounters JOIN demographics ON encounters.pid=demographics.pid WHERE encounters.bill_submitted!='Done' AND encounters.addendum='n' ORDER BY $sidx $sord LIMIT $start , $limit");
+		$query1 = $this->db->query("SELECT * FROM encounters JOIN demographics ON encounters.pid=demographics.pid WHERE encounters.bill_submitted!='Done' AND encounters.addendum='n' AND encounters.practice_id=$practice_id ORDER BY $sidx $sord LIMIT $start , $limit");
 		$response['page'] = $page;
 		$response['total'] = $total_pages;
 		$response['records'] = $count;
@@ -54,11 +55,12 @@ class Billing extends Application
 	
 	function submit_batch_queue()
 	{
+		$practice_id = $this->session->userdata('practice_id');
 		$page = $this->input->post('page');
 		$limit = $this->input->post('rows');
 		$sidx = $this->input->post('sidx');
 		$sord = $this->input->post('sord');
-		$query = $this->db->query("SELECT * FROM encounters JOIN demographics ON encounters.pid=demographics.pid WHERE encounters.bill_submitted='Pend' AND encounters.addendum='n'");
+		$query = $this->db->query("SELECT * FROM encounters JOIN demographics ON encounters.pid=demographics.pid WHERE encounters.bill_submitted='Pend' AND encounters.addendum='n' AND encounters.practice_id=$practice_id");
 		$count = $query->num_rows(); 
 		if($count > 0) { 
 			$total_pages = ceil($count/$limit); 
@@ -68,7 +70,7 @@ class Billing extends Application
 		if ($page > $total_pages) $page=$total_pages;
 		$start = $limit*$page - $limit;
 		if($start < 0) $start = 0;
-		$query1 = $this->db->query("SELECT * FROM encounters JOIN demographics ON encounters.pid=demographics.pid WHERE encounters.bill_submitted='Pend' AND encounters.addendum='n' ORDER BY $sidx $sord LIMIT $start , $limit");
+		$query1 = $this->db->query("SELECT * FROM encounters JOIN demographics ON encounters.pid=demographics.pid WHERE encounters.bill_submitted='Pend' AND encounters.addendum='n' AND encounters.practice_id=$practice_id ORDER BY $sidx $sord LIMIT $start , $limit");
 		$response['page'] = $page;
 		$response['total'] = $total_pages;
 		$response['records'] = $count;
@@ -364,7 +366,8 @@ class Billing extends Application
 	
 	function check_batch()
 	{
-		$query = $this->db->query("SELECT * FROM encounters WHERE bill_submitted='Pend'");
+		$practice_id = $this->session->userdata('practice_id');
+		$query = $this->db->query("SELECT * FROM encounters WHERE bill_submitted='Pend' AND practice_id=$practice_id");
 		if ($query->num_rows() > 0) {
 			echo 'OK';
 		} else {
@@ -375,7 +378,8 @@ class Billing extends Application
 	
 	function check_batch1()
 	{
-		$query = $this->db->query("SELECT * FROM encounters WHERE bill_submitted='HCFA'");
+		$practice_id = $this->session->userdata('practice_id');
+		$query = $this->db->query("SELECT * FROM encounters WHERE bill_submitted='HCFA' AND practice_id=$practice_id");
 		if ($query->num_rows() > 0) {
 			echo 'OK';
 		} else {
@@ -386,8 +390,8 @@ class Billing extends Application
 	
 	function printimage_batch()
 	{
-		$query = $this->db->query("SELECT * FROM encounters WHERE bill_submitted='Pend'");
-		$result = $query->result_array();
+		$practice_id = $this->session->userdata('practice_id');
+		$result = $this->db->query("SELECT * FROM encounters WHERE bill_submitted='Pend' AND practice_id=$practice_id")->result_array();
 		$entire = '';
 		foreach ($result as $row) {
 			$entire .= $this->printimage($row['eid']);
@@ -405,8 +409,8 @@ class Billing extends Application
 	
 	function printhcfa_batch()
 	{
-		$query = $this->db->query("SELECT * FROM encounters WHERE bill_submitted='HCFA'");
-		$result = $query->result_array();
+		$practice_id = $this->session->userdata('practice_id');
+		$result = $this->db->query("SELECT * FROM encounters WHERE bill_submitted='HCFA' AND practice_id=$practice_id")->result_array();
 		$entire = '';
 		foreach ($result as $row) {
 			if ($entire === '') {
@@ -441,15 +445,16 @@ class Billing extends Application
 			if($file_extension!='pdf') {
 				die('LOGGED! bad extension');
 			}
-			ob_start();
+			//ob_start();
 			header('Content-type: application/pdf');
 			header('Content-Disposition: attachment; filename="'.$file_name.'"');
-			header("Content-length: $file_size");
-			ob_end_flush(); 
-			while(!feof($fp)) {
-				$file_buffer = fread($fp, 2048);
-				echo $file_buffer;
-			}
+			readfile($file_path);
+			//header("Content-length: $file_size");
+			//ob_end_flush(); 
+			//while(!feof($fp)) {
+				//$file_buffer = fread($fp, 2048);
+				//echo $file_buffer;
+			//}
 			fclose($fp);
 			unlink($file_path);
 			exit();
@@ -550,15 +555,16 @@ class Billing extends Application
 				if($file_extension!='pdf') {
 					die('LOGGED! bad extension');
 				}
-				ob_start();
+				//ob_start();
 				header('Content-type: application/pdf');
 				header('Content-Disposition: attachment; filename="'.$file_name.'"');
-				header("Content-length: $file_size");
-				ob_end_flush(); 
-				while(!feof($fp)) {
-					$file_buffer = fread($fp, 2048);
-					echo $file_buffer;
-				}
+				readfile($file_path);
+				//header("Content-length: $file_size");
+				//ob_end_flush(); 
+				//while(!feof($fp)) {
+					//$file_buffer = fread($fp, 2048);
+					//echo $file_buffer;
+				//}
 				fclose($fp);
 				unlink($file_path);
 				exit();
@@ -580,15 +586,16 @@ class Billing extends Application
 			if($file_extension!='pdf') {
 				die('LOGGED! bad extension');
 			}
-			ob_start();
+			//ob_start();
 			header('Content-type: application/pdf');
 			header('Content-Disposition: attachment; filename="'.$file_name.'"');
-			header("Content-length: $file_size");
-			ob_end_flush(); 
-			while(!feof($fp)) {
-				$file_buffer = fread($fp, 2048);
-				echo $file_buffer;
-			}
+			readfile($file_path);
+			//header("Content-length: $file_size");
+			//ob_end_flush(); 
+			//while(!feof($fp)) {
+				//$file_buffer = fread($fp, 2048);
+				//echo $file_buffer;
+			//}
 			fclose($fp);
 			unlink($file_path);
 			exit();
@@ -687,11 +694,12 @@ class Billing extends Application
 	
 	function bills_done()
 	{
+		$practice_id = $this->session->userdata('practice_id');
 		$page = $this->input->post('page');
 		$limit = $this->input->post('rows');
 		$sidx = $this->input->post('sidx');
 		$sord = $this->input->post('sord');
-		$query = $this->db->query("SELECT * FROM encounters JOIN demographics ON encounters.pid=demographics.pid WHERE encounters.bill_submitted='Done' AND encounters.addendum='n'");
+		$query = $this->db->query("SELECT * FROM encounters JOIN demographics ON encounters.pid=demographics.pid WHERE encounters.bill_submitted='Done' AND encounters.addendum='n' AND encounters.practice_id=$practice_id");
 		$count = $query->num_rows(); 
 		if($count > 0) { 
 			$total_pages = ceil($count/$limit); 
@@ -701,7 +709,7 @@ class Billing extends Application
 		if ($page > $total_pages) $page=$total_pages;
 		$start = $limit*$page - $limit;
 		if($start < 0) $start = 0;
-		$query1 = $this->db->query("SELECT * FROM encounters JOIN demographics ON encounters.pid=demographics.pid WHERE encounters.bill_submitted='Done' AND encounters.addendum='n' ORDER BY $sidx $sord LIMIT $start , $limit");
+		$query1 = $this->db->query("SELECT * FROM encounters JOIN demographics ON encounters.pid=demographics.pid WHERE encounters.bill_submitted='Done' AND encounters.addendum='n' AND encounters.practice_id=$practice_id ORDER BY $sidx $sord LIMIT $start , $limit");
 		$response['page'] = $page;
 		$response['total'] = $total_pages;
 		$response['records'] = $count;
@@ -755,15 +763,19 @@ class Billing extends Application
 	
 	function outstanding_balance()
 	{
+		$practice_id = $this->session->userdata('practice_id');
 		$page = $this->input->post('page');
 		$limit = $this->input->post('rows');
 		$sidx = $this->input->post('sidx');
 		$sord = $this->input->post('sord');
-		$query = $this->db->query("SELECT * FROM demographics");
+		$query = $this->db->query("SELECT * FROM demographics JOIN demographics_relate ON demographics.pid=demographics_relate.pid WHERE demographics_relate.practice_id=$practice_id");
 		$count = 0;
 		$full_array = array();
 		foreach ($query->result_array() as $row) {
 			$pid = $row['pid'];
+			$this->db->where('pid', $pid);
+			$this->db->where('practice_id', $this->session->userdata('practice_id'));
+			$notes = $this->db->get('demographics_notes')->row_array();
 			$query_a = $this->db->query("SELECT * FROM encounters WHERE pid=$pid AND addendum='n'");
 			$g = 0;
 			if ($query_a->num_rows() > 0) {
@@ -810,14 +822,14 @@ class Billing extends Application
 				$balance1 = 0;
 			}
 			$totalbalance = $balance + $balance1;
-			if ($totalbalance >= 0.01 || $row['billing_notes'] != '') {
+			if ($totalbalance >= 0.01 || $notes['billing_notes'] != '') {
 				$count++;
 				$full_array[] = array(
 					'pid' => $row['pid'],
 					'lastname' => $row['lastname'],
 					'firstname' => $row['firstname'],
 					'balance' => $totalbalance,
-					'billing_notes' => $row['billing_notes']
+					'billing_notes' => $notes['billing_notes']
 				);
 			}
 		}
@@ -1136,10 +1148,10 @@ class Billing extends Application
 			'dos_f' => $this->input->post('dos_f'),
 			'dos_t' => $this->input->post('dos_t'),
 			'payment' => '0',
-			'billing_group' => $billing_group
+			'billing_group' => $billing_group,
+			'practice_id' => $this->session->userdata('practice_id')
 		);
-							
-		if ($count > 0) {		
+		if ($count > 0) {
 			$this->encounters_model->updateBillingCore($id, $data);
 			$this->audit_model->update();
 			$result = 'Billing Updated';
@@ -1164,6 +1176,7 @@ class Billing extends Application
 	
 	function billing_save_common($insurance_id_1, $insurance_id_2, $eid)
 	{
+		$practice_id = $this->session->userdata('practice_id');
 		$pid = $this->session->userdata('billing_pid');
 		if ($pid == FALSE) {
 			echo "Close Chart";
@@ -1171,7 +1184,7 @@ class Billing extends Application
 		}
 		$this->encounters_model->deleteBilling($eid);
 		$this->audit_model->delete();
-		$practiceInfo = $this->practiceinfo_model->get()->row();
+		$practiceInfo = $this->practiceinfo_model->get($practice_id)->row();
 		$encounterInfo = $this->encounters_model->getEncounter($eid)->row();
 		$demographics = $this->demographics_model->get($pid);
 		$row = $demographics->row();
@@ -1400,11 +1413,25 @@ class Billing extends Application
 			$bill_Box10CP = 'No';
 		}
 		$provider = $encounterInfo->encounter_provider;
-		if ($encounterInfo->referring_provider != '') {
-			$referring_provider = $encounterInfo->referring_provider;
-			$bill_Box17 = $this->string_format($referring_provider, 26);
+		if ($encounterInfo->referring_provider != 'Primary Care Provider' || $encounterInfo->referring_provider != '') {
+			$bill_Box17 = $this->string_format($encounterInfo->referring_provider, 26);
+			$bill_Box17A = $this->string_format($encounterInfo->referring_provider_npi, 17);
 		} else {
-			$bill_Box17 = $this->string_format("", 26);
+			if ($encounterInfo->referring_provider != 'Primary Care Provider') {
+				$bill_Box17 = $this->string_format('', 26);
+				$bill_Box17A = $this->string_format('', 17);
+			} else {
+				$bill_Box17 = $this->string_format($provider, 26);
+				$this->db->select('id');
+				$this->db->where('displayname', $provider);
+				$user_id = $this->db->get('users')->row()->id;
+				$this->db->select('npi');
+				$this->db->where('id', $user_id);
+				$query4 = $this->db->get('providers');
+				$result4 = $query4->row();
+				$npi = $result4->npi;
+				$bill_Box17A = $this->string_format($npi, 17);
+			}
 		}
 		if ($result2['insurance_box_31'] == 'n') {
 			$bill_Box31 = $this->string_format($provider, 21);
@@ -1416,15 +1443,6 @@ class Billing extends Application
 		}
 		$bill_Box33B = $this->string_format($provider, 29);
 		$pos = $encounterInfo->encounter_location;
-		$this->db->select('id');
-		$this->db->where('displayname', $provider);
-		$user_id = $this->db->get('users')->row()->id;
-		$this->db->select('npi');
-		$this->db->where('id', $user_id);
-		$query4 = $this->db->get('providers');
-		$result4 = $query4->row();
-		$npi = $result4->npi;
-		$bill_Box17A = $this->string_format("", 17);
 		$bill_Box25 = $practiceInfo->tax_id;
 		$bill_Box25 = $this->string_format($bill_Box25, 15);
 		$bill_Box26 = $this->string_format($pid, 14);	
@@ -1858,9 +1876,10 @@ class Billing extends Application
 				$cpt_final[$i]['cpt_charge1'] = $cpt_final[$i]['cpt_charge'];
 				$cpt_final[$i]['cpt_charge'] = $this->string_format($cpt_final[$i]['cpt_charge'], 8);
 				$cpt_final[$i]['npi'] = $this->string_format($npi, 11);
+				$cpt_final[$i]['icd_pointer'] =  $this->string_format($cpt_final[$i]['icd_pointer'], 4);
 				$i++;
 			}
-			if ($num_rows5 < 6) {
+			if ($num_rows7 < 6) {
 				$array['dos_f'] = $this->string_format('', 8);
 				$array['dos_t'] = $this->string_format('', 8);
 				$array['pos'] = $this->string_format('', 5);
@@ -1871,6 +1890,7 @@ class Billing extends Application
 				$array['cpt_charge1'] = '0';
 				$array['cpt_charge'] = $this->string_format('', 8);
 				$array['npi'] = $this->string_format('', 11);
+				$array['icd_pointer'] =  $this->string_format('', 4);
 				$cpt_final = array_pad($cpt_final, 6, $array);
 			}
 			$bill_Box28 = $cpt_final[0]['cpt_charge1'] * $cpt_final[0]['unit1'] + $cpt_final[1]['cpt_charge1'] * $cpt_final[1]['unit1'] + $cpt_final[2]['cpt_charge1'] * $cpt_final[2]['unit1'] + $cpt_final[3]['cpt_charge1'] * $cpt_final[3]['unit1'] + $cpt_final[4]['cpt_charge1'] * $cpt_final[4]['unit1'] + $cpt_final[5]['cpt_charge1'] * $cpt_final[5]['unit1'];
@@ -2038,6 +2058,7 @@ class Billing extends Application
 					$array1['cpt_charge1'] = '0';
 					$array1['cpt_charge'] = $this->string_format('', 8);
 					$array1['npi'] = $this->string_format('', 11);
+					$array1['icd_pointer'] =  $this->string_format('', 4);
 					$cpt_final = array_pad($cpt_final, 6, $array1);
 				}
 				$bill_Box28 = $cpt_final[0]['cpt_charge1'] * $cpt_final[0]['unit1'] + $cpt_final[1]['cpt_charge1'] * $cpt_final[1]['unit1'] + $cpt_final[2]['cpt_charge1'] * $cpt_final[2]['unit1'] + $cpt_final[3]['cpt_charge1'] * $cpt_final[3]['unit1'] + $cpt_final[4]['cpt_charge1'] * $cpt_final[4]['unit1'] + $cpt_final[5]['cpt_charge1'] * $cpt_final[5]['unit1'];
@@ -2195,6 +2216,7 @@ class Billing extends Application
 	
 	function page_invoice1($eid)
 	{
+		$practice_id = $this->session->userdata('practice_id');
 		$pid = $this->session->userdata('billing_pid');
 		if ($pid == FALSE) {
 			redirect('start');
@@ -2286,7 +2308,10 @@ class Billing extends Application
 		}
 		$this->db->where('pid', $pid);
 		$row = $this->db->get('demographics')->row_array();
-		$practice = $this->practiceinfo_model->get()->row();
+		$this->db->where('pid', $pid);
+		$this->db->where('practice_id', $this->session->userdata('practice_id'));
+		$notes = $this->db->get('demographics_notes')->row_array();
+		$practice = $this->practiceinfo_model->get($practice_id)->row();
 		$data['practiceName'] = $practice->practice_name;
 		$data['practiceInfo1'] = $practice->street_address1;
 		if ($practice->street_address2 != '') {
@@ -2320,18 +2345,17 @@ class Billing extends Application
 		$data['title'] = "INVOICE";
 		$date = now();
 		$data['date'] = date('F jS, Y', $date);
-		$this->db->select('billing_notes');
-		$this->db->where('pid', $pid);
-		$result = $this->db->get('demographics')->row_array();
-		if (is_null($result['billing_notes']) || $result['billing_notes'] == '') {
+		if (is_null($notes['billing_notes']) || $notes['billing_notes'] == '') {
 			$billing_notes = 'Invoice for encounter (Date of Service: ' . $data['encounter_DOS'] . ') printed on ' . $data['date'] . '.';
 		} else {
-			$billing_notes = $result['billing_notes'] . "\n" . 'Invoice for encounter (Date of Service: ' . $data['encounter_DOS'] . ') printed on ' . $data['date'] . '.';
+			$billing_notes = $notes['billing_notes'] . "\n" . 'Invoice for encounter (Date of Service: ' . $data['encounter_DOS'] . ') printed on ' . $data['date'] . '.';
 		}
 		$billing_notes_data = array(
 			'billing_notes' => $billing_notes
 		);
-		$this->demographics_model->update($pid, $billing_notes_data);
+		$this->db->where('pid', $pid);
+		$this->db->where('practice_id', $this->session->userdata('practice_id'));
+		$this->db->update('demographics_notes', $billing_notes_data);
 		$this->audit_model->update();
 		return $this->load->view('auth/pages/invoice_page',$data, TRUE);
 	}
@@ -2365,15 +2389,16 @@ class Billing extends Application
 			if($file_extension!='pdf') {
 				die('LOGGED! bad extension');
 			}
-			ob_start();
+			//ob_start();
 			header('Content-type: application/pdf');
 			header('Content-Disposition: attachment; filename="'.$file_name.'"');
-			header("Content-length: $file_size");
-			ob_end_flush(); 
-			while(!feof($fp)) {
-				$file_buffer = fread($fp, 2048);
-				echo $file_buffer;
-			}
+			readfile($file_path);
+			//header("Content-length: $file_size");
+			//ob_end_flush(); 
+			//while(!feof($fp)) {
+				//$file_buffer = fread($fp, 2048);
+				//echo $file_buffer;
+			//}
 			fclose($fp);
 			unlink($file_path);
 			exit();
@@ -2384,6 +2409,7 @@ class Billing extends Application
 	
 	function page_invoice2($id)
 	{
+		$practice_id = $this->session->userdata('practice_id');
 		$pid = $this->session->userdata('billing_pid');
 		if ($pid == FALSE) {
 			redirect('start');
@@ -2415,7 +2441,7 @@ class Billing extends Application
 		}
 		$this->db->where('pid', $pid);
 		$row = $this->db->get('demographics')->row_array();
-		$practice = $this->practiceinfo_model->get()->row();
+		$practice = $this->practiceinfo_model->get($practice_id)->row();
 		$data['practiceName'] = $practice->practice_name;
 		$data['practiceInfo1'] = $practice->street_address1;
 		if ($practice->street_address2 != '') {
@@ -2438,18 +2464,20 @@ class Billing extends Application
 		$data['title'] = "INVOICE";
 		$date = now();
 		$data['date'] = date('F jS, Y', $date);
-		$this->db->select('billing_notes');
 		$this->db->where('pid', $pid);
-		$result = $this->db->get('demographics')->row_array();
-		if (is_null($result['billing_notes']) || $result['billing_notes'] == '') {
+		$this->db->where('practice_id', $this->session->userdata('practice_id'));
+		$notes = $this->db->get('demographics_notes')->row_array();
+		if (is_null($notes['billing_notes']) || $notes['billing_notes'] == '') {
 			$billing_notes = 'Invoice for ' . $result1['reason'] . ' (Date of Bill: ' . $result1['dos_f'] . ') printed on ' . $data['date'] . '.';
 		} else {
-			$billing_notes = $result['billing_notes'] . "\n" . 'Invoice for ' . $result1['reason'] . ' (Date of Bill: ' . $result1['dos_f'] . ') printed on ' . $data['date'] . '.';
+			$billing_notes = $notes['billing_notes'] . "\n" . 'Invoice for ' . $result1['reason'] . ' (Date of Bill: ' . $result1['dos_f'] . ') printed on ' . $data['date'] . '.';
 		}
 		$billing_notes_data = array(
 			'billing_notes' => $billing_notes
 		);
-		$this->demographics_model->update($pid, $billing_notes_data);
+		$this->db->where('pid', $pid);
+		$this->db->where('practice_id', $this->session->userdata('practice_id'));
+		$this->db->update('demographics_notes', $billing_notes_data);
 		$this->audit_model->update();
 		return $this->load->view('auth/pages/invoice_page2',$data, TRUE);
 	}
@@ -2482,15 +2510,16 @@ class Billing extends Application
 			if($file_extension!='pdf') {
 				die('LOGGED! bad extension');
 			}
-			ob_start();
+			//ob_start();
 			header('Content-type: application/pdf');
 			header('Content-Disposition: attachment; filename="'.$file_name.'"');
-			header("Content-length: $file_size");
-			ob_end_flush(); 
-			while(!feof($fp)) {
-				$file_buffer = fread($fp, 2048);
-				echo $file_buffer;
-			}
+			readfile($file_path);
+			//header("Content-length: $file_size");
+			//ob_end_flush(); 
+			//while(!feof($fp)) {
+				//$file_buffer = fread($fp, 2048);
+				//echo $file_buffer;
+			//}
 			fclose($fp);
 			exit();
 		} else {
@@ -2588,15 +2617,16 @@ class Billing extends Application
 				if($file_extension!='pdf') {
 					die('LOGGED! bad extension');
 				}
-				ob_start();
+				//ob_start();
 				header('Content-type: application/pdf');
 				header('Content-Disposition: attachment; filename="'.$file_name.'"');
-				header("Content-length: $file_size");
-				ob_end_flush(); 
-				while(!feof($fp)) {
-					$file_buffer = fread($fp, 2048);
-					echo $file_buffer;
-				}
+				readfile($file_path);
+				//header("Content-length: $file_size");
+				//ob_end_flush(); 
+				//while(!feof($fp)) {
+					//$file_buffer = fread($fp, 2048);
+					//echo $file_buffer;
+				//}
 				fclose($fp);
 				unlink($file_path);
 				exit();
@@ -2648,11 +2678,12 @@ class Billing extends Application
 	
 	function billing_payment_history2($id)
 	{
+		$practice_id = $this->session->userdata('practice_id');
 		$page = $this->input->post('page');
 		$limit = $this->input->post('rows');
 		$sidx = $this->input->post('sidx');
 		$sord = $this->input->post('sord');
-		$query = $this->db->query("SELECT * FROM billing_core WHERE other_billing_id=$id AND payment!='0'");
+		$query = $this->db->query("SELECT * FROM billing_core WHERE other_billing_id=$id AND payment!='0' AND practice_id=$practice_id");
 		$count = $query->num_rows(); 
 		if($count > 0) { 
 			$total_pages = ceil($count/$limit); 
@@ -2662,7 +2693,7 @@ class Billing extends Application
 		if ($page > $total_pages) $page=$total_pages;
 		$start = $limit*$page - $limit;
 		if($start < 0) $start = 0;
-		$query1 = $this->db->query("SELECT * FROM billing_core WHERE other_billing_id=$id AND payment!='0' ORDER BY $sidx $sord LIMIT $start , $limit");
+		$query1 = $this->db->query("SELECT * FROM billing_core WHERE other_billing_id=$id AND payment!='0' AND practice_id=$practice_id ORDER BY $sidx $sord LIMIT $start , $limit");
 		$response['page'] = $page;
 		$response['total'] = $total_pages;
 		$response['records'] = $count;
@@ -2696,7 +2727,8 @@ class Billing extends Application
 			'pid' => $pid,
 			'dos_f' => $this->input->post('dos_f'),
 			'payment' => $this->input->post('payment'),
-			'payment_type' => $this->input->post('payment_type')
+			'payment_type' => $this->input->post('payment_type'),
+			'practice_id' => $this->session->userdata('practice_id')
 		);
 		if ($count > 0) {		
 			$this->chart_model->updateBillingCore($id, $data);
@@ -2799,7 +2831,8 @@ class Billing extends Application
 			'cpt_charge' => $this->input->post('cpt_charge'),
 			'reason' => $this->input->post('reason'),
 			'unit' => '1',
-			'payment' => '0'
+			'payment' => '0',
+			'practice_id' => $this->session->userdata('practice_id')
 		);
 		if ($count > 0) {		
 			$this->chart_model->updateBillingCore($id, $data);
@@ -2868,8 +2901,9 @@ class Billing extends Application
 	
 	function total_balance()
 	{
+		$practice_id = $this->session->userdata('practice_id');
 		$pid = $this->session->userdata('billing_pid');
-		$query1 = $this->db->query("SELECT * FROM encounters WHERE pid=$pid AND addendum='n'");
+		$query1 = $this->db->query("SELECT * FROM encounters WHERE pid=$pid AND addendum='n' AND practice_id=$practice_id");
 		$i = 0;
 		if ($query1->num_rows() > 0) {
 			$balance1 = 0;
@@ -2892,7 +2926,7 @@ class Billing extends Application
 		} else {
 			$balance1 = 0;
 		}
-		$query2 = $this->db->query("SELECT * FROM billing_core WHERE pid=$pid AND eid='0' AND payment='0'");
+		$query2 = $this->db->query("SELECT * FROM billing_core WHERE pid=$pid AND eid='0' AND payment='0' AND practice_id=$practice_id");
 		$j = 0;
 		$charge2 = 0;
 		$payment2 = 0;
@@ -2913,13 +2947,13 @@ class Billing extends Application
 			$balance2 = 0;
 		}
 		$total_balance = $balance1 + $balance2;
-		$this->db->select('billing_notes');
 		$this->db->where('pid', $pid);
-		$result = $this->db->get('demographics')->row_array();
-		if (is_null($result['billing_notes']) || $result['billing_notes'] == '') {
+		$this->db->where('practice_id', $this->session->userdata('practice_id'));
+		$notes = $this->db->get('demographics_notes')->row_array();
+		if (is_null($notes['billing_notes']) || $notes['billing_notes'] == '') {
 			$billing_notes = "None.";
 		} else {
-			$billing_notes = nl2br($result['billing_notes']);
+			$billing_notes = nl2br($notes['billing_notes']);
 		}
 		echo "<strong>Total Balance: $" .  number_format($total_balance, 2, '.', ',') . "</strong><br><br><strong>Billing Notes: </strong>" . $billing_notes . "<br>";
 		exit( 0 );
@@ -2927,11 +2961,12 @@ class Billing extends Application
 	
 	function monthly_stats()
 	{
+		$practice_id = $this->session->userdata('practice_id');
 		$page = $this->input->post('page');
 		$limit = $this->input->post('rows');
 		$sidx = $this->input->post('sidx');
 		$sord = $this->input->post('sord');
-		$query = $this->db->query("SELECT DATE_FORMAT(encounter_DOS, '%Y-%m') AS month, COUNT(*) AS patients_seen FROM encounters WHERE addendum='n' GROUP BY month");
+		$query = $this->db->query("SELECT DATE_FORMAT(encounter_DOS, '%Y-%m') AS month, COUNT(*) AS patients_seen FROM encounters WHERE addendum='n' AND practice_id=$practice_id GROUP BY month");
 		$count = $query->num_rows(); 
 		if($count > 0) { 
 			$total_pages = ceil($count/$limit); 
@@ -2941,7 +2976,7 @@ class Billing extends Application
 		if ($page > $total_pages) $page=$total_pages;
 		$start = $limit*$page - $limit;
 		if($start < 0) $start = 0;
-		$query1 = $this->db->query("SELECT DATE_FORMAT(encounter_DOS, '%Y-%m') AS month, COUNT(*) AS patients_seen FROM encounters WHERE addendum='n' GROUP BY month ORDER BY $sidx $sord LIMIT $start , $limit");
+		$query1 = $this->db->query("SELECT DATE_FORMAT(encounter_DOS, '%Y-%m') AS month, COUNT(*) AS patients_seen FROM encounters WHERE addendum='n' AND practice_id=$practice_id GROUP BY month ORDER BY $sidx $sord LIMIT $start , $limit");
 		$response['page'] = $page;
 		$response['total'] = $total_pages;
 		$response['records'] = $count;
@@ -2955,7 +2990,7 @@ class Billing extends Application
 			$row['total_payments'] = 0;
 			$row['dnka'] = 0;
 			$row['lmc'] = 0;
-			$query1a = $this->db->query("SELECT eid FROM encounters WHERE YEAR(encounter_DOS)=$year AND MONTH(encounter_DOS)=$month AND addendum='n'");
+			$query1a = $this->db->query("SELECT eid FROM encounters WHERE YEAR(encounter_DOS)=$year AND MONTH(encounter_DOS)=$month AND addendum='n' AND practice_id=$practice_id");
 			foreach ($query1a->result_array() as $row1) {
 				$this->db->where('eid', $row1['eid']);
 				$query2 = $this->db->get('billing_core');
@@ -2972,7 +3007,7 @@ class Billing extends Application
 					$row['total_payments'] += $payment;
 				}
 			}
-			$query1b = $this->db->query("SELECT status FROM schedule WHERE FROM_UNIXTIME(end, '%Y')=$year AND FROM_UNIXTIME(end, '%m')='$month'");
+			$query1b = $this->db->query("SELECT status FROM schedule JOIN providers ON providers.id=schedule.provider_id WHERE FROM_UNIXTIME(schedule.end, '%Y')=$year AND FROM_UNIXTIME(schedule.end, '%m')='$month' AND providers.practice_id=$practice_id");
 			foreach ($query1b->result_array() as $row3) {
 				if ($row3['status'] == "DNKA") { 
 					$row['dnka'] += 1;
@@ -2991,6 +3026,7 @@ class Billing extends Application
 	
 	function monthly_stats_insurance($id)
 	{
+		$practice_id = $this->session->userdata('practice_id');
 		$month_piece = explode("-", $id);
 		$year = $month_piece[0];
 		$month = $month_piece[1];
@@ -2998,7 +3034,7 @@ class Billing extends Application
 		$limit = $this->input->post('rows');
 		$sidx = $this->input->post('sidx');
 		$sord = $this->input->post('sord');
-		$query = $this->db->query("SELECT t2.insurance_plan_name AS insuranceplan, COUNT(*) AS ins_patients_seen FROM billing AS t1 LEFT JOIN insurance AS t2 ON t1.insurance_id_1=t2.insurance_id LEFT JOIN encounters AS t3 ON t1.eid=t3.eid WHERE YEAR(t3.encounter_DOS)=$year AND MONTH(t3.encounter_DOS)=$month AND t3.addendum='n' GROUP BY insuranceplan");
+		$query = $this->db->query("SELECT t2.insurance_plan_name AS insuranceplan, COUNT(*) AS ins_patients_seen FROM billing AS t1 LEFT JOIN insurance AS t2 ON t1.insurance_id_1=t2.insurance_id LEFT JOIN encounters AS t3 ON t1.eid=t3.eid WHERE YEAR(t3.encounter_DOS)=$year AND MONTH(t3.encounter_DOS)=$month AND t3.addendum='n' AND t3.practice_id=$practice_id GROUP BY insuranceplan");
 		$count = $query->num_rows(); 
 		if($count > 0) { 
 			$total_pages = ceil($count/$limit); 
@@ -3008,7 +3044,7 @@ class Billing extends Application
 		if ($page > $total_pages) $page=$total_pages;
 		$start = $limit*$page - $limit;
 		if($start < 0) $start = 0;
-		$query1 = $this->db->query("SELECT t2.insurance_plan_name AS insuranceplan, COUNT(*) AS ins_patients_seen FROM billing AS t1 LEFT JOIN insurance AS t2 ON t1.insurance_id_1=t2.insurance_id LEFT JOIN encounters AS t3 ON t1.eid=t3.eid WHERE YEAR(t3.encounter_DOS)=$year AND MONTH(t3.encounter_DOS)=$month AND t3.addendum='n' GROUP BY insuranceplan ORDER BY $sidx $sord LIMIT $start , $limit");
+		$query1 = $this->db->query("SELECT t2.insurance_plan_name AS insuranceplan, COUNT(*) AS ins_patients_seen FROM billing AS t1 LEFT JOIN insurance AS t2 ON t1.insurance_id_1=t2.insurance_id LEFT JOIN encounters AS t3 ON t1.eid=t3.eid WHERE YEAR(t3.encounter_DOS)=$year AND MONTH(t3.encounter_DOS)=$month AND t3.addendum='n' AND t3.practice_id=$practice_id GROUP BY insuranceplan ORDER BY $sidx $sord LIMIT $start , $limit");
 		$response['page'] = $page;
 		$response['total'] = $total_pages;
 		$response['records'] = $count;
@@ -3028,11 +3064,12 @@ class Billing extends Application
 	
 	function yearly_stats()
 	{
+		$practice_id = $this->session->userdata('practice_id');
 		$page = $this->input->post('page');
 		$limit = $this->input->post('rows');
 		$sidx = $this->input->post('sidx');
 		$sord = $this->input->post('sord');
-		$query = $this->db->query("SELECT DATE_FORMAT(encounter_DOS, '%Y') AS year, COUNT(*) AS patients_seen FROM encounters WHERE addendum='n' GROUP BY year");
+		$query = $this->db->query("SELECT DATE_FORMAT(encounter_DOS, '%Y') AS year, COUNT(*) AS patients_seen FROM encounters WHERE addendum='n' AND practice_id=$practice_id GROUP BY year");
 		$count = $query->num_rows(); 
 		if($count > 0) { 
 			$total_pages = ceil($count/$limit); 
@@ -3042,7 +3079,7 @@ class Billing extends Application
 		if ($page > $total_pages) $page=$total_pages;
 		$start = $limit*$page - $limit;
 		if($start < 0) $start = 0;
-		$query1 = $this->db->query("SELECT DATE_FORMAT(encounter_DOS, '%Y') AS year, COUNT(*) AS patients_seen FROM encounters WHERE addendum='n' GROUP BY year ORDER BY $sidx $sord LIMIT $start , $limit");
+		$query1 = $this->db->query("SELECT DATE_FORMAT(encounter_DOS, '%Y') AS year, COUNT(*) AS patients_seen FROM encounters WHERE addendum='n' AND practice_id=$practice_id GROUP BY year ORDER BY $sidx $sord LIMIT $start , $limit");
 		$response['page'] = $page;
 		$response['total'] = $total_pages;
 		$response['records'] = $count;
@@ -3054,7 +3091,7 @@ class Billing extends Application
 			$row['total_payments'] = 0;
 			$row['dnka'] = 0;
 			$row['lmc'] = 0;
-			$query1a = $this->db->query("SELECT eid FROM encounters WHERE YEAR(encounter_DOS)=$year AND addendum='n'");
+			$query1a = $this->db->query("SELECT eid FROM encounters WHERE YEAR(encounter_DOS)=$year AND addendum='n' AND practice_id=$practice_id");
 			foreach ($query1a->result_array() as $row1) {
 				$this->db->where('eid', $row1['eid']);
 				$query2 = $this->db->get('billing_core');
@@ -3071,7 +3108,7 @@ class Billing extends Application
 					$row['total_payments'] += $payment;
 				}
 			}
-			$query1b = $this->db->query("SELECT status FROM schedule WHERE FROM_UNIXTIME(end, '%Y')=$year");
+			$query1b = $this->db->query("SELECT status FROM schedule JOIN providers ON providers.id=schedule.provider_id WHERE FROM_UNIXTIME(schedule.end, '%Y')=$year AND providers.practice_id=$practice_id");
 			foreach ($query1b->result_array() as $row3) {
 				if ($row3['status'] == "DNKA") { 
 					$row['dnka'] += 1;
@@ -3090,11 +3127,12 @@ class Billing extends Application
 	
 	function yearly_stats_insurance($id)
 	{
+		$practice_id = $this->session->userdata('practice_id');
 		$page = $this->input->post('page');
 		$limit = $this->input->post('rows');
 		$sidx = $this->input->post('sidx');
 		$sord = $this->input->post('sord');
-		$query = $this->db->query("SELECT t2.insurance_plan_name AS insuranceplan, COUNT(*) AS ins_patients_seen FROM billing AS t1 LEFT JOIN insurance AS t2 ON t1.insurance_id_1=t2.insurance_id LEFT JOIN encounters AS t3 ON t1.eid=t3.eid WHERE YEAR(t3.encounter_DOS)=$id AND t3.addendum='n' GROUP BY insuranceplan");
+		$query = $this->db->query("SELECT t2.insurance_plan_name AS insuranceplan, COUNT(*) AS ins_patients_seen FROM billing AS t1 LEFT JOIN insurance AS t2 ON t1.insurance_id_1=t2.insurance_id LEFT JOIN encounters AS t3 ON t1.eid=t3.eid WHERE YEAR(t3.encounter_DOS)=$id AND t3.addendum='n' AND t3.practice_id=$practice_id GROUP BY insuranceplan");
 		$count = $query->num_rows(); 
 		if($count > 0) { 
 			$total_pages = ceil($count/$limit); 
@@ -3104,7 +3142,7 @@ class Billing extends Application
 		if ($page > $total_pages) $page=$total_pages;
 		$start = $limit*$page - $limit;
 		if($start < 0) $start = 0;
-		$query1 = $this->db->query("SELECT t2.insurance_plan_name AS insuranceplan, COUNT(*) AS ins_patients_seen FROM billing AS t1 LEFT JOIN insurance AS t2 ON t1.insurance_id_1=t2.insurance_id LEFT JOIN encounters AS t3 ON t1.eid=t3.eid WHERE YEAR(t3.encounter_DOS)=$id AND t3.addendum='n' GROUP BY insuranceplan ORDER BY $sidx $sord LIMIT $start , $limit");
+		$query1 = $this->db->query("SELECT t2.insurance_plan_name AS insuranceplan, COUNT(*) AS ins_patients_seen FROM billing AS t1 LEFT JOIN insurance AS t2 ON t1.insurance_id_1=t2.insurance_id LEFT JOIN encounters AS t3 ON t1.eid=t3.eid WHERE YEAR(t3.encounter_DOS)=$id AND t3.addendum='n' AND t3.practice_id=$practice_id GROUP BY insuranceplan ORDER BY $sidx $sord LIMIT $start , $limit");
 		$response['page'] = $page;
 		$response['total'] = $total_pages;
 		$response['records'] = $count;
@@ -3125,13 +3163,13 @@ class Billing extends Application
 	function get_billing_notes()
 	{
 		$pid = $this->session->userdata('billing_pid');
-		$this->db->select('billing_notes');
 		$this->db->where('pid', $pid);
-		$result = $this->db->get('demographics')->row_array();
-		if (is_null($result['billing_notes']) || $result['billing_notes'] == '') {
+		$this->db->where('practice_id', $this->session->userdata('practice_id'));
+		$notes = $this->db->get('demographics_notes')->row_array();
+		if (is_null($notes['billing_notes']) || $notes['billing_notes'] == '') {
 			echo "";
 		} else {
-			echo $result['billing_notes'];
+			echo $notes['billing_notes'];
 		}
 		exit( 0 );
 	}
@@ -3146,7 +3184,9 @@ class Billing extends Application
 		$data = array(
 			'billing_notes' => $this->input->post('billing_notes')
 		);
-		$this->demographics_model->update($pid, $data);
+		$this->db->where('pid', $pid);
+		$this->db->where('practice_id', $this->session->userdata('practice_id'));
+		$this->db->update('demographics_notes', $data);
 		$this->audit_model->update();
 		echo "Billing notes updated!";
 		exit( 0 );

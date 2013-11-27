@@ -57,11 +57,22 @@ class Messaging extends Application
 			$row1 = $this->db->query("SELECT displayname FROM users WHERE id=$user_id")->row_array();
 			$displayname = $row1['displayname'] . ' (' . $row['message_from'] . ')';
 			$response['rows'][$i]['id']=$row['message_id']; 
-			$response['rows'][$i]['cell']=array($row['message_id'],$row['message_to'],$row['date'],$row['message_from'],$displayname,$row['subject'],$row['body'],$row['cc'],$row['pid'],$row['patient_name'],$bodytext,$row['t_messages_id']);
+			$response['rows'][$i]['cell']=array($row['message_id'],$row['message_to'],$row['read'],$row['date'],$row['message_from'],$displayname,$row['subject'],$row['body'],$row['cc'],$row['pid'],$row['patient_name'],$bodytext,$row['t_messages_id']);
 			$i++; 
 		}
 		echo json_encode($response);
 		exit( 0 );
+	}
+	
+	function read_message($id)
+	{
+		$data = array(
+			'read' => 'y'
+		);
+		$this->db->where('message_id', $id);
+		$this->db->update('messaging', $data);
+		$this->audit_model->update();
+		echo "Message read.";
 	}
 	
 	function get_displayname()
@@ -131,7 +142,8 @@ class Messaging extends Application
 					'body' => $this->input->post('body'),
 					't_messages_id' => $t_messages_id,
 					'status' => 'Sent',
-					'mailbox' => $mailbox_row
+					'mailbox' => $mailbox_row,
+					'practice_id' => $this->session->userdata('practice_id')
 				);
 				$this->messaging_model->add($data);
 				$this->audit_model->add();
@@ -144,7 +156,8 @@ class Messaging extends Application
 					$config['smtp_timeout']='30';
 					$config['charset']='utf-8';
 					$config['newline']="\r\n";
-					$email_query = $this->db->query("SELECT * FROM practiceinfo WHERE practice_id=1");
+					$practice_id = $this->session->userdata('practice_id');
+					$email_query = $this->db->query("SELECT * FROM practiceinfo WHERE practice_id=$practice_id");
 					$email_row = $email_query->row_array();
 					$config['smtp_user']=$email_row['smtp_user'];
 					$config['smtp_pass']=$email_row['smtp_pass'];
@@ -167,7 +180,8 @@ class Messaging extends Application
 			'subject' => $subject,
 			'body' => $this->input->post('body'),
 			'status' => 'Sent',
-			'mailbox' => '0'
+			'mailbox' => '0',
+			'practice_id' => $this->session->userdata('practice_id')
 		);
 		if ($message_id != '') {
 			$this->messaging_model->update($message_id, $data1a);
@@ -209,7 +223,8 @@ class Messaging extends Application
 			'subject' => $this->input->post('subject'),
 			'body' => $this->input->post('body'),
 			'status' => 'Draft',
-			'mailbox' => '0'
+			'mailbox' => '0',
+			'practice_id' => $this->session->userdata('practice_id')
 		);
 		if ($message_id != '') {
 			$this->messaging_model->update($message_id, $data);
@@ -243,7 +258,8 @@ class Messaging extends Application
 			't_messages_provider' => $this->session->userdata('displayname'),
 			't_messages_signed' => 'No',
 			't_messages_from' => $from,
-			'pid' => $pid
+			'pid' => $pid,
+			'practice_id' => $this->session->userdata('practice_id')
 		);
 		$this->chart_model->addTMessage($data);
 		echo "Message exported to the chart as a patient Message.";
@@ -318,7 +334,7 @@ class Messaging extends Application
 	
 	function get_scans()
 	{
-		$query = $this->practiceinfo_model->get();
+		$query = $this->practiceinfo_model->get($this->session->userdata('practice_id'));
 		$result = $query->row_array();
 		$dir = $result['documents_dir'] . 'scans/';
 		$files = scandir($dir);
@@ -344,11 +360,12 @@ class Messaging extends Application
 	
 	function scans()
 	{
+		$practice_id = $this->session->userdata('practice_id');
 		$page = $this->input->post('page');
 		$limit = $this->input->post('rows');
 		$sidx = $this->input->post('sidx');
 		$sord = $this->input->post('sord'); 
-		$query = $this->db->query("SELECT * FROM scans");
+		$query = $this->db->query("SELECT * FROM scans WHERE practice_id=$practice_id");
 		$count = $query->num_rows(); 
 		if( $count >0 ) { 
 			$total_pages = ceil($count/$limit); 
@@ -358,7 +375,7 @@ class Messaging extends Application
 		if ($page > $total_pages) $page=$total_pages;
 		$start = $limit*$page - $limit;
 		if($start < 0) $start = 0;
-		$query1 = $this->db->query("SELECT * FROM scans ORDER BY $sidx $sord LIMIT $start , $limit");
+		$query1 = $this->db->query("SELECT * FROM scans WHERE practice_id=$practice_id ORDER BY $sidx $sord LIMIT $start , $limit");
 		$response['page'] = $page;
 		$response['total'] = $total_pages;
 		$response['records'] = $count;
@@ -418,7 +435,7 @@ class Messaging extends Application
 		if ($count > 0) {
 			$this->db->where('scans_id', $scans_id);
 			$row = $this->db->get('scans')->row_array();
-			$query = $this->practiceinfo_model->get();
+			$query = $this->practiceinfo_model->get($this->session->userdata('practice_id'));
 			$result = $query->row_array();
 			$directory = $result['documents_dir'] . $pid;
 			if ($this->input->post('scan_import_pages') == '') {
@@ -470,7 +487,7 @@ class Messaging extends Application
 		if ($count > 0) {
 			$this->db->where('scans_id', $scans_id);
 			$row = $this->db->get('scans')->row_array();
-			$query = $this->practiceinfo_model->get();
+			$query = $this->practiceinfo_model->get($this->session->userdata('practice_id'));
 			$result = $query->row_array();
 			$filePath = $result['documents_dir'] . $pid . '/' . $row['fileName'] . '_' . now() . '.pdf';	
 			if (!copy($row['filePath'], $filePath)) {
@@ -549,11 +566,12 @@ class Messaging extends Application
 	
 	function receive_fax()
 	{
+		$practice_id = $this->session->userdata('practice_id');
 		$page = $this->input->post('page');
 		$limit = $this->input->post('rows');
 		$sidx = $this->input->post('sidx');
 		$sord = $this->input->post('sord');
-		$query = $this->db->query("SELECT * FROM received");
+		$query = $this->db->query("SELECT * FROM received WHERE practice_id=$practice_id");
 		$count = $query->num_rows(); 
 		if( $count >0 ) {
 			$total_pages = ceil($count/$limit);
@@ -563,7 +581,7 @@ class Messaging extends Application
 		if ($page > $total_pages) $page=$total_pages;
 		$start = $limit*$page - $limit;
 		if($start < 0) $start = 0;
-		$query1 = $this->db->query("SELECT * FROM received ORDER BY $sidx $sord LIMIT $start , $limit");
+		$query1 = $this->db->query("SELECT * FROM received WHERE practice_id=$practice_id ORDER BY $sidx $sord LIMIT $start , $limit");
 		$response['page'] = $page;
 		$response['total'] = $total_pages;
 		$response['records'] = $count;
@@ -689,11 +707,12 @@ class Messaging extends Application
 	
 	function drafts_list()
 	{
+		$practice_id = $this->session->userdata('practice_id');
 		$page = $this->input->post('page');
 		$limit = $this->input->post('rows');
 		$sidx = $this->input->post('sidx');
 		$sord = $this->input->post('sord');
-		$query = $this->db->query("SELECT * FROM sendfax WHERE faxdraft='yes' OR faxdraft IS NULL");
+		$query = $this->db->query("SELECT * FROM sendfax WHERE faxdraft='yes' OR faxdraft IS NULL AND practice_id=$practice_id");
 		$count = $query->num_rows();
 		if( $count >0 ) {
 			$total_pages = ceil($count/$limit);
@@ -703,7 +722,7 @@ class Messaging extends Application
 		if ($page > $total_pages) $page=$total_pages;
 		$start = $limit*$page - $limit;
 		if($start < 0) $start = 0;
-		$query1 = $this->db->query("SELECT * FROM sendfax WHERE faxdraft='yes' OR faxdraft IS NULL ORDER BY $sidx $sord LIMIT $start , $limit");
+		$query1 = $this->db->query("SELECT * FROM sendfax WHERE faxdraft='yes' OR faxdraft IS NULL AND practice_id=$practice_id ORDER BY $sidx $sord LIMIT $start , $limit");
 		$response['page'] = $page;
 		$response['total'] = $total_pages;
 		$response['records'] = $count;
@@ -716,7 +735,8 @@ class Messaging extends Application
 	function new_fax()
 	{
 		$fax_data = array(
-			'user' => $this->session->userdata('displayname')
+			'user' => $this->session->userdata('displayname'),
+			'practice_id' => $this->session->userdata('practice_id')
 		);
 		$job_id = $this->fax_model->addFax($fax_data);
 		$this->session->set_userdata('fax_job_id', $job_id);
@@ -742,11 +762,12 @@ class Messaging extends Application
 	
 	function sent_list()
 	{
+		$practice_id = $this->session->userdata('practice_id');
 		$page = $this->input->post('page');
 		$limit = $this->input->post('rows');
 		$sidx = $this->input->post('sidx');
 		$sord = $this->input->post('sord');
-		$query = $this->db->query("SELECT * FROM sendfax WHERE senddate IS NOT NULL");
+		$query = $this->db->query("SELECT * FROM sendfax WHERE senddate IS NOT NULL AND practice_id=$practice_id");
 		$count = $query->num_rows();
 		if($count > 0) {
 			$total_pages = ceil($count/$limit);
@@ -756,7 +777,7 @@ class Messaging extends Application
 		if ($page > $total_pages) $page=$total_pages;
 		$start = $limit*$page - $limit;
 		if($start < 0) $start = 0;
-		$query1 = $this->db->query("SELECT * FROM sendfax WHERE senddate IS NOT NULL ORDER BY $sidx $sord LIMIT $start , $limit");
+		$query1 = $this->db->query("SELECT * FROM sendfax WHERE senddate IS NOT NULL AND practice_id=$practice_id ORDER BY $sidx $sord LIMIT $start , $limit");
 		$response['page'] = $page;
 		$response['total'] = $total_pages;
 		$response['records'] = $count;
@@ -964,7 +985,7 @@ class Messaging extends Application
 			'faxpages' => $totalpages,
 			'faxdate' => $date
 		);
-		$practice = $this->practiceinfo_model->get()->row();
+		$practice = $this->practiceinfo_model->get($this->session->userdata('practice_id'))->row();
 		$data['practiceName'] = $practice->practice_name;
 		$data['website'] = $practice->website;
 		$data['practiceInfo'] = $practice->street_address1;
@@ -1041,6 +1062,7 @@ class Messaging extends Application
 					$faxnumbers .= $row3['faxnumber'];
 				}
 			}
+			$this->db->where('practice_id', $this->session->userdata('practice_id'));
 			$practice_row = $this->db->get('practiceinfo')->row_array();
 			$faxnumber_array = explode(",", $faxnumbers);
 			$faxnumber_to = array();
@@ -1089,6 +1111,7 @@ class Messaging extends Application
 			$fax_data['senddate'] = $senddate;
 			$fax_data['faxdraft'] = '0';
 			$fax_data['attempts'] = '0';
+			$fax_data['success'] = '1';
 			$this->fax_model->updateFax($job_id, $fax_data);
 			$this->email->send();
 			if ($faxInfo2['faxschedule'] == 'yes') {
@@ -1106,7 +1129,7 @@ class Messaging extends Application
 		$pid = $this->input->post('pid');
 		$this->db->where('pid', $pid);
 		if ($this->db->get('demographics')->num_rows() > 0) {
-			$query = $this->practiceinfo_model->get();
+			$query = $this->practiceinfo_model->get($this->session->userdata('practice_id'));
 			$result = $query->row_array();
 			$directory = $result['documents_dir'] . $pid;
 			$date1 = $this->input->post('documents_date');
@@ -1215,7 +1238,8 @@ class Messaging extends Application
 			'fax' => $this->input->post('fax'),
 			'email' => $this->input->post('email'),
 			'comments' => $this->input->post('comments'),
-			'specialty' => $this->input->post('specialty')
+			'specialty' => $this->input->post('specialty'),
+			'npi' => $this->input->post('npi')
 		);	
 		if($this->input->post('address_id') == '') {
 			$add = $this->contact_model->addContact($data);

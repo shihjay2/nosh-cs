@@ -689,8 +689,10 @@ class Encounters_model extends Model {
 	
 	function lastEncounterVisitDate($pid)
 	{
+		$practice_id = $this->session->userdata('practice_id');
 		$this->db->where('pid', $pid);
 		$this->db->where('eid != ""');
+		$this->db->where('practice_id', $practice_id);
 		$this->db->orderby("eid", "desc"); 
 		$this->db->limit(1);
 		$query = $this->db->get('encounters');

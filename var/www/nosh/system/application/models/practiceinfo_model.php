@@ -9,23 +9,26 @@ class Practiceinfo_model extends Model {
 
 	// --------------------------------------------------------------------
 
-	function get()
+	function get($id)
 	{
+		$this->db->where('practice_id', $id);
 		return $this->db->get('practiceinfo');
 	}
 	
-	function get_calendar_settings()
+	function get_calendar_settings($id)
 	{
+		$this->db->where('practice_id', $id);
 		return $this->db->get('calendar');
 	}
 	
-	function getProviders()
+	function getProviders($id)
 	{
 		$this->db->where('group_id', '2');
+		$this->db->where('practice_id', $id);
 		return $this->db->get('users');
 	}
 	
-	function get_extensions()
+	function get_extensions($id)
 	{
 		$this->db->select('rcopia_extension');
 		$this->db->select('rcopia_apiVendor');
@@ -37,15 +40,9 @@ class Practiceinfo_model extends Model {
 		$this->db->select('mtm_alert_users');
 		$this->db->select('snomed_extension');
 		$this->db->select('vivacare');
+		$this->db->select('peacehealth_id');
+		$this->db->where('practice_id', $id);
 		return $this->db->get('practiceinfo');
-	}
-	
-	// --------------------------------------------------------------------
-	
-	function update($data)
-	{
-		$this->db->where('practice_id', '1');
-		$this->db->update('practiceinfo', $data);
 	}
 }
 

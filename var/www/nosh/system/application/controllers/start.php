@@ -15,24 +15,34 @@ class Start extends Application
 		$this->load->model('fax_model');
 		$this->load->model('demographics_model');
 		$this->load->model('audit_model');
+		$this->load->model('chart_model');
 	}
 	
-	function index()
+	function index($practicehandle='')
 	{
-		if(logged_in())
-		{
+		if ($practicehandle != '') {
+			$practice_query = $this->db->query("SELECT * FROM practiceinfo WHERE practicehandle=$practicehandle");
+			if ($practice_query->num_rows == 0) {
+				$data_error = array(
+					'practicehandle' => $practicehandle
+				);
+				$this->auth->view('login_error', $data_error);
+			}
+		}
+		if(logged_in()) {
 			$user_id = $this->session->userdata('user_id');
-			$settingsInfo = $this->practiceinfo_model->get();
+			$settingsInfo = $this->practiceinfo_model->get($this->session->userdata('practice_id'));
+			$practice_id = $this->session->userdata('practice_id');
 			$data['practiceinfo'] = $settingsInfo->row();
 			$query = $this->users_model->get($user_id);
 			$result = $query->row();
 			$data['displayname'] = $result->displayname;
 			$displayname = $result->displayname;
 			$this->session->set_userdata('displayname', $data['displayname']);
-			$fax_query = $this->db->query("SELECT * FROM received")->num_rows();
+			$fax_query = $this->db->query("SELECT * FROM received WHERE practice_id=$practice_id")->num_rows();
 			if(user_group('provider')) {
 				$data['number_messages'] = $this->db->query("SELECT * FROM messaging WHERE mailbox=$user_id")->num_rows();
-				$data['number_documents'] = $this->db->query("SELECT * FROM scans")->num_rows() + $fax_query;
+				$data['number_documents'] = $this->db->query("SELECT * FROM scans WHERE practice_id=$practice_id")->num_rows() + $fax_query;
 				$data['number_appts'] = $this->schedule_model->getNumberAppts($user_id);
 				$from = $displayname . ' (' . $this->session->userdata('user_id') . ')';
 				$query1 = $this->db->query("SELECT * FROM t_messages JOIN demographics ON t_messages.pid=demographics.pid WHERE t_messages.t_messages_from='$from' AND t_messages.t_messages_signed='No'");
@@ -40,11 +50,13 @@ class Start extends Application
 				$data['number_drafts'] = $query1->num_rows() + $query2->num_rows();
 				$query3 = $this->db->query("SELECT * FROM alerts JOIN demographics ON alerts.pid=demographics.pid WHERE alerts.alert_provider='$user_id' AND alerts.alert_date_complete='0000-00-00 00:00:00' AND alerts.alert_reason_not_complete='' AND (alerts.alert='Laboratory results pending' OR alerts.alert='Radiology results pending' OR alerts.alert='Cardiopulmonary results pending' OR alerts.alert='Referral pending' OR alerts.alert='Reminder' OR alerts.alert='REMINDER')");
 				$data['number_reminders'] = $query3->num_rows(); 
-				$data['number_bills'] = $this->db->query("SELECT * FROM encounters WHERE bill_submitted='No' AND encounter_provider='$displayname'")->num_rows();
+				$data['number_bills'] = $this->db->query("SELECT * FROM encounters WHERE bill_submitted='No' AND user_id=$user_id")->num_rows();
+				$query7 = $this->db->query("SELECT * FROM tests WHERE pid IS NULL AND practice_id=$practice_id");
+				$data['number_tests'] = $query7->num_rows();
 				if($data['practiceinfo']->mtm_extension == 'y') {
 					$mtm_users_array = explode(",", $data['practiceinfo']->mtm_alert_users);
 					if (in_array($user_id, $mtm_users_array)) {
-						$query6 = $this->db->query("SELECT * FROM alerts WHERE alert_date_complete='0000-00-00 00:00:00' AND alert_reason_not_complete='' AND alert='Medication Therapy Management'");
+						$query6 = $this->db->query("SELECT * FROM alerts WHERE alert_date_complete='0000-00-00 00:00:00' AND alert_reason_not_complete='' AND alert='Medication Therapy Management' AND practice_id=$practice_id");
 						$data['mtm_alerts'] = $query6->num_rows();
 						$data['mtm_alerts_status'] = "y";
 					} else {
@@ -56,21 +68,20 @@ class Start extends Application
 			}
 			if(user_group('assistant')) {
 				$data['number_messages'] = $this->db->query("SELECT * FROM messaging WHERE mailbox=$user_id")->num_rows();
-				$data['number_documents'] = $this->db->query("SELECT * FROM scans")->num_rows() + $fax_query;
+				$data['number_documents'] = $this->db->query("SELECT * FROM scans WHERE practice_id=$practice_id")->num_rows() + $fax_query;
 				$from = $displayname . ' (' . $this->session->userdata('user_id') . ')';
 				$query4 = $this->db->query("SELECT * FROM t_messages JOIN demographics ON t_messages.pid=demographics.pid WHERE t_messages.t_messages_from='$from' AND t_messages.t_messages_signed='No'");
 				$data['number_drafts'] = $query4->num_rows();
 				$query5 = $this->db->query("SELECT * FROM alerts JOIN demographics ON alerts.pid=demographics.pid WHERE alerts.alert_provider='$user_id' AND alerts.alert_date_complete='0000-00-00 00:00:00' AND alerts.alert_reason_not_complete='' AND (alerts.alert='Laboratory results pending' OR alerts.alert='Radiology results pending' OR alerts.alert='Cardiopulmonary results pending' OR alerts.alert='Referral pending' OR alerts.alert='Reminder' OR alerts.alert='REMINDER')");
 				$data['number_reminders'] = $query5->num_rows(); 
-				$data['number_bills'] = $this->db->query("SELECT * FROM encounters WHERE bill_submitted='No'")->num_rows();
+				$data['number_bills'] = $this->db->query("SELECT * FROM encounters WHERE bill_submitted='No' AND practice_id=$practice_id")->num_rows();
+				$query8 = $this->db->query("SELECT * FROM tests WHERE pid IS NULL AND practice_id=$practice_id");
+				$data['number_tests'] = $query8->num_rows();
 			}
 			if(user_group('billing')) {
 				$data['number_messages'] = $this->db->query("SELECT * FROM messaging WHERE mailbox=$user_id")->num_rows();
-				$data['number_bills'] = $this->db->query("SELECT * FROM encounters WHERE bill_submitted='No'")->num_rows();
-				$data['number_documents'] = $this->db->query("SELECT * FROM scans")->num_rows() + $fax_query;
-			}
-			if(user_group('admin')) {
-				$data['number_messages'] = $this->db->query("SELECT * FROM messaging WHERE mailbox=$user_id")->num_rows();
+				$data['number_bills'] = $this->db->query("SELECT * FROM encounters WHERE bill_submitted='No' AND practice_id=$practice_id")->num_rows();
+				$data['number_documents'] = $this->db->query("SELECT * FROM scans WHERE practice_id=$practice_id")->num_rows() + $fax_query;
 			}
 			if(user_group('patient')) {
 				$this->db->where('id', $user_id);
@@ -78,10 +89,8 @@ class Start extends Application
 				$this->session->set_userdata('pid', $row['pid']);
 			}
 			$this->auth->view('dashboard', $data);
-		}
-		else
-		{
-			$this->auth->login();
+		} else {
+			$this->auth->login($practicehandle);
 		}
 	}
 	
@@ -114,12 +123,12 @@ class Start extends Application
 	
 	function draft_encounters()
 	{
-		$provider = $this->session->userdata('displayname');
+		$user_id = $this->session->userdata('user_id');
 		$page = $this->input->post('page');
 		$limit = $this->input->post('rows');
 		$sidx = $this->input->post('sidx');
 		$sord = $this->input->post('sord');
-		$query = $this->db->query("SELECT * FROM encounters JOIN demographics ON encounters.pid=demographics.pid WHERE encounters.encounter_provider='$provider' AND encounters.encounter_signed='No'");
+		$query = $this->db->query("SELECT * FROM encounters JOIN demographics ON encounters.pid=demographics.pid WHERE encounters.user_id=$user_id AND encounters.encounter_signed='No'");
 		$count = $query->num_rows(); 
 		if($count > 0) { 
 			$total_pages = ceil($count/$limit); 
@@ -129,7 +138,7 @@ class Start extends Application
 		if ($page > $total_pages) $page=$total_pages;
 		$start = $limit*$page - $limit;
 		if($start < 0) $start = 0;
-		$query1 = $this->db->query("SELECT * FROM encounters JOIN demographics ON encounters.pid=demographics.pid WHERE encounters.encounter_provider='$provider' AND encounters.encounter_signed='No' ORDER BY $sidx $sord LIMIT $start , $limit");
+		$query1 = $this->db->query("SELECT * FROM encounters JOIN demographics ON encounters.pid=demographics.pid WHERE encounters.user_id=$user_id AND encounters.encounter_signed='No' ORDER BY $sidx $sord LIMIT $start , $limit");
 		$response['page'] = $page;
 		$response['total'] = $total_pages;
 		$response['records'] = $count;
@@ -195,6 +204,12 @@ class Start extends Application
 	
 	function get_version()
 	{
+		if (!$this->session->userdata('practice_id')) {
+			$practice_id = "1";
+		} else {
+			$practice_id = $this->session->userdata('practice_id');
+		}
+		$this->db->where('practice_id', $practice_id);
 		$result = $this->db->get('practiceinfo')->row_array();
 		echo $result['version'];
 	}
@@ -380,28 +395,50 @@ class Start extends Application
 				if ($result->num_rows() > 0) {
 					$arr['response'] = "1";
 					$displayname = $this->input->post('firstname') . " " . $this->input->post('lastname');
-					$data1 = array(
-						'username' => $this->input->post('username'),
-						'firstname' => $this->input->post('firstname'),
-						'lastname' => $this->input->post('lastname'),
-						'email' => $this->input->post('email'),
-						'group_id' => '100',
-						'active' => '1',
-						'displayname' => $displayname
-					);
-					$arr['id'] = $this->users_model->add($data1);
-					$data2 = array(
-						'id' => $arr['id']
-					);
-					$demographics = $result->row_array();
-					$this->demographics_model->update($demographics['pid'], $data2);
+					$patient_result = $result->row_array();
+					$this->db->where('pid', $patient_result['pid']);
+					foreach ($this->db->get('demographics_relate')->result_array() as $demographics_relate_row) {
+						$data1 = array(
+							'username' => $this->input->post('username'),
+							'firstname' => $this->input->post('firstname'),
+							'lastname' => $this->input->post('lastname'),
+							'email' => $this->input->post('email'),
+							'group_id' => '100',
+							'active' => '1',
+							'displayname' => $displayname,
+							'practice_id' => $demographics_relate_row['practice_id']
+						);
+						$arr['id'] = $this->users_model->add($data1);
+						$data2 = array(
+							'id' => $arr['id']
+						);
+						$this->db->where('demographics_relate_id', $demographics_relate_row['demographics_relate_id']);
+						$this->db->update('demographics_relate', $data2);
+						$this->db->where('practice_id', $demographics_relate_row['practice_id']);
+						$row1 = $this->db->get('practiceinfo')->row_array();
+						$message = 'You are now registered to your patient portal for ' . $row1['practice_name'] . ". Your username is " . $this->input->post('username') . '.';
+						$config['protocol']='smtp';
+						$config['smtp_host']='ssl://smtp.googlemail.com';
+						$config['smtp_port']='465';
+						$config['smtp_timeout']='30';
+						$config['charset']='utf-8';
+						$config['newline']="\r\n";
+						$config['smtp_user']=$row1['smtp_user'];
+						$config['smtp_pass']=$row1['smtp_pass'];
+						$this->email->initialize($config);
+						$this->email->from($row1['email'], $row1['practice_name']);
+						$this->email->to($this->input->post('email'));
+						$this->email->subject('Patient Portal Registration Confirmation');
+						$this->email->message($message);
+						$this->email->send();
+					}
 				} else {
 					$arr['response'] = "2";
 					$count++;
 					$arr['count'] = strval($count);
 				}
 			} else {
-				$this->db->where('practice_id', '1');
+				$this->db->where('practice_id', $this->input->post('practice_id'));
 				$row1 = $this->db->get('practiceinfo')->row_array();
 				$displayname = $this->session->userdata('displayname');
 				$message = 'You have a new user request from ' . $this->input->post('firstname') . " " . $this->input->post('lastname') . ". Date of birth is " . $this->input->post('dob') . ". Desired user name is " . $this->input->post('username') . ". Return e-mail to " . $this->input->post('email');
@@ -471,7 +508,7 @@ class Start extends Application
 	function provider_info()
 	{
 		$id = $this->session->userdata('user_id');
-		$this->db->select('id, license, license_state, npi, specialty, upin, dea, medicare, tax_id, rcopia_username, schedule_increment');
+		$this->db->select('id, license, license_state, npi, specialty, upin, dea, medicare, tax_id, rcopia_username, schedule_increment, peacehealth_id');
 		$this->db->where('id', $id);
 		$result = $this->db->get('providers')->row_array();
 		echo json_encode($result);
@@ -492,7 +529,8 @@ class Start extends Application
 			'medicare' => $this->input->post('medicare'),
 			'tax_id' => $this->input->post('tax_id'),
 			'rcopia_username' => $this->input->post('rcopia_username'),
-			'schedule_increment' => $this->input->post('schedule_increment')
+			'schedule_increment' => $this->input->post('schedule_increment'),
+			'peacehealth_id' => $this->input->post('peacehealth_id')
 		);
 		$this->users_model->updateProvider($this->input->post('id'), $data);
 		echo "Provider information updated!";
@@ -500,13 +538,13 @@ class Start extends Application
 	
 	function check_rcopia_extension()
 	{
-		$result = $this->practiceinfo_model->get()->row_array();
+		$result = $this->practiceinfo_model->get($this->session->userdata('practice_id'))->row_array();
 		echo $result['rcopia_extension'];
 	}
 	
 	function check_mtm_extension()
 	{
-		$result = $this->practiceinfo_model->get()->row_array();
+		$result = $this->practiceinfo_model->get($this->session->userdata('practice_id'))->row_array();
 		if ($result['mtm_extension'] == 'y') {
 			$arr['response'] = 'y';
 			$arr['row'] = '<img src="' . base_url() . 'images/graph.png" border="0" height="30" width="30" style="vertical-align:middle;" id="mtm_list_img" class="mtm_tooltip"> <a href="#" id="mtm_list" class="mtm_tooltip">MTM</a><br />';
@@ -518,7 +556,7 @@ class Start extends Application
 	
 	function check_fax()
 	{
-		$result = $this->practiceinfo_model->get()->row_array();
+		$result = $this->practiceinfo_model->get($this->session->userdata('practice_id'))->row_array();
 		if ($result['fax_type'] != "") {
 			echo "Yes";
 		} else {
@@ -537,7 +575,7 @@ class Start extends Application
 	
 	function check_snomed_extension()
 	{
-		$result = $this->practiceinfo_model->get()->row_array();
+		$result = $this->practiceinfo_model->get($this->session->userdata('practice_id'))->row_array();
 		echo $result['snomed_extension'];
 	}
 	
@@ -673,22 +711,46 @@ class Start extends Application
 		$response['total'] = $total_pages;
 		$response['records'] = $count;
 		$records = $query1->result_array();
-		$response['rows'] = $records;
+		$records1 = array();
+		$i = 0;
+		foreach ($records as $records_row) {
+			$this->db->where('cpt', $records_row['cpt']);
+			$this->db->where('practice_id', $this->session->userdata('practice_id'));
+			$query2 = $this->db->get('cpt_relate');
+			if ($query2->num_rows() > 0) {
+				$query2_row = $query2->row_array();
+				$records1[$i] = array(
+					'cpt_id' => $records_row['cpt_id'],
+					'cpt_relate_id' => $query2_row['cpt_relate_id'],
+					'cpt' => $query2_row['cpt'],
+					'cpt_description' => $query2_row['cpt_description'],
+					'cpt_charge' => $query2_row['cpt_charge'],
+					'favorite' => $query2_row['favorite'],
+					'unit' => $query2_row['unit']
+				);
+			} else {
+				$records1[$i] = array(
+					'cpt_id' => $records_row['cpt_id'],
+					'cpt_relate_id' => '',
+					'cpt' => $records_row['cpt'],
+					'cpt_description' => $records_row['cpt_description'],
+					'cpt_charge' => '',
+					'favorite' => '0',
+					'unit' => '1'
+				);
+			}
+			$i++;
+		}
+		$response['rows'] = $records1;
 		echo json_encode($response);
 		exit( 0 );
 	}
 	
 	function edit_cpt_list()
 	{
-		$charge = str_replace("$", "", $this->input->post('cpt_charge'));
-		$pos = strpos($charge, ".");
-		if ($pos === FALSE) {
-			$charge .= ".00";
-		}
 		$data = array(
 			'cpt' => $this->input->post('cpt'),
 			'cpt_description' => $this->input->post('cpt_description'),
-			'cpt_charge' => $charge
 		);
 		if ($this->input->post('cpt_id') != '') {
 			$this->db->where('cpt_id', $this->input->post('cpt_id'));
@@ -698,7 +760,32 @@ class Start extends Application
 			$this->db->insert('cpt', $data);
 			$arr['message'] = "CPT code added!";
 		}
-		$arr['charge'] = $charge;
+		if ($this->input->post('cpt_charge') != '') {
+			$charge = str_replace("$", "", $this->input->post('cpt_charge'));
+			$pos = strpos($charge, ".");
+			if ($pos === FALSE) {
+				$charge .= ".00";
+			}
+			$data_relate = array(
+				'cpt' => $this->input->post('cpt'),
+				'cpt_description' => $this->input->post('cpt_description'),
+				'cpt_charge' => $charge,
+				'practice_id' => $this->session->userdata('practice_id'),
+				'favorite' => $this->input->post('favorite'),
+				'unit' => $this->input->post('unit')
+			);
+			if ($this->input->post('cpt_relate_id') != '') {
+				$this->db->where('cpt_relate_id', $this->input->post('cpt_relate_id'));
+				$this->db->update('cpt_relate', $data_relate);
+				$arr['message'] .= "  CPT charge updated!";
+			} else {
+				$this->db->insert('cpt_relate', $data_relate);
+				$arr['message'] .= "  CPT charge added!";
+			}
+			$arr['charge'] = $charge;
+		} else {
+			$arr['charge'] = '';
+		}
 		echo json_encode($arr);
 	}
 	
@@ -711,14 +798,14 @@ class Start extends Application
 	
 	function get_sales_tax()
 	{
-		$result = $this->practiceinfo_model->get()->row_array();
+		$result = $this->practiceinfo_model->get($this->session->userdata('practice_id'))->row_array();
 		echo $result['sales_tax'];
 	}
 	
 	function update_sales_tax()
 	{
 		$data['sales_tax'] = $this->input->post('sales_tax');
-		$this->db->where('practice_id','1');
+		$this->db->where('practice_id',$this->session->userdata('practice_id'));
 		$this->db->update('practiceinfo', $data);
 		if ($data['sales_tax'] != "") {
 			$this->db->where('cpt','sptax');
@@ -727,9 +814,10 @@ class Start extends Application
 				$data1 = array(
 					'cpt' => 'sptax',
 					'cpt_description' => 'Sales Tax',
-					'cpt_charge' => ''
+					'cpt_charge' => '',
+					'practice_id' => $this->session->userdata('practice_id')
 				);
-				$this->db->insert('cpt',$data1);
+				$this->db->insert('cpt_relate',$data1);
 			}
 		}
 		echo "Sales tax percentage updated!";
@@ -747,12 +835,13 @@ class Start extends Application
 	
 	function patient_forms_list()
 	{
+		$practice_id = $this->session->userdata('practice_id');
 		$pid = $this->session->userdata('pid');
 		$page = $this->input->post('page');
 		$limit = $this->input->post('rows');
 		$sidx = $this->input->post('sidx');
 		$sord = $this->input->post('sord');
-		$query = $this->db->query("SELECT * FROM templates WHERE category='forms'");
+		$query = $this->db->query("SELECT * FROM templates WHERE category='forms' AND practice_id=$practice_id");
 		$count = $query->num_rows(); 
 		if($count > 0) { 
 			$total_pages = ceil($count/$limit); 
@@ -762,7 +851,7 @@ class Start extends Application
 		if ($page > $total_pages) $page=$total_pages;
 		$start = $limit*$page - $limit;
 		if($start < 0) $start = 0;
-		$query1 = $this->db->query("SELECT * FROM templates WHERE category='forms' ORDER BY $sidx $sord LIMIT $start , $limit");
+		$query1 = $this->db->query("SELECT * FROM templates WHERE category='forms' AND practice_id=$practice_id ORDER BY $sidx $sord LIMIT $start , $limit");
 		$response['page'] = $page;
 		$response['total'] = $total_pages;
 		$response['records'] = $count;
@@ -801,7 +890,8 @@ class Start extends Application
 				'category' => 'forms',
 				'sex' => 'm',
 				'group' => $group,
-				'array' => $array
+				'array' => $array,
+				'practice_id' => $this->session->userdata('practice_id')
 			);
 			$template_data2 = array(
 				'user_id' => $user_id,
@@ -811,7 +901,8 @@ class Start extends Application
 				'category' => 'forms',
 				'sex' => 'f',
 				'group' => $group,
-				'array' => $array
+				'array' => $array,
+				'practice_id' => $this->session->userdata('practice_id')
 			);
 			if ($this->input->post('template_id') == '') {
 				$this->db->insert('templates', $template_data1);
@@ -863,7 +954,8 @@ class Start extends Application
 				'category' => 'forms',
 				'sex' => $this->input->post('sex'),
 				'group' => $group,
-				'array' => $array
+				'array' => $array,
+				'practice_id' => $this->session->userdata('practice_id')
 			);
 			if ($this->input->post('template_id') == '') {
 				$this->db->insert('templates', $template_data3);
@@ -896,6 +988,164 @@ class Start extends Application
 		$array = unserialize($row['array']);
 		echo $array;
 		exit( 0 );
+	}
+	
+	function get_practices()
+	{
+		$query = $this->db->get('practiceinfo');
+		$data['message'] = array();
+		foreach ($query->result_array() as $row) {
+			$data['message'][$row['practice_id']] = $row['practice_name'];
+		}
+		echo json_encode($data);
+		exit( 0 );
+	}
+	
+	function tests()
+	{
+		$pid = $this->session->userdata('pid');
+		$page = $this->input->post('page');
+		$limit = $this->input->post('rows');
+		$sidx = $this->input->post('sidx');
+		$sord = $this->input->post('sord'); 
+		$query = $this->db->query("SELECT * FROM tests WHERE pid IS NULL");
+		$count = $query->num_rows(); 
+		if($count > 0) { 
+			$total_pages = ceil($count/$limit); 
+		} else { 
+			$total_pages = 0; 
+		}
+		if ($page > $total_pages) $page=$total_pages;
+		$start = $limit*$page - $limit;
+		if($start < 0) $start = 0;
+		$query1 = $this->db->query("SELECT * FROM tests WHERE pid IS NULL ORDER BY $sidx $sord LIMIT $start , $limit");
+		$response['page'] = $page;
+		$response['total'] = $total_pages;
+		$response['records'] = $count;
+		$records = $query1->result_array();
+		$response['rows'] = $records;
+		echo json_encode($response);
+		exit( 0 );
+	}
+	
+	function tests_import()
+	{
+		$pid = $this->input->post('pid');
+		$tests_id_array = json_decode($this->input->post('tests_id_array'));
+		$i = 0;
+		$results = array();
+		foreach ($tests_id_array as $tests_id) {
+			$data = array(
+				'pid' => $pid,
+				'test_unassigned' => ''
+			);
+			$this->db->where('tests_id', $tests_id);
+			$this->db->update('tests', $data);
+			$this->db->where('tests_id', $tests_id);
+			$results[$i] = $this->db->get('tests')->row_array();
+			$provider_id = $results[$i]['test_provider_id'];
+			$from = $results[$i]['test_from'];
+			$test_type = $results[$i]['test_type'];
+			$i++;
+		}
+		$this->db->where('pid', $pid);
+		$patient_row = $this->db->get('demographics')->row_array();
+		$dob_message = mdate("%m/%d/%Y", strtotime($patient_row['DOB']));
+		$patient_name =  $patient_row['lastname'] . ', ' . $patient_row['firstname'] . ' (DOB: ' . $dob_message . ') (ID: ' . $pid . ')';
+		$practice_row = $this->practiceinfo_model->get($this->session->userdata('practice_id'))->row_array();
+		$directory = $practice_row['documents_dir'] . $pid;
+		$file_path = $directory . '/tests_' . now() . '.pdf';
+		$html = $this->page_intro('Test Results', $this->session->userdata('practice_id'));
+		$html .= $this->page_results($pid, $results, $patient_name);
+		$this->load->library('mpdf');
+		$this->mpdf=new mpdf('','Letter',0,'',26,26,26,26,9,9,'P');
+		$this->mpdf->useOnlyCoreFonts = true;
+		$this->mpdf->shrink_tables_to_fit=1;
+		$this->mpdf->AddPage();
+		$this->mpdf->SetHTMLFooter($footer,'O');
+		$this->mpdf->SetHTMLFooter($footer,'E');
+		$this->mpdf->WriteHTML($html);
+		$this->mpdf->SetTitle('Document Generated by NOSH ChartingSystem');
+		$this->mpdf->debug = true;
+		$this->mpdf->Output($file_path,'F');
+		while(!file_exists($file_path)) {
+			sleep(2);
+		}
+		$documents_date = mdate("%Y-%m-%d %H:%i:%s", now());
+		$test_desc = 'Test results for ' . $patient_name;
+		$pages_data = array(
+			'documents_url' => $file_path,
+			'pid' => $pid,
+			'documents_type' => $test_type,
+			'documents_desc' => $test_desc,
+			'documents_from' => $from,
+			'documents_date' => $documents_date
+		);
+		if(user_group('provider')) {
+			$pages_data['documents_viewed'] = $this->session->userdata('displayname');
+		}
+		$documents_id = $this->chart_model->addDocuments($pages_data);
+		$this->audit_model->add();
+		if(user_group('assistant')) {
+			$this->db->where('id', $provider_id);
+			$provider_row = $this->db->get('users')->row_array();
+			$provider_name = $provider_row['firstname'] . " " . $provider_row['lastname'] . ", " . $provider_row['title'] . " (" . $provider_id . ")";
+			$subject = "Test results for " . $patient_name;
+			$body = "Test results for " . $patient_name . "\n\n";
+			foreach ($results as $results_row1) {
+				$body .= $results_row1['test_name'] . ": " . $results_row1['test_result'] . ", Units: " . $results_row1['test_units'] . ", Normal reference range: " . $results_row1['test_reference'] . ", Date: " . $results_row1['test_datetime'] . "\n";
+			}
+			$body .= "\n" . $from;
+			$data_message = array(
+				'pid' => $pid,
+				'message_to' => $provider_name,
+				'message_from' => $this->session->userdata('user_id'),
+				'subject' => $subject,
+				'body' => $body,
+				'patient_name' => $patient_name,
+				'status' => 'Sent',
+				'mailbox' => $provider_id,
+				'practice_id' => $practice_id,
+				'documents_id' => $documents_id
+			);
+			$this->db->insert('messages', $data_message);
+		}
+	}
+	
+	function page_intro($title, $practice_id)
+	{
+		$practice = $this->practiceinfo_model->get($practice_id)->row_array();
+		$data['practiceName'] = $practice['practice_name'];
+		$data['website'] = $practice['website'];
+		$data['practiceInfo'] = $practice['street_address1'];
+		if ($practice['street_address2'] != '') {
+			$data['practiceInfo'] .= ', ' . $practice['street_address2'];
+		}
+		$data['practiceInfo'] .= '<br />';
+		$data['practiceInfo'] .= $practice['city'] . ', ' . $practice['state'] . ' ' . $practice['zip'] . '<br />';
+		$data['practiceInfo'] .= 'Phone: ' . $practice['phone'] . ', Fax: ' . $practice['fax'] . '<br />';
+		if ($practice['practice_logo'] != '') {
+			$logo = str_replace("/var/www/","http://localhost/", $practice['practice_logo']);
+			$data['practiceLogo'] = "<img src='" . $logo . "' border='0'>";
+		} else {
+			$data['practiceLogo'] = '<br><br><br><br><br>';
+		}
+		$data['title'] = $title;
+		return $this->load->view('auth/pages/intro_page', $data, TRUE);
+	}
+	
+	function page_results($pid, $results, $patient_name)
+	{
+		$body = '';
+		$body .= "<br>Test results for " . $patient_name . "<br><br>";
+		$body .= "<table><tr><th>Date</th><th>Test</th><th>Result</th><th>Units</th><th>Normal reference range</th><th>Flags</th></tr>";
+		foreach ($results as $results_row1) {
+			$body .= "<tr><td>" . $results_row1['test_datetime'] . "</td><td>" . $results_row1['test_name'] . "</td><td>" . $results_row1['test_result'] . "</td><td>" . $results_row1['test_units'] . "</td><td>" . $results_row1['test_reference'] . "</td><td>" . $results_row1['test_flags'] . "</td></tr>";
+			$from = $results_row1['test_from'];
+		}
+		$body .= "</table><br>" . $from;
+		$body .= '</body></html>';
+		return $body;
 	}
 }
 

@@ -10,7 +10,7 @@ LOGDIR=/var/log/nosh
 LOG=$LOGDIR/installation_log
 WEB=/var/www
 NOSH=$WEB/nosh
-TMPDIR=/tmp/nosh
+CONFIGDATABASEBACKUP=$NOSH/system/application/config/database_backup.php
 CONFIGDATABASE=$NOSH/system/application/config/database.php
 WEB_GROUP=www-data
 WEB_USER=www-data
@@ -44,6 +44,15 @@ insert_settings () {
 	sed -i 's%^[ 	]*'"$1"'[ 	=].*$%'"$1"' = '"$2"'%' "$3"
 }
 
+# Check prerequisites
+type apache2 >/dev/null 2>&1 || { echo >&2 "Apache Web Server is required, but it's not installed.  Aborting."; exit 1; }
+type mysql >/dev/null 2>&1 || { echo >&2 "MySQL is required, but it's not installed.  Aborting."; exit 1; }
+type php >/dev/null 2>&1 || { echo >&2 "PHP is required, but it's not installed.  Aborting."; exit 1; }
+type perl >/dev/null 2>&1 || { echo >&2 "Perl is required, but it's not installed.  Aborting."; exit 1; }
+type pdftk >/dev/null 2>&1 || { echo >&2 "PDFTK is required, but it's not installed.  Aborting."; exit 1; }
+type convert >/dev/null 2>&1 || { echo >&2 "ImageMagick is required, but it's not installed.  Aborting."; exit 1; }
+type sshd >/dev/null 2>&1 || { echo >&2 "SSH Server is required, but it's not installed.  Aborting."; exit 1; }
+
 # Secure NOSH ChartingSystem
 chown -R $WEB_GROUP.$WEB_USER $NOSH
 chmod -R 755 $NOSH
@@ -63,6 +72,37 @@ echo "*/1 *   * * *   root    /usr/bin/noshreminder" >> $NOSHCRON
 echo "0 0     * * *   root    /usr/bin/noshbackup" >> $NOSHCRON
 chown root.root $NOSHCRON
 chmod 644 $NOSHCRON
+/bin/egrep  -i "^ftpshared" /etc/group
+if [ $? -eq 0 ]; then
+	log_only "Group ftpshared already exists."
+else
+	groupadd ftpshared
+	log_only "Group ftpshared does not exist.  Making group."
+fi
+if [ -d $FTPIMPORT ]; then
+	log_only "The NOSH ChartingSystem SFTP directories already exist."
+else
+	mkdir -p $FTPIMPORT
+	mkdir -p $FTPEXPORT
+	chown -R root:ftpshared /srv/ftp/shared
+	chmod 755 /srv/ftp/shared
+	chmod -R 775 /srv/ftp/shared/import
+	chmod -R 775 /srv/ftp/shared/export
+	chmod g+s /srv/ftp/shared/import
+	chmod g+s /srv/ftp/shared/export
+	log_only "The NOSH ChartingSystem SFTP directories have been created."
+	/usr/bin/gpasswd -a www-data ftpshared
+	cp /etc/ssh/sshd_config /etc/ssh/sshd_config.bak
+	log_only "Backup of SSH config file created."
+	sed -i '/Subsystem/s/^/#/' /etc/ssh/sshd_config
+	echo 'Subsystem sftp internal-sftp' >> /etc/ssh/sshd_config
+	echo 'Match Group ftpshared' >> /etc/ssh/sshd_config
+	echo 'ChrootDirectory /srv/ftp/shared' >> /etc/ssh/sshd_config
+	echo 'X11Forwarding no' >> /etc/ssh/sshd_config
+	echo 'AllowTCPForwarding no' >> /etc/ssh/sshd_config
+	echo 'ForceCommand internal-sftp' >> /etc/ssh/sshd_config
+	log_only "SSH config file updated."
+fi
 # Check to ensure the php configuration file exists
 if [ -f $PHP ]; then
 	# Collect php variables from php.ini
@@ -127,16 +167,15 @@ fi
 if [ -d $NOSH ]; then
 	rm -rf $OLDNOSHFAX
 	rm -rf $OLDNOSHREMINDER
-	mkdir -p $TMPDIR
 	if [ -e "$CONFIGDATABASE" ]; then
-		cp -fr $CONFIGDATABASE $TMPDIR/database.php
+		cp -fr $CONFIGDATABASE $CONFIGDATABASEBACKUP
 		log_only "Backup of Codeigniter database configuration file"
 	fi
 	cp -a var/ /var/
 fi
-if [ -d $TMPDIR ]; then
-	DEFAULTUSERNAME=$(get_settings \$default_db_username $TMPDIR/database.php)
-	DEFAULTPASSWORD=$(get_settings \$default_db_password $TMPDIR/database.php)
+if [ -e $CONFIGDATABASEBACKUP ]; then
+	DEFAULTUSERNAME=$(get_settings \$default_db_username $CONFIGDATABASEBACKUP)
+	DEFAULTPASSWORD=$(get_settings \$default_db_password $CONFIGDATABASEBACKUP)
 	insert_settings "\$default_db_username" "\'$DEFAULTUSERNAME\';" $CONFIGDATABASE
 	insert_settings "\$default_db_password" "\'$DEFAULTPASSWORD\';" $CONFIGDATABASE
 	log_only "Imported previous settings in the Codeigniter database configuartion file."
@@ -181,4 +220,6 @@ else
 fi
 log_only "Restarting Apache service"
 invoke-rc.d apache2 restart >> $LOG 2>&1
+log_only "Restarting SSH server service"
+invoke-rc.d ssh restart >> $LOG 2>&1
 exit 0

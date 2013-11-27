@@ -5,9 +5,9 @@ $(document).ready(function() {
 		inactivity: 3600000,
 		noconfirm: 10000,
 		alive_url: '<?php echo site_url("patient/messaging");?>',
-		redirect_url: '<?php echo site_url("start");?>',
+		redirect_url: '<?php echo site_url("logout");?>',
 		logout_url: '<?php echo site_url("logout");?>',
-		sessionAlive: 300000
+		sessionAlive: false
 	});
 	$("#new_message").button({
 		icons: {
@@ -31,18 +31,26 @@ $(document).ready(function() {
 		$("#internal_messages_dialog").dialog('open');
 		$("#messages_subject").focus();
 	});
+	function mail_status(cellvalue, options, rowObject){
+		if (cellvalue == "y") {
+			return "<span class='ui-icon ui-icon-mail-open'></span>";
+		} else {
+			return "<span class='ui-icon ui-icon-mail-closed'></span>";
+		}
+	}
 	jQuery("#internal_inbox").jqGrid({
 		url:"<?php echo site_url('patient/messaging/internal_inbox/');?>",
 		datatype: "json",
 		mtype: "POST",
-		colNames:['ID','To','Date','FromID','From','Subject','Message','CC','PID','Patient Name','Body Text','Telephone Messages ID'],
+		colNames:['ID','To','','Date','FromID','From','Subject','Message','CC','PID','Patient Name','Body Text','Telephone Messages ID'],
 		colModel:[
 			{name:'message_id',index:'message_id',width:1,hidden:true},
 			{name:'message_to',index:'message_to',width:1,hidden:true},
+			{name:'read',index:'read',width:15,formatter:mail_status},
 			{name:'date',index:'date',width:120},
 			{name:'message_from',index:'message_from',width:1,hidden:true},
 			{name:'displayname',index:'displayname',width:180},
-			{name:'subject',index:'subject',width:250},
+			{name:'subject',index:'subject',width:240},
 			{name:'body',index:'body',width:1,hidden:true},
 			{name:'cc',index:'cc',width:1,hidden:true},
 			{name:'pid',index:'pid',width:1,hidden:true},
@@ -81,6 +89,20 @@ $(document).ready(function() {
 		 		$("#message_view_wrapper").show('fast');
 		 		$("#message_view_wrapper2").hide('fast');
 		 		$("#internal_messages_dialog").dialog('open');
+		 		setTimeout(function() {
+					var a = $("#internal_messages_dialog" ).dialog("isOpen");
+					if (a) {
+						var id = $("#message_view_message_id").val();
+						$.ajax({
+							type: "POST",
+							url: "<?php echo site_url('patient/messaging/read_message');?>/" + id,
+							success: function(data){
+								$.jGrowl(data);
+								jQuery("#internal_inbox").trigger("reloadGrid");
+							}
+						});
+					}
+				}, 3000);
 		 	}
 	 	}
 	}).navGrid('#internal_inbox_pager',{search:false,edit:false,add:false,del:false

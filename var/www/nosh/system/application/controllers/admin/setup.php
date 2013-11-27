@@ -13,6 +13,7 @@ class Setup extends Application
 		$this->load->library('csv');
 		$this->load->model('practiceinfo_model');
 		$this->load->model('demographics_model');
+		$this->load->model('audit_model');
 	}
 
 	// --------------------------------------------------------------------
@@ -24,7 +25,7 @@ class Setup extends Application
 	
 	function information()
 	{
-		$settingsInfo = $this->practiceinfo_model->get();
+		$settingsInfo = $this->practiceinfo_model->get($this->session->userdata('practice_id'));
 		$data['admin'] = $settingsInfo->row();
 		$this->load->view('auth/pages/admin/information', $data);
 	}
@@ -73,14 +74,16 @@ class Setup extends Application
 			'patient_portal' => $this->input->post('patient_portal'),
 			'additional_message' => $this->input->post('additional_message')
 		);
-		$this->practiceinfo_model->update($data);
+		$this->db->where('practice_id', $this->session->userdata('practice_id'));
+		$this->db->update('practiceinfo', $data);
+		$this->audit_model->update();
 		$result = 'Practice Settings Updated';
 		echo $result;
 	}
 	
 	function get_practicelocation()
 	{
-		$settingsInfo = $this->practiceinfo_model->get();
+		$settingsInfo = $this->practiceinfo_model->get($this->session->userdata('practice_id'));
 		$data = $settingsInfo->row_array();
 		echo json_encode($data);
 		exit( 0 );
@@ -103,7 +106,8 @@ class Setup extends Application
 			'mtm_extension' => $this->input->post('mtm_extension'),
 			'mtm_alert_users' => $mtm_alert_users,
 			'snomed_extension' => $this->input->post('snomed_extension'),
-			'vivacare' => $this->input->post('vivacare')
+			'vivacare' => $this->input->post('vivacare'),
+			'peacehealth_id' => $this->input->post('peacehealth_id')
 		);
 		if ($this->input->post('rcopia_extension') == 'y') {
 			$date = now();
@@ -111,21 +115,23 @@ class Setup extends Application
 			$date1 = mdate($datestring, $date);
 			$data['rcopia_update_notification_lastupdate'] = $date1;
 		}
-		$this->practiceinfo_model->update($data);
+		$this->db->where('practice_id', $this->session->userdata('practice_id'));
+		$this->db->update('practiceinfo', $data);
+		$this->audit_model->update();
 		$result = 'Extensions Updated';
 		echo $result;
 	}
 	
 	function get_extensions()
 	{
-		$extensions = $this->practiceinfo_model->get_extensions()->row_array();
+		$extensions = $this->practiceinfo_model->get_extensions($this->session->userdata('practice_id'))->row_array();
 		echo json_encode($extensions);
 		exit( 0 );
 	}
 	
 	function get_providers()
 	{
-		$query = $this->practiceinfo_model->getProviders();
+		$query = $this->practiceinfo_model->getProviders($this->session->userdata('practice_id'));
 		if ($query->num_rows() > 0) {
 			$data1['message'] = "OK";
 			foreach ($query->result_array() as $data) {
@@ -181,14 +187,16 @@ class Setup extends Application
 			'default_pos_id' => $this->input->post('default_pos_id'),
 			'documents_dir' => $this->input->post('documents_dir')
 		);
-		$this->practiceinfo_model->update($data);
+		$this->db->where('practice_id', $this->session->userdata('practice_id'));
+		$this->db->update('practiceinfo', $data);
+		$this->audit_model->update();
 		$result = 'Practice settings updated!';
 		echo $result;
 	}
 	
 	function get_practice_logo()
 	{
-		$this->db->where('practice_id', '1');
+		$this->db->where('practice_id', $this->session->userdata('practice_id'));
 		$row = $this->db->get('practiceinfo')->row_array();
 		if ($row['practice_logo'] != '') {
 			$logo = str_replace("/var/www/nosh/","",$row['practice_logo']);
@@ -233,7 +241,9 @@ class Setup extends Application
 			$data = array(
 				'practice_logo' => $practice_logo
 			);
-			$this->practiceinfo_model->update($data);
+			$this->db->where('practice_id', $this->session->userdata('practice_id'));
+			$this->db->update('practiceinfo', $data);
+			$this->audit_model->update();
 			$img = $this->getImageFile($practice_logo);
 			if (imagesx($img) > 350 || imagesy($img) > 100) {
 				$width = imagesx($img);
@@ -255,12 +265,14 @@ class Setup extends Application
 		$data = array(
 			'practice_logo' => ''
 		);
-		$this->practiceinfo_model->update($data);
+		$this->db->where('practice_id', $this->session->userdata('practice_id'));
+		$this->db->update('practiceinfo', $data);
+		$this->audit_model->update();
 	}
 	
 	function cropimage()
 	{
-		$this->db->where('practice_id', '1');
+		$this->db->where('practice_id', $this->session->userdata('practice_id'));
 		$row = $this->db->get('practiceinfo')->row_array();
 		$targ_w = 350;
 		$targ_h = 100;

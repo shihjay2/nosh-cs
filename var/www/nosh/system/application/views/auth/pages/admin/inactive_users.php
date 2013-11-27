@@ -52,7 +52,8 @@ $(document).ready(function() {
 		var item = jQuery("#provider_list_inactive").getGridParam('selrow');
 		if(item){
 			jQuery("#provider_list_inactive").editGridRow(item,{closeAfterEdit:true});
-			jQuery("#provider_list_inactive").delRowData(item);
+			$("#password").val('');
+			jQuery("#provider_list_inactive").trigger("reloadGrid");
 		} else {
 			$.jgrowl("Please select provider to reactivate!");
 		}
@@ -101,7 +102,8 @@ $(document).ready(function() {
 		var item = jQuery("#assistant_list_inactive").getGridParam('selrow');
 		if(item){
 			jQuery("#assistant_list_inactive").editGridRow(item,{closeAfterEdit:true});
-			jQuery("#assistant_list_inactive").delRowData(item);
+			$("#password").val('');
+			jQuery("#assistant_list_inactive").trigger("reloadGrid");
 		} else {
 			$.jgrowl("Please select assistant to reactivate!");
 		}
@@ -150,7 +152,8 @@ $(document).ready(function() {
 		var item = jQuery("#billing_list_inactive").getGridParam('selrow');
 		if(item){
 			jQuery("#billing_list_inactive").editGridRow(item,{closeAfterEdit:true});
-			jQuery("#billing_list_inactive").delRowData(item);
+			$("#password").val('');
+			jQuery("#billing_list_inactive").trigger("reloadGrid");
 		} else {
 			$.jgrowl("Please select biller to reactivate!");
 		}
@@ -200,7 +203,8 @@ $(document).ready(function() {
 		var item = jQuery("#patient_list_inactive").getGridParam('selrow');
 		if(item){
 			jQuery("#patient_list_inactive").editGridRow(item,{closeAfterEdit:true});
-			jQuery("#patient_list_inactive").delRowData(item);
+			$("#password").val('');
+			jQuery("#patient_list_inactive").trigger("reloadGrid");
 		} else {
 			$.jgrowl("Please select patient to reactivate!");
 		}

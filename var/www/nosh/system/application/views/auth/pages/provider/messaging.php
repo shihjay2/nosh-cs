@@ -17,9 +17,9 @@ $(document).ready(function() {
 		inactivity: 3600000,
 		noconfirm: 10000,
 		alive_url: '<?php echo site_url("provider/messaging");?>',
-		redirect_url: '<?php echo site_url("start");?>',
+		redirect_url: '<?php echo site_url("logout");?>',
 		logout_url: '<?php echo site_url("logout");?>',
-		sessionAlive: 300000
+		sessionAlive: false
 	});
 	$("#new_message").button({
 		icons: {
@@ -31,27 +31,37 @@ $(document).ready(function() {
 		$("#internal_messages_form_id").show('fast');
 		$("#message_view_wrapper").hide('fast');
  		$("#message_view_wrapper2").hide('fast');
+ 		$("#messages_tags").hide();
  		$("#internal_messages_dialog").dialog('open');
 		$("#messages_subject").focus();
 	});
+	function mail_status(cellvalue, options, rowObject){
+		if (cellvalue == "y") {
+			return "<span class='ui-icon ui-icon-mail-open'></span>";
+		} else {
+			return "<span class='ui-icon ui-icon-mail-closed'></span>";
+		}
+	}
 	jQuery("#internal_inbox").jqGrid({
 		url:"<?php echo site_url('provider/messaging/internal_inbox/');?>",
 		datatype: "json",
 		mtype: "POST",
-		colNames:['ID','To','Date','FromID','From','Subject','Message','CC','PID','Patient Name','Body Text','Telephone Messages ID'],
+		colNames:['ID','To','','Date','FromID','From','Subject','Message','CC','PID','Patient Name','Body Text','Telephone Messages ID','Document ID'],
 		colModel:[
 			{name:'message_id',index:'message_id',width:1,hidden:true},
 			{name:'message_to',index:'message_to',width:1,hidden:true},
+			{name:'read',index:'read',width:15,formatter:mail_status},
 			{name:'date',index:'date',width:120},
 			{name:'message_from',index:'message_from',width:1,hidden:true},
 			{name:'displayname',index:'displayname',width:180},
-			{name:'subject',index:'subject',width:255},
+			{name:'subject',index:'subject',width:240},
 			{name:'body',index:'body',width:1,hidden:true},
 			{name:'cc',index:'cc',width:1,hidden:true},
 			{name:'pid',index:'pid',width:1,hidden:true},
 			{name:'patient_name',index:'patient_name',width:1,hidden:true},
 			{name:'bodytext',index:'bodytext',width:1,hidden:true},
-			{name:'t_messages_id',index:'t_messages_id',width:1,hidden:true}
+			{name:'t_messages_id',index:'t_messages_id',width:1,hidden:true},
+			{name:'documents_id',index:'documents_id',width:1,hidden:true}
 		],
 		rowNum:10,
 		rowList:[10,20,30],
@@ -80,9 +90,11 @@ $(document).ready(function() {
 				$("#message_view_pid").val(row['pid']);
 				$("#message_view_patient_name").val(row['patient_name']);
 				$("#message_view_t_messages_id").val(row['t_messages_id']);
+				$("#message_view_documents_id").val(row['documents_id']);
 				$("#internal_messages_form_id").hide('fast');
 				$("#message_view_wrapper").show('fast');
 				$("#message_view_wrapper2").hide('fast');
+				messages_tags();
 				$("#internal_messages_dialog").dialog('open');
 				if (row['pid'] == '' || row['pid'] == "0") {
 		 			$("#export_message").hide();
@@ -91,6 +103,21 @@ $(document).ready(function() {
 					$("#export_message").show();
 					$("#export_message1").hide();
 				}
+				setTimeout(function() {
+					var a = $("#internal_messages_dialog" ).dialog("isOpen");
+					if (a) {
+						var id = $("#message_view_message_id").val();
+						var documents_id = $("#message_view_documents_id").val();
+						$.ajax({
+							type: "POST",
+							url: "<?php echo site_url('provider/messaging/read_message');?>/" + id + "/" + documents_id,
+							success: function(data){
+								$.jGrowl(data);
+								jQuery("#internal_inbox").trigger("reloadGrid");
+							}
+						});
+					}
+				}, 3000);
 			}
 		}
 	}).navGrid('#internal_inbox_pager',{search:false,edit:false,add:false,del:false
@@ -148,6 +175,7 @@ $(document).ready(function() {
 		 		jQuery("#internal_draft").GridToForm(id,"#internal_messages_form_id");
 		 		$("#internal_messages_dialog").dialog('open');
 		 		$("#internal_messages_form_id").show('fast');
+		 		messages_tags();
 		 		$("#messages_subject").focus();
 		 	}
 	 	}
@@ -206,6 +234,7 @@ $(document).ready(function() {
 		 		var row = jQuery("#internal_outbox").getRowData(id);
 				var text = '<br><strong>To:</strong>  ' + row['message_to'] + '<br><strong>CC:</strong> ' + row['cc'] + '<br<br><strong>Date:</strong>  ' + row['date'] + '<br><br><strong>Subject:</strong>  ' + row['subject'] + '<br><br><strong>Message:</strong> ' + row['body']; 
 				$("#message_view2").html(text);
+				$("#message_view_message_id").val(id);
 				$("#message_view_subject1").val(row['subject']);
 				$("#message_view_body1").val(row['body']);
 				$("#message_view_date1").val(row['date']);
@@ -213,6 +242,7 @@ $(document).ready(function() {
 				$("#internal_messages_form_id").hide('fast');
 		 		$("#message_view_wrapper2").show('fast');
 		 		$("#message_view_wrapper").hide('fast');
+		 		messages_tags();
 		 		$("#internal_messages_dialog").dialog('open');
 		 		if (row['pid'] == '' || row['pid'] == "0") {
 		 			$("#export_message1").hide();
@@ -1500,8 +1530,8 @@ $(document).ready(function() {
 		}
 	});
 	$("#savescan1").click(function(){
-		$("#scan_pid1").val();
-		$("#scan_patient_search1").val();
+		$("#scan_pid1").val('');
+		$("#scan_patient_search1").val('');
 		$("#savescan1_div").show('fast');
 		$("#scan_patient_search1").focus();
 	});
@@ -1605,7 +1635,7 @@ $(document).ready(function() {
 		url:"<?php echo site_url('provider/messaging/all_contacts');?>",
 		datatype: "json",
 		mtype: "POST",
-		colNames:['ID','Name','Specialty','Last Name','First Name','Prefix','Suffix','Facility','Street Address 1','Street Address 2','City','State','Zip','Phone','Fax','Email','Comments'],
+		colNames:['ID','Name','Specialty','Last Name','First Name','Prefix','Suffix','Facility','Street Address 1','Street Address 2','City','State','Zip','Phone','Fax','Email','Comments','NPI'],
 		colModel:[
 			{name:'address_id',index:'address_id',width:1,hidden:true},
 			{name:'displayname',index:'displayname',width:200},
@@ -1623,7 +1653,8 @@ $(document).ready(function() {
 			{name:'phone',index:'phone',width:100},
 			{name:'fax',index:'fax',width:100},
 			{name:'email',index:'email',width:1,hidden:true},
-			{name:'comments',index:'comments',width:1,hidden:true}
+			{name:'comments',index:'comments',width:1,hidden:true},
+			{name:'npi',index:'npi',width:1,hidden:true}
 		],
 		rowNum:20,
 		rowList:[10,20,30],
@@ -1737,6 +1768,33 @@ $(document).ready(function() {
 	$("#messaging_state").addOption({"AL":"Alabama","AK":"Alaska","AS":"America Samoa","AZ":"Arizona","AR":"Arkansas","CA":"California","CO":"Colorefo","CT":"Connecticut","DE":"Delaware","DC":"District of Columbia","FM":"Federated States of Micronesia","FL":"Florida","GA":"Georgia","GU":"Guam","HI":"Hawaii","ID":"Idaho","IL":"Illinois","IN":"Indiana","IA":"Iowa","KS":"Kansas","KY":"Kentucky","LA":"Louisiana","ME":"Maine","MH":"Marshall Islands","MD":"Maryland","MA":"Massachusetts","MI":"Michigan","MN":"Minnesota","MS":"Mississippi","MO":"Missouri","MT":"Montana","NE":"Nebraska","NV":"Nevada","NH":"New Hampshire","NJ":"New Jersey","NM":"New Mexico","NY":"New York","NC":"North Carolina","ND":"North Dakota","OH":"Ohio","OK":"Oklahoma","OR":"Oregon","PW":"Palau","PA":"Pennsylvania","PR":"Puerto Rico","RI":"Rhode Island","SC":"South Carolina","SD":"South Dakota","TN":"Tennessee","TX":"Texas","UT":"Utah","VT":"Vermont","VI":"Virgin Island","VA":"Virginia","WA":"Washington","WV":"West Virginia","WI":"Wisconsin","WY":"Wyoming"}, false);
 	$("#messaging_phone").mask("(999) 999-9999");
 	$("#messaging_fax").mask("(999) 999-9999");
+	$("#messaging_npi").autocomplete({
+		source: function (req, add){
+			$.ajax({
+				url: "<?php echo site_url('search/npi_lookup');?>",
+				dataType: "json",
+				type: "POST",
+				data: req,
+				success: function(data){
+					if(data.response =='true'){
+						add(data.message);
+					}				
+				}
+			});
+		},
+		minLength: 3,
+		open: function() { 
+			$('.ui-menu').width(300);
+		}
+	}).focus(function() {
+		var a = $("#messaging_lastname").val();
+		var b = $("#messaging_firstname").val();
+		var c = $("#messaging_state").val();
+		if (a != "" && b != "" && c != "") {
+			var q = a + "," + b + "," + c
+			$("#messaging_npi").autocomplete("search", q);
+		}
+	}).mask("9999999999");
 	$("#messaging_save_contact").button({
 		icons: {
 			primary: "ui-icon-disk"
@@ -1894,6 +1952,58 @@ $(document).ready(function() {
 			}
 		}
 	});
+	$("#messages_tags").tagit({
+		tagSource: function (req, add){
+			$.ajax({
+				url: "<?php echo site_url('search/search_tags');?>",
+				dataType: "json",
+				type: "POST",
+				data: req,
+				success: function(data){
+					if(data.response =='true'){
+						add(data.message);
+					}				
+				}
+			});
+		},
+		tagsChanged: function(a, b) {
+			if($("#internal_messages_form_id").is(":hidden")) {
+				var c = $("#message_view_message_id").val();
+			} else {
+				var c = $("#messages_message_id").val(); 
+			}
+			if (b == "added") {
+				$.ajax({
+					type: "POST",
+					url: "<?php echo site_url('search/save_tag/message_id') . '/';?>" + c,
+					data: 'tag=' + a
+				});
+			}
+			if (b == "popped") {
+				$.ajax({
+					type: "POST",
+					url: "<?php echo site_url('search/remove_tag/message_id') . '/';?>" + c,
+					data: 'tag=' + a
+				});
+			}
+		}
+	});
+	function messages_tags() {
+		$("#messages_tags").show();
+		if($("#internal_messages_form_id").is(":hidden")) {
+			var id = $("#message_view_message_id").val();
+		} else {
+			var id = $("#messages_message_id").val();
+		}
+		$.ajax({
+			type: "POST",
+			url: "<?php echo site_url('search/get_tags/message_id');?>" + "/" + id,
+			dataType: "json",
+			success: function(data){
+				$("#messages_tags").tagit("fill",data);
+			}
+		});
+	}
 });
 </script>
 <div id="heading2"></div>
@@ -1919,6 +2029,7 @@ $(document).ready(function() {
 						<div id="internal_outbox_pager" class="scroll" style="text-align:center;"></div>
 					</span>
 					<div id="internal_messages_dialog" title="Internal Message">
+						<ul id="messages_tags"></ul>
 						<form name="internal_messages_form" id="internal_messages_form_id" style="display: none">
 							<input type="hidden" name="message_id" id="messages_message_id"/>
 							<input type="hidden" name="pid" id="messages_pid">
@@ -1969,6 +2080,7 @@ $(document).ready(function() {
 							<input type="hidden" id="message_view_patient_name">
 							<input type="hidden" id="message_view_rawtext">
 							<input type="hidden" id="message_view_t_messages_id">
+							<input type="hidden" id="message_view_documents_id">
 							<hr class="ui-state-default"/>
 							<div id="message_view"></div>
 						</div>
@@ -2177,7 +2289,7 @@ $(document).ready(function() {
 		</form>
 	</div>
 </div>
-<div id="contacts_dialog" title="Add/Edit Entry for Address Book"><hr class="ui-state-default"/>
+<div id="contacts_dialog" title="Add/Edit Entry for Address Book">
 	<form id="messaging_contact_form">
 		<input type="hidden" name="address_id" id="messaging_address_id"/>
 		<table>
@@ -2209,7 +2321,7 @@ $(document).ready(function() {
 			<tr>
 				<td>Phone:<br><input type="text" name="phone" id="messaging_phone" style="width:164px" class="text ui-widget-content ui-corner-all"/></td>
 				<td>Fax:<br><input type="text" name="fax" id="messaging_fax" style="width:164px" class="text ui-widget-content ui-corner-all"/></td>
-				<td></td>
+				<td>NPI:<br><input type="text" name="npi" id="messaging_npi" style="width:164px" class="text ui-widget-content ui-corner-all"/></td>
 			</tr>
 			<tr>
 				<td colspan="3">Comments:<br><input type="text" name="comments" id="messaging_comments" style="width:500px" class="text ui-widget-content ui-corner-all"/></td>

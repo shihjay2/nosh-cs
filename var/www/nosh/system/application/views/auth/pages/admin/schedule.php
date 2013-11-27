@@ -115,23 +115,23 @@ $(document).ready(function() {
 					<input type="button" id="save_admin_schedule_tab1" value="Save" class="ui-button ui-state-default ui-corner-all">
 					<input type="button" id="save_admin_schedule_tab1a" value="Save and Continue" class="ui-button ui-state-default ui-corner-all">
 					<input type="button" id="cancel_admin_schedule_tab1" value="Cancel" class="ui-button ui-state-default ui-corner-all">
-					<hr />
+					<hr class="ui-state-default"/>
 					<table>
 						<tr>
 							<td>Include Weekends in the schedule:</td>
-							<td><input type="checkbox" name="weekends" id="weekends" value="Yes"/></td>
+							<td><input type="checkbox" name="weekends" id="weekends" value="Yes" class="text ui-widget-content ui-corner-all"/></td>
 						</tr>
 						<tr>
 							<td>First hour/time that will be displayed on the schedule:</td>
-							<td><input type="text" name="minTime" id="minTime" size="20" class="schedule_time" value="<?php if ($schedule->minTime != '') {echo $schedule->minTime;}?>"/></td>
+							<td><input type="text" name="minTime" id="minTime" size="20" class="schedule_time text ui-widget-content ui-corner-all" value="<?php if ($schedule->minTime != '') {echo $schedule->minTime;}?>"/></td>
 						</tr>
 						<tr>
 							<td>Last hour/time that will be displayed on the schedule:</td>
-							<td><input type="text" name="maxTime" id="maxTime" size="20" class="schedule_time" value="<?php if ($schedule->maxTime != '') {echo $schedule->maxTime;}?>"/></td>
+							<td><input type="text" name="maxTime" id="maxTime" size="20" class="schedule_time text ui-widget-content ui-corner-all" value="<?php if ($schedule->maxTime != '') {echo $schedule->maxTime;}?>"/></td>
 						</tr>
 					</table>
 					<br>
-					<h5>Clinic-wide operation hours</h5>
+					<strong>Clinic-wide operation hours</strong>
 					<table id="global_schedule" class="ui-widget ui-widget-content ui-corner-all">
 						<thead>
 							<tr class="ui-widget-header ui-corner-all">
@@ -144,44 +144,44 @@ $(document).ready(function() {
 						<tbody>
 							<tr>
 								<td>Sunday</td>
-								<td><input type="text" name="sun_o" id="sun_o" size="20" class="schedule_time" value="<?php if ($schedule->sun_o != '') {echo $schedule->sun_o;}?>"/></td>
-								<td><input type="text" name="sun_c" id="sun_c" size="20" class="schedule_time" value="<?php if ($schedule->sun_c != '') {echo $schedule->sun_c;}?>"/></td>
+								<td><input type="text" name="sun_o" id="sun_o" size="20" class="schedule_time text ui-widget-content ui-corner-all" value="<?php if ($schedule->sun_o != '') {echo $schedule->sun_o;}?>"/></td>
+								<td><input type="text" name="sun_c" id="sun_c" size="20" class="schedule_time text ui-widget-content ui-corner-all" value="<?php if ($schedule->sun_c != '') {echo $schedule->sun_c;}?>"/></td>
 								<td><input type="checkbox" id="sun_all" name="sun_all"/></td>
 							</tr>
 							<tr>
 								<td>Monday</td>
-								<td><input type="text" name="mon_o" id="mon_o" size="20" class="schedule_time" value="<?php if ($schedule->mon_o != '') {echo $schedule->mon_o;}?>"/></td>
-								<td><input type="text" name="mon_c" id="mon_c" size="20" class="schedule_time" value="<?php if ($schedule->mon_c != '') {echo $schedule->mon_c;}?>"/></td>
+								<td><input type="text" name="mon_o" id="mon_o" size="20" class="schedule_time text ui-widget-content ui-corner-all" value="<?php if ($schedule->mon_o != '') {echo $schedule->mon_o;}?>"/></td>
+								<td><input type="text" name="mon_c" id="mon_c" size="20" class="schedule_time text ui-widget-content ui-corner-all" value="<?php if ($schedule->mon_c != '') {echo $schedule->mon_c;}?>"/></td>
 								<td><input type="checkbox" id="mon_all" name="mon_all"/></td>
 							</tr>
 							<tr>
 								<td>Tuesday</td>
-								<td><input type="text" name="tue_o" id="tue_o" size="20" class="schedule_time" value="<?php if ($schedule->tue_o != '') {echo $schedule->tue_o;}?>"/></td>
-								<td><input type="text" name="tue_c" id="tue_c" size="20" class="schedule_time" value="<?php if ($schedule->tue_c != '') {echo $schedule->tue_c;}?>"/></td>
+								<td><input type="text" name="tue_o" id="tue_o" size="20" class="schedule_time text ui-widget-content ui-corner-all" value="<?php if ($schedule->tue_o != '') {echo $schedule->tue_o;}?>"/></td>
+								<td><input type="text" name="tue_c" id="tue_c" size="20" class="schedule_time text ui-widget-content ui-corner-all" value="<?php if ($schedule->tue_c != '') {echo $schedule->tue_c;}?>"/></td>
 								<td><input type="checkbox" id="tue_all" name="tue_all"/></td>
 							</tr>
 							<tr>
 								<td>Wednesday</td>
-								<td><input type="text" name="wed_o" id="wed_o" size="20" class="schedule_time" value="<?php if ($schedule->wed_o != '') {echo $schedule->wed_o;}?>"/></td>
-								<td><input type="text" name="wed_c" id="wed_c" size="20" class="schedule_time" value="<?php if ($schedule->wed_c != '') {echo $schedule->wed_c;}?>"/></td>
+								<td><input type="text" name="wed_o" id="wed_o" size="20" class="schedule_time text ui-widget-content ui-corner-all" value="<?php if ($schedule->wed_o != '') {echo $schedule->wed_o;}?>"/></td>
+								<td><input type="text" name="wed_c" id="wed_c" size="20" class="schedule_time text ui-widget-content ui-corner-all" value="<?php if ($schedule->wed_c != '') {echo $schedule->wed_c;}?>"/></td>
 								<td><input type="checkbox" id="wed_all" name="wed_all"/></td>
 							</tr>
 							<tr>
 								<td>Thursday</td>
-								<td><input type="text" name="thu_o" id="thu_o" size="20" class="schedule_time" value="<?php if ($schedule->thu_o != '') {echo $schedule->thu_o;}?>"/></td>
-								<td><input type="text" name="thu_c" id="thu_c" size="20" class="schedule_time" value="<?php if ($schedule->thu_c != '') {echo $schedule->thu_c;}?>"/></td>
+								<td><input type="text" name="thu_o" id="thu_o" size="20" class="schedule_time text ui-widget-content ui-corner-all" value="<?php if ($schedule->thu_o != '') {echo $schedule->thu_o;}?>"/></td>
+								<td><input type="text" name="thu_c" id="thu_c" size="20" class="schedule_time text ui-widget-content ui-corner-all" value="<?php if ($schedule->thu_c != '') {echo $schedule->thu_c;}?>"/></td>
 								<td><input type="checkbox" id="thu_all" name="thu_all"/></td>
 							</tr>
 							<tr>
 								<td>Friday</td>
-								<td><input type="text" name="fri_o" id="fri_o" size="20" class="schedule_time" value="<?php if ($schedule->fri_o != '') {echo $schedule->fri_o;}?>"/></td>
-								<td><input type="text" name="fri_c" id="fri_c" size="20" class="schedule_time" value="<?php if ($schedule->fri_c != '') {echo $schedule->fri_c;}?>"/></td>
+								<td><input type="text" name="fri_o" id="fri_o" size="20" class="schedule_time text ui-widget-content ui-corner-all" value="<?php if ($schedule->fri_o != '') {echo $schedule->fri_o;}?>"/></td>
+								<td><input type="text" name="fri_c" id="fri_c" size="20" class="schedule_time text ui-widget-content ui-corner-all" value="<?php if ($schedule->fri_c != '') {echo $schedule->fri_c;}?>"/></td>
 								<td><input type="checkbox" id="fri_all" name="fri_all"/></td>
 							</tr>
 							<tr>
 								<td>Saturday</td>
-								<td><input type="text" name="sat_o" id="sat_o" size="20" class="schedule_time" value="<?php if ($schedule->sat_o != '') {echo $schedule->sat_o;}?>"/></td>
-								<td><input type="text" name="sat_c" id="sat_c" size="20" class="schedule_time" value="<?php if ($schedule->sat_c != '') {echo $schedule->sat_c;}?>"/></td>
+								<td><input type="text" name="sat_o" id="sat_o" size="20" class="schedule_time text ui-widget-content ui-corner-all" value="<?php if ($schedule->sat_o != '') {echo $schedule->sat_o;}?>"/></td>
+								<td><input type="text" name="sat_c" id="sat_c" size="20" class="schedule_time text ui-widget-content ui-corner-all" value="<?php if ($schedule->sat_c != '') {echo $schedule->sat_c;}?>"/></td>
 								<td><input type="checkbox" id="sat_all" name="sat_all"/></td>
 							</tr>
 						</tbody>

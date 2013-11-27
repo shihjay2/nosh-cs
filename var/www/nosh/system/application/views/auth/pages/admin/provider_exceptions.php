@@ -16,6 +16,6 @@ $(document).ready(function() {
 });
 </script>
 
-Provider: <select id ="provider_list1" name="provider_list1"><?php if ($providers != '') {echo $providers;}?></select><br>
+Provider: <select id ="provider_list1" name="provider_list1" class="text ui-widget-content ui-corner-all"><?php if ($providers != '') {echo $providers;}?></select><br>
 <hr />
 <div id="provider_grid"></div>

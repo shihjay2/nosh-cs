@@ -26,7 +26,7 @@ LOGDIR=/var/log/nosh
 LOG=$LOGDIR/installation_log
 WEB=/var/www
 NOSH=$WEB/nosh
-TMPDIR=/tmp/nosh
+CONFIGDATABASEBACKUP=$NOSH/system/application/config/database_backup.php
 CONFIGDATABASE=$NOSH/system/application/config/database.php
 WEB_GROUP=www-data
 WEB_USER=www-data
@@ -36,6 +36,8 @@ NOSHFAX=/usr/bin/noshfax
 NOSHBACKUP=/usr/bin/noshbackup
 NOSHCRON=/etc/cron.d/nosh-cs
 INSTALL_VIEW=$NOSH/system/application/views/install.php
+FTPIMPORT=/srv/ftp/shared/import
+FTPEXPORT=/srv/ftp/shared/export
 
 log_only () {
 	echo "$1"
@@ -78,6 +80,38 @@ configure)
 	echo "0 0     * * *   root    /usr/bin/noshbackup" >> $NOSHCRON
 	chown root.root $NOSHCRON
 	chmod 644 $NOSHCRON
+	/bin/egrep  -i "^ftpshared" /etc/group
+	if [ $? -eq 0 ]; then
+		log_only "Group ftpshared already exists."
+	else
+		groupadd ftpshared
+		log_only "Group ftpshared does not exist.  Making group."
+	fi
+	if [ -d $FTPIMPORT ]; then
+		log_only "The NOSH ChartingSystem SFTP directories already exist."
+	else
+		mkdir -p $FTPIMPORT
+		mkdir -p $FTPEXPORT
+		chown -R root:ftpshared /srv/ftp/shared
+		chmod 755 /srv/ftp/shared
+		chmod -R 775 /srv/ftp/shared/import
+		chmod -R 775 /srv/ftp/shared/export
+		chmod g+s /srv/ftp/shared/import
+		chmod g+s /srv/ftp/shared/export
+		log_only "The NOSH ChartingSystem SFTP directories have been created."
+		/usr/bin/gpasswd -a www-data ftpshared
+		cp /etc/ssh/sshd_config /etc/ssh/sshd_config.bak
+		log_only "Backup of SSH config file created."
+		sed -i '/Subsystem/s/^/#/' /etc/ssh/sshd_config
+		echo 'Subsystem sftp internal-sftp' >> /etc/ssh/sshd_config
+		echo 'Match Group ftpshared' >> /etc/ssh/sshd_config
+		echo 'ChrootDirectory /srv/ftp/shared' >> /etc/ssh/sshd_config
+		echo 'X11Forwarding no' >> /etc/ssh/sshd_config
+		echo 'AllowTCPForwarding no' >> /etc/ssh/sshd_config
+		echo 'ForceCommand internal-sftp' >> /etc/ssh/sshd_config
+		log_only "SSH config file updated."
+	fi
+	
 	# Check to ensure the php configuration file exists
 	if [ -f $PHP ]; then
 		# Collect php variables from php.ini
@@ -139,9 +173,9 @@ configure)
 		log_only "post_max_size = 100M"
 	fi
 	# Check if there was a previous installation of NOSH ChartingSystem
-	if [ -d $TMPDIR ]; then
-		DEFAULTUSERNAME=$(get_settings \$default_db_username $TMPDIR/database.php)
-		DEFAULTPASSWORD=$(get_settings \$default_db_password $TMPDIR/database.php)
+	if [ -e $CONFIGDATABASEBACKUP ]; then
+		DEFAULTUSERNAME=$(get_settings \$default_db_username $CONFIGDATABASEBACKUP)
+		DEFAULTPASSWORD=$(get_settings \$default_db_password $CONFIGDATABASEBACKUP)
 		insert_settings "\$default_db_username" "\'$DEFAULTUSERNAME\';" $CONFIGDATABASE
 		insert_settings "\$default_db_password" "\'$DEFAULTPASSWORD\';" $CONFIGDATABASE
 		log_only "Imported previous settings in the Codeigniter database configuartion file."
@@ -153,8 +187,6 @@ configure)
 			chmod -R 777 "$NOSH_DIR"scans
 		fi
 		log_only "The NOSH ChartingSystem documents directory is secured."
-		rm -rf $TMPDIR
-		log_only "Temporary files have been removed."
 		log_only "You can now use your newly updated NOSH ChartingSystem!"
 	else
 		if db_get noshemr/documents_directory; then
@@ -190,6 +222,8 @@ configure)
 	fi
 	log_only "Restarting Apache service"
 	invoke-rc.d apache2 restart >> $LOG 2>&1
+	log_only "Restarting SSH server service"
+	invoke-rc.d ssh restart >> $LOG 2>&1
 ;;
 esac
 db_stop

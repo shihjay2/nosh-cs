@@ -14,9 +14,9 @@ $(document).ready(function() {
 		inactivity: 3600000,
 		noconfirm: 10000,
 		alive_url: '<?php echo site_url("billing/chartmenu");?>',
-		redirect_url: '<?php echo site_url("start");?>',
+		redirect_url: '<?php echo site_url("logout");?>',
 		logout_url: '<?php echo site_url("logout");?>',
-		sessionAlive: 300000
+		sessionAlive: false
 	});
 	$("#encounter_location").val("<?php echo $default_pos;?>");
 	$("#encounter_location").autocomplete({
@@ -151,6 +151,8 @@ $(document).ready(function() {
 		$("#messages_list_dialog").dialog('open');
 		$("#edit_message_fieldset").show('fast');
 		$("#t_messages_subject").focus();
+		$("#message_view").html('');
+		$("#messages_main_dialog").dialog('open');
 	});
 	$("#new_letter").click(function() {
 		$("#letter_dialog").dialog('open');

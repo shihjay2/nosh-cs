@@ -1332,9 +1332,9 @@
 		autoOpen: false, 
 		height: 575, 
 		width: 800, 
-		modal: true,
 		draggable: false,
 		resizable: false,
+		position: [293,43],
 		open: function() {
 			$("#pe_gen_accordion").accordion({
 				change: function(event, ui) {
@@ -1390,9 +1390,9 @@
 		autoOpen: false, 
 		height: 575, 
 		width: 800, 
-		modal: true,
 		draggable: false,
 		resizable: false,
+		position: [293,43],
 		open: function() {
 			$("#pe_eye_accordion").accordion({
 				change: function(event, ui) {
@@ -1451,9 +1451,9 @@
 		autoOpen: false, 
 		height: 575, 
 		width: 800, 
-		modal: true,
 		draggable: false,
 		resizable: false,
+		position: [293,43],
 		open: function() {
 			$("#pe_ent_accordion").accordion({
 				change: function(event, ui) {
@@ -1518,9 +1518,9 @@
 		autoOpen: false, 
 		height: 575, 
 		width: 800, 
-		modal: true,
 		draggable: false,
 		resizable: false,
+		position: [293,43],
 		open: function() {
 			$("#pe_neck_accordion").accordion({
 				change: function(event, ui) {
@@ -1577,9 +1577,9 @@
 		autoOpen: false, 
 		height: 575, 
 		width: 800, 
-		modal: true,
 		draggable: false,
 		resizable: false,
+		position: [293,43],
 		open: function() {
 			$("#pe_resp_accordion").accordion({
 				change: function(event, ui) {
@@ -1640,9 +1640,9 @@
 		autoOpen: false, 
 		height: 575, 
 		width: 800, 
-		modal: true,
 		draggable: false,
 		resizable: false,
+		position: [293,43],
 		open: function() {
 			$("#pe_cv_accordion").accordion({
 				change: function(event, ui) {
@@ -1707,9 +1707,9 @@
 		autoOpen: false, 
 		height: 575, 
 		width: 800, 
-		modal: true,
 		draggable: false,
 		resizable: false,
+		position: [293,43],
 		open: function() {
 			$("#pe_ch_accordion").accordion({
 				change: function(event, ui) {
@@ -1766,9 +1766,9 @@
 		autoOpen: false, 
 		height: 575, 
 		width: 800, 
-		modal: true,
 		draggable: false,
 		resizable: false,
+		position: [293,43],
 		open: function() {
 			$("#pe_gi_accordion").accordion({
 				change: function(event, ui) {
@@ -1829,9 +1829,9 @@
 		autoOpen: false, 
 		height: 575, 
 		width: 800, 
-		modal: true,
 		draggable: false,
 		resizable: false,
+		position: [293,43],
 		open: function() {
 			$("#pe_gu_accordion").accordion({
 				change: function(event, ui) {
@@ -1902,9 +1902,9 @@
 		autoOpen: false, 
 		height: 575, 
 		width: 800, 
-		modal: true,
 		draggable: false,
 		resizable: false,
+		position: [293,43],
 		open: function() {
 			$("#pe_lymph_accordion").accordion({
 				change: function(event, ui) {
@@ -1963,9 +1963,9 @@
 		autoOpen: false, 
 		height: 575, 
 		width: 800, 
-		modal: true,
 		draggable: false,
 		resizable: false,
+		position: [293,43],
 		open: function() {
 			$("#pe_ms_accordion").accordion({
 				change: function(event, ui) {
@@ -2042,9 +2042,9 @@
 		autoOpen: false, 
 		height: 575, 
 		width: 800, 
-		modal: true,
 		draggable: false,
 		resizable: false,
+		position: [293,43],
 		open: function() {
 			$("#pe_neuro_accordion").accordion({
 				change: function(event, ui) {
@@ -2103,9 +2103,9 @@
 		autoOpen: false, 
 		height: 575, 
 		width: 800, 
-		modal: true,
 		draggable: false,
 		resizable: false,
+		position: [293,43],
 		open: function() {
 			$("#pe_psych_accordion").accordion({
 				change: function(event, ui) {
@@ -2166,9 +2166,9 @@
 		autoOpen: false, 
 		height: 575, 
 		width: 800, 
-		modal: true,
 		draggable: false,
 		resizable: false,
+		position: [293,43],
 		open: function() {
 			$("#pe_skin_accordion").accordion({
 				change: function(event, ui) {

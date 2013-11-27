@@ -20,7 +20,7 @@ db_version 2.0
 LOGDIR=/var/log/nosh
 LOG=$LOGDIR/installation_log
 NOSH=/var/www/nosh
-TMPDIR=/tmp/nosh
+CONFIGDATABASEBACKUP=$NOSH/system/application/config/database_backup.php
 CONFIGDATABASE=$NOSH/system/application/config/database.php
 NOSHREMINDER=/usr/bin/noshreminder.php
 NOSHFAX=/usr/bin/fax.php
@@ -47,9 +47,8 @@ case "$1" in
 		rm -rf $NOSHFAX
 		rm -rf $NOSHREMINDER
 		if [ -d "$NOSH" ]; then
-			mkdir -p $TMPDIR
 			if [ -e "$CONFIGDATABASE" ]; then
-				cp -fr $CONFIGDATABASE $TMPDIR/database.php
+				cp -fr $CONFIGDATABASE $CONFIGDATABASEBACKUP
 				log_only "Backup of Codeigniter database configuration file"
 			fi
 		fi

@@ -292,7 +292,7 @@ class Encounters extends Application
 		}
 		$data['age1'] = $encounterInfo['encounter_age'];
 		$data['encounter_cc'] = nl2br($encounterInfo['encounter_cc']);	
-		$practiceInfo = $this->practiceinfo_model->get()->row_array();
+		$practiceInfo = $this->practiceinfo_model->get($this->session->userdata('practice_id'))->row_array();
 		$data['practiceName'] = $practiceInfo['practice_name'];
 		$data['website'] = $practiceInfo['website'];
 		$data['practiceInfo'] = $practiceInfo['street_address1'];
@@ -1123,7 +1123,8 @@ class Encounters extends Application
 			'encounter_condition_work' => $this->input->post('encounter_condition_work'),
 			'encounter_condition_auto' => $this->input->post('encounter_condition_auto'),
 			'encounter_condition_auto_state' => $this->input->post('encounter_condition_auto_state'),
-			'encounter_condition_other' => $this->input->post('encounter_condition_other')
+			'encounter_condition_other' => $this->input->post('encounter_condition_other'),
+			'practice_id' => $this->session->userdata('practice_id')
 		);
 
 		$this->encounters_model->updateEncounter($eid, $data);
@@ -2122,7 +2123,7 @@ class Encounters extends Application
 		if ($eid == FALSE) {
 			redirect('start');
 		}
-		$data['practiceInfo'] = $this->practiceinfo_model->get()->row();
+		$data['practiceInfo'] = $this->practiceinfo_model->get($this->session->userdata('practice_id'))->row();
 		$gender = $this->session->userdata('gender');
 		$agealldays = $this->session->userdata('agealldays');
 		if ($agealldays < 6574.5) {
@@ -3631,7 +3632,7 @@ class Encounters extends Application
 		} else {
 			$data['plan'] = '';
 		}		
-		$practice = $this->practiceinfo_model->get()->row();
+		$practice = $this->practiceinfo_model->get($this->session->userdata('practice_id'))->row();
 		$data['practiceName'] = $practice->practice_name;
 		$data['website'] = $practice->website;
 		$data['practiceInfo'] = $practice->street_address1;
@@ -3864,7 +3865,8 @@ class Encounters extends Application
 			if ($labsInfo->labs_ua_urobili != '' || $labsInfo->labs_ua_bilirubin != '' || $labsInfo->labs_ua_ketones != '' || $labsInfo->labs_ua_glucose != '' || $labsInfo->labs_ua_protein != '' || $labsInfo->labs_ua_nitrites != '' || $labsInfo->labs_ua_leukocytes != '' || $labsInfo->labs_ua_blood != '' || $labsInfo->labs_ua_ph != '' || $labsInfo->labs_ua_spgr != '' || $labsInfo->labs_ua_color != '' || $labsInfo->labs_ua_clarity != ''){
 				$cpt3 = '81002';
 				$this->db->where('cpt', $cpt3);
-				$query3 = $this->db->get('cpt');
+				$this->db->where('practice_id', $this->session->userdata('practice_id'));
+				$query3 = $this->db->get('cpt_relate');
 				$result3 = $query3->row_array();
 				$cpt_charge3 = $result3['cpt_charge'];
 				$cpt3 = array(
@@ -3878,7 +3880,8 @@ class Encounters extends Application
 					'icd_pointer' => $icd_pointer,
 					'unit' => '1',
 					'billing_group' => '1',
-					'modifier' => ''
+					'modifier' => '',
+					'practice_id' => $this->session->userdata('practice_id')
 				);
 				$this->db->insert('billing_core', $cpt3);
 				$this->audit_model->add();
@@ -3886,7 +3889,8 @@ class Encounters extends Application
 			if ($labsInfo->labs_upt != '') {
 				$cpt4 = '81025';
 				$this->db->where('cpt', $cpt4);
-				$query4 = $this->db->get('cpt');
+				$this->db->where('practice_id', $this->session->userdata('practice_id'));
+				$query4 = $this->db->get('cpt_relate');
 				$result4 = $query4->row_array();
 				$cpt_charge4 = $result4['cpt_charge'];
 				$cpt4 = array(
@@ -3900,7 +3904,8 @@ class Encounters extends Application
 					'icd_pointer' => $icd_pointer,
 					'unit' => '1',
 					'billing_group' => '1',
-					'modifier' => ''
+					'modifier' => '',
+					'practice_id' => $this->session->userdata('practice_id')
 				);
 				$this->db->insert('billing_core', $cpt4);
 				$this->audit_model->add();
@@ -3908,7 +3913,8 @@ class Encounters extends Application
 			if ($labsInfo->labs_strep != '') {
 				$cpt5 = '87880';
 				$this->db->where('cpt', $cpt5);
-				$query5 = $this->db->get('cpt');
+				$this->db->where('practice_id', $this->session->userdata('practice_id'));
+				$query5 = $this->db->get('cpt_relate');
 				$result5 = $query5->row_array();
 				$cpt_charge5 = $result5['cpt_charge'];
 				$cpt5 = array(
@@ -3922,7 +3928,8 @@ class Encounters extends Application
 					'icd_pointer' => $icd_pointer,
 					'unit' => '1',
 					'billing_group' => '1',
-					'modifier' => ''
+					'modifier' => '',
+					'practice_id' => $this->session->userdata('practice_id')
 				);
 				$this->db->insert('billing_core', $cpt5);
 				$this->audit_model->add();
@@ -3930,7 +3937,8 @@ class Encounters extends Application
 			if ($labsInfo->labs_mono != '') {
 				$cpt6 = '86308';
 				$this->db->where('cpt', $cpt6);
-				$query6 = $this->db->get('cpt');
+				$this->db->where('practice_id', $this->session->userdata('practice_id'));
+				$query6 = $this->db->get('cpt_relate');
 				$result6 = $query6->row_array();
 				$cpt_charge6 = $result6['cpt_charge'];
 				$cpt6 = array(
@@ -3944,7 +3952,8 @@ class Encounters extends Application
 					'icd_pointer' => $icd_pointer,
 					'unit' => '1',
 					'billing_group' => '1',
-					'modifier' => ''
+					'modifier' => '',
+					'practice_id' => $this->session->userdata('practice_id')
 				);
 				$this->db->insert('billing_core', $cpt6);
 				$this->audit_model->add();
@@ -3952,7 +3961,8 @@ class Encounters extends Application
 			if ($labsInfo->labs_flu != '') {
 				$cpt7 = '87804';
 				$this->db->where('cpt', $cpt7);
-				$query7 = $this->db->get('cpt');
+				$this->db->where('practice_id', $this->session->userdata('practice_id'));
+				$query7 = $this->db->get('cpt_relate');
 				$result7 = $query7->row_array();
 				$cpt_charge7 = $result7['cpt_charge'];
 				$cpt7 = array(
@@ -3966,7 +3976,8 @@ class Encounters extends Application
 					'icd_pointer' => $icd_pointer,
 					'unit' => '1',
 					'billing_group' => '1',
-					'modifier' => ''
+					'modifier' => '',
+					'practice_id' => $this->session->userdata('practice_id')
 				);
 				$this->db->insert('billing_core', $cpt7);
 				$this->audit_model->add();
@@ -3974,7 +3985,8 @@ class Encounters extends Application
 			if ($labsInfo->labs_glucose != '') {
 				$cpt8 = '82962';
 				$this->db->where('cpt', $cpt8);
-				$query8 = $this->db->get('cpt');
+				$this->db->where('practice_id', $this->session->userdata('practice_id'));
+				$query8 = $this->db->get('cpt_relate');
 				$result8 = $query8->row_array();
 				$cpt_charge8 = $result8['cpt_charge'];
 				$cpt9 = array(
@@ -3988,7 +4000,8 @@ class Encounters extends Application
 					'icd_pointer' => $icd_pointer,
 					'unit' => '1',
 					'billing_group' => '1',
-					'modifier' => ''
+					'modifier' => '',
+					'practice_id' => $this->session->userdata('practice_id')
 				);
 				$this->db->insert('billing_core', $cpt9);
 				$this->audit_model->add();
@@ -3998,7 +4011,8 @@ class Encounters extends Application
 		if ($query9->num_rows() > 0) {
 			$result9 = $query9->row_array();
 			$this->db->where('cpt', $result9['proc_cpt']);
-			$query10 = $this->db->get('cpt');
+			$this->db->where('practice_id', $this->session->userdata('practice_id'));
+			$query10 = $this->db->get('cpt_relate');
 			$result10 = $query10->row_array();
 			$cpt_charge10 = $result10['cpt_charge'];
 			$cpt10 = array(
@@ -4023,7 +4037,8 @@ class Encounters extends Application
 			$result11 = $query11->result_array();
 			foreach ($result11 as $row11) {
 				$this->db->where('cpt', $row11['cpt']);
-				$query12 = $this->db->get('cpt');
+				$this->db->where('practice_id', $this->session->userdata('practice_id'));
+				$query12 = $this->db->get('cpt_relate');
 				$result12 = $query12->row_array();
 				if ($query12->num_rows() > 0) {
 					$cpt_charge12 = $result12['cpt_charge'];
@@ -4058,7 +4073,7 @@ class Encounters extends Application
 		$limit = $this->input->post('rows');
 		$sidx = 'billing_core.' . $this->input->post('sidx');
 		$sord = $this->input->post('sord');
-		$query = $this->db->query("SELECT * FROM billing_core JOIN cpt ON billing_core.cpt=cpt.cpt WHERE eid=$eid");
+		$query = $this->db->query("SELECT billing_core.*, cpt_relate.cpt_description FROM billing_core JOIN cpt_relate ON billing_core.cpt=cpt_relate.cpt WHERE billing_core.eid=$eid");
 		$count = $query->num_rows(); 
 		if($count > 0) { 
 			$total_pages = ceil($count/$limit); 
@@ -4068,7 +4083,7 @@ class Encounters extends Application
 		if ($page > $total_pages) $page=$total_pages;
 		$start = $limit*$page - $limit;
 		if($start < 0) $start = 0;
-		$query1 = $this->db->query("SELECT * FROM billing_core JOIN cpt ON billing_core.cpt=cpt.cpt WHERE eid=$eid ORDER BY $sidx $sord LIMIT $start , $limit");
+		$query1 = $this->db->query("SELECT billing_core.*, cpt_relate.cpt_description FROM billing_core JOIN cpt_relate ON billing_core.cpt=cpt_relate.cpt WHERE billing_core.eid=$eid ORDER BY $sidx $sord LIMIT $start , $limit");
 		$response['page'] = $page;
 		$response['total'] = $total_pages;
 		$response['records'] = $count;
@@ -4139,10 +4154,23 @@ class Encounters extends Application
 		);
 		$cpt = $this->input->post('cpt');
 		$this->db->where('cpt', $cpt);
-		$this->db->update('cpt', $data);
-		$this->audit_model->update();
-		$arr = 'CPT charge updated!';
-		echo $arr;
+		$this->db->where('practice_id', $this->session->userdata('practice_id'));
+		$query = $this->db->get('cpt_relate');
+		if ($query->num_rows() > 0) {
+			$row = $query->row_array();
+			$this->db->where('cpt_relate_id', $row['cpt_relate_id']);
+			$this->db->update('cpt_relate', $data);
+			$this->audit_model->update();
+		} else {
+			$this->db->where('cpt', $cpt);
+			$row1 = $this->db->get('cpt')->row_array();
+			$data['cpt_description'] = $row1['cpt_description'];
+			$data['cpt'] = $row1['cpt'];
+			$data['practice_id'] = $this->session->userdata('practice_id');
+			$this->db->insert('cpt_relate', $data);
+			$this->audit_model->add();
+		}
+		echo 'CPT charge updated!';
 		exit( 0 );
 	}
 	
@@ -4184,7 +4212,8 @@ class Encounters extends Application
 			'dos_f' => $this->input->post('dos_f'),
 			'dos_t' => $this->input->post('dos_t'),
 			'payment' => '0',
-			'billing_group' => $billing_group
+			'billing_group' => $billing_group,
+			'practice_id' => $this->session->userdata('practice_id')
 		);
 							
 		if ($count > 0) {		
@@ -5290,7 +5319,7 @@ class Encounters extends Application
 		}
 		$this->db->where('pid', $pid);
 		$row = $this->db->get('demographics')->row_array();
-		$practice = $this->practiceinfo_model->get()->row();
+		$practice = $this->practiceinfo_model->get($this->session->userdata('practice_id'))->row();
 		$data['practiceName'] = $practice->practice_name;
 		$data['practiceInfo1'] = $practice->street_address1;
 		if ($practice->street_address2 != '') {

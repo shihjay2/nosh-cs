@@ -54,11 +54,22 @@ class Messaging extends Application
 			$row1 = $this->db->query("SELECT displayname FROM users WHERE id=$user_id")->row_array();
 			$displayname = $row1['displayname'] . ' (' . $row['message_from'] . ')';
 			$response['rows'][$i]['id']=$row['message_id']; 
-			$response['rows'][$i]['cell']=array($row['message_id'],$row['message_to'],$row['date'],$row['message_from'],$displayname,$row['subject'],$row['body'],$row['cc'],$row['pid'],$row['patient_name'],$bodytext,$row['t_messages_id']);
+			$response['rows'][$i]['cell']=array($row['message_id'],$row['message_to'],$row['read'],$row['date'],$row['message_from'],$displayname,$row['subject'],$row['body'],$row['cc'],$row['pid'],$row['patient_name'],$bodytext,$row['t_messages_id']);
 			$i++; 
 		}
 		echo json_encode($response);
 		exit( 0 );
+	}
+	
+	function read_message($id)
+	{
+		$data = array(
+			'read' => 'y'
+		);
+		$this->db->where('message_id', $id);
+		$this->db->update('messaging', $data);
+		$this->audit_model->update();
+		echo "Message read.";
 	}
 	
 	function get_displayname()
@@ -147,7 +158,8 @@ class Messaging extends Application
 					'body' => $this->input->post('body'),
 					't_messages_id' => $t_messages_id,
 					'status' => 'Sent',
-					'mailbox' => $mailbox_row
+					'mailbox' => $mailbox_row,
+					'practice_id' => $this->session->userdata('practice_id')
 				);
 				$this->messaging_model->add($data);
 				$this->audit_model->add();
@@ -162,7 +174,8 @@ class Messaging extends Application
 			'subject' => $subject,
 			'body' => $this->input->post('body'),
 			'status' => 'Sent',
-			'mailbox' => '0'
+			'mailbox' => '0',
+			'practice_id' => $this->session->userdata('practice_id')
 		);
 		if ($message_id != '') {
 			$this->messaging_model->update($message_id, $data1a);
@@ -204,7 +217,8 @@ class Messaging extends Application
 			'subject' => $this->input->post('subject'),
 			'body' => $this->input->post('body'),
 			'status' => 'Draft',
-			'mailbox' => '0'
+			'mailbox' => '0',
+			'practice_id' => $this->session->userdata('practice_id')
 		);
 		if ($message_id != '') {
 			$this->messaging_model->update($message_id, $data);

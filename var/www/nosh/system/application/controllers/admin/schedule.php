@@ -18,14 +18,14 @@ class Schedule extends Application
 
 	function index()
 	{
-		$scheduleInfo = $this->practiceinfo_model->get();
+		$scheduleInfo = $this->practiceinfo_model->get($this->session->userdata('practice_id'));
 		$data['schedule'] = $scheduleInfo->row();
 		$this->auth->view('admin/schedule', $data);
 	}
 	
 	function visit_types()
 	{
-		$calendarInfo = $this->practiceinfo_model->get_calendar_settings();
+		$calendarInfo = $this->practiceinfo_model->get_calendar_settings($this->session->userdata('practice_id'));
 		$data['calendar'] = $calendarInfo->row();
 		$this->load->view('auth/pages/admin/visit_types', $data);
 	}
@@ -42,7 +42,7 @@ class Schedule extends Application
 	
 	function exceptions()
 	{
-		$query = $this->practiceinfo_model->getProviders();
+		$query = $this->practiceinfo_model->getProviders($this->session->userdata('practice_id'));
 		
 		$data['providers'] = '<option value="">Choose...</option>';
 		if ($query->num_rows() > 0) {
@@ -67,7 +67,7 @@ class Schedule extends Application
 	
 	function provider()
 	{
-		$query = $this->practiceinfo_model->getProviders();
+		$query = $this->practiceinfo_model->getProviders($this->session->userdata('practice_id'));
 		
 		$data['providers'] = '<option value="">Choose...</option>';
 		if ($query->num_rows() > 0) {
@@ -87,7 +87,7 @@ class Schedule extends Application
 	
 	function schedule_view()
 	{
-		$query1 = $this->practiceinfo_model->get();
+		$query1 = $this->practiceinfo_model->get($this->session->userdata('practice_id'));
 		$schedule = $query1->row();
 		if ($schedule->weekends == 'yes') {
 			$data['weekends'] = 'true';
@@ -100,6 +100,7 @@ class Schedule extends Application
 		
 		$this->db->select('visit_type');
 		$this->db->where('active', 'y');
+		$this->db->where('practice_id', $this->session->userdata('practice_id'));
 		$query2 = $this->db->get('calendar');
 		$data['visit_type_select'] = '<option value = "">None</option>';
 		if ($query2->num_rows() > 0) {
@@ -159,9 +160,9 @@ class Schedule extends Application
 			'sat_o' => $sat_o,
 			'sat_c' => $sat_c
 		);
-		
-		$this->practiceinfo_model->update($data);
-		
+		$this->db->where('practice_id', $this->session->userdata('practice_id'));
+		$this->db->update('practiceinfo', $data);
+		$this->audit_model->update();
 		$result = 'Practice Schedule Updated';
 		echo $result;
 	}
@@ -244,11 +245,12 @@ class Schedule extends Application
 	
 	function visit_type_list()
 	{
+		$practice_id = $this->session->userdata('practice_id');
 		$page = $this->input->post('page');
 		$limit = $this->input->post('rows');
 		$sidx = $this->input->post('sidx');
 		$sord = $this->input->post('sord');
-		$query = $this->db->query("SELECT * FROM calendar WHERE active = 'y'");
+		$query = $this->db->query("SELECT * FROM calendar WHERE active='y' AND practice_id=$practice_id");
 		$count = $query->num_rows(); 
 		if($count > 0) { 
 			$total_pages = ceil($count/$limit); 
@@ -258,7 +260,7 @@ class Schedule extends Application
 		if ($page > $total_pages) $page=$total_pages;
 		$start = $limit*$page - $limit;
 		if($start < 0) $start = 0;
-		$query1 = $this->db->query("SELECT * FROM calendar WHERE active = 'y' ORDER BY $sidx $sord LIMIT $start , $limit");
+		$query1 = $this->db->query("SELECT * FROM calendar WHERE active='y' AND practice_id=$practice_id ORDER BY $sidx $sord LIMIT $start , $limit");
 		$response['page'] = $page;
 		$response['total'] = $total_pages;
 		$response['records'] = $count;
@@ -274,7 +276,8 @@ class Schedule extends Application
 			'visit_type' => $this->input->post('visit_type'),
 			'duration' => $this->input->post('duration'),
 			'classname' => $this->input->post('classname'),
-			'active' => 'y'
+			'active' => 'y',
+			'practice_id' => $this->session->userdata('practice_id')
 		);
 		$action = $this->input->post('oper');
 		if ($action == 'edit') {
@@ -368,6 +371,7 @@ class Schedule extends Application
 			if ($row['visit_type'] != '') {
 				$this->db->select('classname');
 				$this->db->where('visit_type', $row['visit_type']);
+				$this->db->where('practice_id', $this->session->userdata('practice_id'));
 				$query1 = $this->db->get('calendar');
 				$row1 = $query1->row_array();
 				$classname = $row1['classname'];
@@ -479,7 +483,7 @@ class Schedule extends Application
 			}
 		}
 		
-		$query3 = $this->practiceinfo_model->get();
+		$query3 = $this->practiceinfo_model->get($this->session->userdata('practice_id'));
 		if ($query3->num_rows() > 0) {
 			foreach ($query3->result_array() as $row3) {
 				$sun_o = $row3['sun_o'];
@@ -607,6 +611,7 @@ class Schedule extends Application
 			$this->db->select('duration');
 			$this->db->where('visit_type', $visit_type);
 			$this->db->where('active','y');
+			$this->db->where('practice_id', $this->session->userdata('practice_id'));
 			$query = $this->db->get('calendar');
 			$row = $query->row_array();
 			$end = $start + $row['duration'];
@@ -752,6 +757,7 @@ class Schedule extends Application
 			if ($row['visit_type'] != '') {
 				$this->db->select('classname');
 				$this->db->where('visit_type', $row['visit_type']);
+				$this->db->where('practice_id', $this->session->userdata('practice_id'));
 				$query1 = $this->db->get('calendar');
 				$row1 = $query1->row_array();
 				$classname = $row1['classname'];

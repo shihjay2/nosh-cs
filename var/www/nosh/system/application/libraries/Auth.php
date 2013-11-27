@@ -9,7 +9,8 @@ ob_start();
 * @link http://adamgriffiths.co.uk
 * @version 1.0.6
 * @copyright Adam Griffiths 2009
-*
+* 
+* Modified for NOSH ChartingSystem by Michael Shihjay Chen
 * Auth provides a powerful, lightweight and simple interface for user authentication 
 */
 
@@ -105,17 +106,19 @@ class Auth
 	* @access public
 	* @param string
 	*/
-	function login($redirect = NULL)
+	//function login($redirect = NULL)
+	function login($practicehandle='')
 	{
-		if($redirect === NULL)
-		{
-			$redirect = $this->config['auth_login'];
-		}
+		//if($redirect === NULL)
+		//{
+			//$redirect = $this->config['auth_login'];
+		//}
 
 			
 		$this->CI->form_validation->set_rules('username', 'Username', 'trim|required|min_length[4]|max_length[40]|callback_username_check');
 		$this->CI->form_validation->set_rules('password', 'Password', 'trim|required|min_length[4]|max_length[12]');
 		$this->CI->form_validation->set_rules('remember', 'Remember Me');
+		$this->CI->form_validation->set_rules('practice_id', 'Practice ID');
 
 		if($this->CI->form_validation->run() == FALSE)
 		{
@@ -125,7 +128,16 @@ class Auth
 			}
 			else
 			{
-				$this->view('login');
+				$practice_result = array(
+					'practice_id' => '1'
+				);
+				if ($practicehandle != '') {
+					$practice_query = $this->CI->db->query("SELECT * FROM practiceinfo WHERE practicehandle=$practicehandle");
+					if ($practice_query->num_rows() > 0) {
+						$practice_result = $practice_query->row_array();
+					}
+				}
+				$this->view('login', $practice_result);
 			}
 		}
 		else
@@ -134,14 +146,15 @@ class Auth
 			$auth_type = $this->_auth_type($username);
 			$password = $this->_salt(set_value('password'));
 			$email = set_value('email');
-
-			if(!$this->_verify_details($auth_type, $username, $password))
+			$practice_id = set_value('practice_id');
+			
+			if(!$this->_verify_details($auth_type, $username, $password, $practice_id))
 			{
 				//show_error($this->CI->lang->line('login_details_error'));
 				$redirect = $this->config['auth_incorrect_login'];
 				redirect($redirect);
 			}
-
+			$redirect = $this->config['auth_login'];
 			$userdata = $this->CI->db->query("SELECT * FROM `$this->user_table` WHERE `$auth_type` = '$username'");
 			$row = $userdata->row_array();
 			
@@ -150,7 +163,8 @@ class Auth
 						'username' => $row['username'],
 						'user_id' => $row['id'],
 						'group_id' => $row['group_id'],
-						'logged_in' => TRUE
+						'logged_in' => TRUE,
+						'practice_id' => $row['practice_id']
 						);
 			$this->CI->session->set_userdata($data);
 
@@ -320,9 +334,9 @@ class Auth
 	* @access private
 	* @param string
 	*/
-	function _verify_details($auth_type, $username, $password)
+	function _verify_details($auth_type, $username, $password, $practice_id)
 	{
-		$query = $this->CI->db->query("SELECT * FROM `$this->user_table` WHERE `$auth_type` = '$username' AND `password` = '$password' AND `active` = '1'");
+		$query = $this->CI->db->query("SELECT * FROM `$this->user_table` WHERE `$auth_type` = '$username' AND `password` = '$password' AND `active` = '1' AND `practice_id`='$practice_id'");
 		
 		if($query->num_rows != 1)
 		{

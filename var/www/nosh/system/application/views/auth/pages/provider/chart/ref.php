@@ -15,7 +15,7 @@
 	<div id="messages_ref_edit_fields">
 		<button type="button" id="messages_ref_save">Save</button>
 		<button type="button" id="messages_ref_cancel">Cancel</button>
-		<div style="float:right;" "id="messages_ref_status"></div>
+		<div style="float:right;" id="messages_ref_status"></div>
 		<hr class="ui-state-default"/>
 		<input type="hidden" name="orders_id" id="messages_ref_orders_id"/>
 		<input type="hidden" name="t_messages_id" id="messages_ref_t_messages_id"/>
@@ -226,28 +226,35 @@
 					var insurance_group = jQuery("#messages_ref_insurance_grid").getCell(id,'insurance_group');
 					var insurance_insu_lastname = jQuery("#messages_ref_insurance_grid").getCell(id,'insurance_insu_lastname');
 					var insurance_insu_firstname = jQuery("#messages_ref_insurance_grid").getCell(id,'insurance_insu_firstname');
-					var text = insurance_plan_name + '; ID: ' + insurance_id_num;
-					if(insurance_group != ''){
-						text += "; Group: " + insurance_group;
-					}
-					text += "; " + insurance_insu_lastname + ", " + insurance_insu_firstname;
-					var old = $("#messages_ref_insurance").val();
-					if(old){
-						var pos = old.lastIndexOf('\n');
-						if (pos == -1) {
-							var old1 = old + '\n';
-						} else {
-							var a = old.slice(pos);
-							if (a == '') {
-								var old1 = old;
-							} else {
-								var old1 = old + '\n';
+					var address_id = jQuery("#messages_ref_insurance_grid").getCell(id,'address_id');
+					$.ajax({
+						url: "<?php echo site_url('search/payor_id');?>/" + address_id,
+						type: "POST",
+						success: function(data){
+							var text = insurance_plan_name + '; Payor ID: ' + data + '; ID: ' + insurance_id_num;
+							if(insurance_group != ''){
+								text += "; Group: " + insurance_group;
 							}
+							text += "; " + insurance_insu_lastname + ", " + insurance_insu_firstname;
+							var old = $("#messages_ref_insurance").val();
+							if(old){
+								var pos = old.lastIndexOf('\n');
+								if (pos == -1) {
+									var old1 = old + '\n';
+								} else {
+									var a = old.slice(pos);
+									if (a == '') {
+										var old1 = old;
+									} else {
+										var old1 = old + '\n';
+									}
+								}
+							} else {
+								var old1 = '';
+							}
+							$("#messages_ref_insurance").val(old1+text);
 						}
-					} else {
-						var old1 = '';
-					}
-					$("#messages_ref_insurance").val(old1+text);
+					});
 				},
 			 	jsonReader: { repeatitems : false, id: "0" }
 			}).navGrid('#messages_ref_insurance_pager',{search:false,edit:false,add:false,del:false});

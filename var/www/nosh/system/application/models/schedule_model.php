@@ -11,6 +11,7 @@ class Schedule_model extends Model {
 
 	function get_calendar_settings()
 	{
+		$this->db->where('practice_id', $this->session->userdata('practice_id'));
 		return $this->db->get('calendar');
 	}
 	

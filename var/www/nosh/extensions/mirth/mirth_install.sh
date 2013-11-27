@@ -121,7 +121,7 @@ if [ "$JAVA" == "Java(TM)SERuntimeEnvironment" ]; then
 	log_only "Removed temporary files."
 	invoke-rc.d mcservice start >> $LOG 2>&1
 	log_only "You can now administer Mirth by browsing to: http://localhost:8080."
-	exit 1
+	exit 0
 else
 	echo "Exiting...Wrong version of the JAVA runtime environment.  You must install the Oracle JAVA JRE before proceeding."
 	exit 1
