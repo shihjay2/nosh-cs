@@ -105,7 +105,7 @@ class Front extends Controller {
 		if ($row1['version'] < "1.7.2") {
 			$this->system_update1_7_2();
 		}
-		$this->run();
+		//$this->run();
 		redirect('start/' . $practicehandle);
 	}
 	
@@ -1396,12 +1396,6 @@ class Front extends Controller {
 	{
 		$this->load->dbforge();
 		$this->load->database();
-		if (!$this->db->field_exists('practice_id','tests')) {
-			$tests_definition = array(
-				'practice_id' => array('type' => 'INT', 'constraint' => 11)
-			);
-			$this->dbforge->add_column('tests', $tests_definition);
-		}
 	}
 }
 
