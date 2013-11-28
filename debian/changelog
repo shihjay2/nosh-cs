@@ -1,3 +1,9 @@
+nosh-cs (1.7.2-0ubuntu4) precise; urgency=low
+
+  * Fixed - Upgrade error in front.php.
+
+ -- Michael Shihjay Chen <shihjay2@gmail.com>  Thu, 28 Nov 2013 00:09:26 -0800
+
 nosh-cs (1.7.2-0ubuntu3) precise; urgency=low
 
   * Fixed - Post installation errors if ftpshared group does not exist.
