@@ -80,12 +80,11 @@ configure)
 	echo "0 0     * * *   root    /usr/bin/noshbackup" >> $NOSHCRON
 	chown root.root $NOSHCRON
 	chmod 644 $NOSHCRON
-	/bin/egrep  -i "^ftpshared" /etc/group
-	if [ $? -eq 0 ]; then
-		log_only "Group ftpshared already exists."
-	else
+	if ! getent group "ftpshared" > /dev/null 2>&1 ; then
 		groupadd ftpshared
 		log_only "Group ftpshared does not exist.  Making group."
+	else
+		log_only "Group ftpshared already exists."
 	fi
 	if [ -d $FTPIMPORT ]; then
 		log_only "The NOSH ChartingSystem SFTP directories already exist."
