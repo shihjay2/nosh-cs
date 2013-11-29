@@ -1,3 +1,9 @@
+nosh-cs (1.7.2-0ubuntu6) precise; urgency=low
+
+  * Fixed - Upgrade errors where incorrect table column is entered for messaging.
+
+ -- Michael Shihjay Chen <shihjay2@gmail.com>  Fri, 29 Nov 2013 14:18:31 -0800
+
 nosh-cs (1.7.2-0ubuntu4) precise; urgency=low
 
   * Fixed - Upgrade error in front.php.
