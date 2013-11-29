@@ -105,7 +105,7 @@ class Front extends Controller {
 		if ($row1['version'] < "1.7.2") {
 			$this->system_update1_7_2();
 		}
-		//$this->run();
+		$this->run();
 		redirect('start/' . $practicehandle);
 	}
 	
@@ -1382,7 +1382,7 @@ class Front extends Controller {
 		if (!$this->db->field_exists('read','messaging')) {
 			$messaging_definition = array(
 				'read' => array('type' => 'VARCHAR', 'constraint' => 4),
-				'tests_id' => array('type' => 'INT', 'constraint' => 11)
+				'documents_id' => array('type' => 'INT', 'constraint' => 11)
 			);
 			$this->dbforge->add_column('messaging', $messaging_definition);
 		}
@@ -1396,6 +1396,16 @@ class Front extends Controller {
 	{
 		$this->load->dbforge();
 		$this->load->database();
+		if (!$this->db->field_exists('documents_id','messaging')) {
+			$fields = array(
+				'tests_id' => array(
+					'name' => 'documents_id',
+					'type' => 'INT',
+					'constraint' => 11
+				),
+			);
+			$this->dbforge->modify_column('messaging', $fields);
+		}
 	}
 }
 
