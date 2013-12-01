@@ -55,7 +55,7 @@ class Install extends Controller {
 			$db_password = set_value('db_password');
 			$smtp_user = set_value('smtp_user');
 			$smtp_pass = set_value('smtp_pass');
-			$con = mysql_connect("localhost",$db_username,$db_password);
+			$con = mysqli_connect("localhost",$db_username,$db_password);
 			if (!$con){
 				die('Could not connect: ' . mysql_error());
 			}
@@ -63,7 +63,7 @@ class Install extends Controller {
 			if (!$create) {
 				die('Error creating database: ' . mysql_error());
 			}
-			mysql_close($con);
+			mysqli_close($con);
 			$filename = '/var/www/nosh/system/application/config/database.php';
 			$str = file_get_contents($filename);
 			$fp = fopen($filename,'w');
@@ -1478,25 +1478,6 @@ class Install extends Controller {
 		include(APPPATH.'config/database'.EXT);
 		$orderslist1_command = "mysql -u " . $db['default']['username']. " -p". $db['default']['password'] . " nosh < " . $orderslist1_sql_file;
 		system($orderslist1_command);
-		//$orderslist1_csv = "/var/www/nosh/import/peacehealth.csv";
-		//if (($orderslist1_handle = fopen($orderslist1_csv, "r")) !== FALSE) {
-			//while (($orderslist1 = fgetcsv($orderslist1_handle, 0, ";")) !== FALSE) {
-				//if ($orderslist1[0] != '') {
-					//$orderslist1_data = array (
-						//'orders_code' => $orderslist1[0],
-						//'orders_category' => 'Laboratory',
-						//'orders_vendor' => 'PeaceHealth',
-						//'cpt' => ltrim($orderslist1[8]),
-						//'orders_description' => $orderslist1[1],
-						//'result_code' => $orderslist1[2],
-						//'result_name' => $orderslist1[3],
-						//'units' => $orderslist1[9]
-					//);
-					//$this->db->insert('orderslist1', $orderslist1_data);
-				//}
-			//}
-			//fclose($orderslist1_csv);
-		//}
 		
 		// Insert Administrator
 		$data1 = array(

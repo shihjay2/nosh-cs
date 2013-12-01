@@ -1,3 +1,10 @@
+nosh-cs (1.7.2-0ubuntu7) precise; urgency=low
+
+  * Update - Updated system to use mysqli driver instead of mysql as it is depreciated as of PHP 5.5.
+  * Fixed - Script error for postinstall if apache ssl is enabled.
+
+ -- Michael Shihjay Chen <shihjay2@gmail.com>  Sat, 30 Nov 2013 20:20:47 -0800
+
 nosh-cs (1.7.2-0ubuntu6) precise; urgency=low
 
   * Fixed - Upgrade errors where incorrect table column is entered for messaging.

@@ -14,11 +14,11 @@ class Front extends Controller {
 		if ($db['default']['username'] === "") {
 			redirect('install');
 		}
-		$link = mysql_connect('localhost', $db['default']['username'], $db['default']['password']);
+		$link = mysqli_connect('localhost', $db['default']['username'], $db['default']['password']);
 		if (!$link) {
 			redirect('install/fix_db_conn');
 		}
-		$db_selected = mysql_select_db('nosh', $link);
+		$db_selected = mysqli_select_db('nosh', $link);
 		if (!$db_selected) {
 			redirect('install');
 		} else {

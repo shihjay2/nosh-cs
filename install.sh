@@ -209,7 +209,7 @@ else
 		log_only "The NOSH ChartingSystem documents directory is secured."
 	fi
 	# Set up SSL for Apache server
-	if [ ! -f /etc/apache2/sites-enabled/default-ssl ]; then
+	if ! [ -L /etc/apache2/sites-enabled/default-ssl ]; then
 		log_only "Setting up Apache to use SSL"
 		ln -s /etc/apache2/sites-available/default-ssl /etc/apache2/sites-enabled/default-ssl
 	fi

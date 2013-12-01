@@ -815,6 +815,30 @@ class Setup extends Application
 		}
 		echo $link3;
 	}
+	
+	function peacehealth_update()
+	{
+		$this->db->truncate('orderslist1');
+		$orderslist1_csv = "/var/www/nosh/import/peacehealth.csv";
+		if (($orderslist1_handle = fopen($orderslist1_csv, "r")) !== FALSE) {
+			while (($orderslist1 = fgetcsv($orderslist1_handle, 0, ";")) !== FALSE) {
+				if ($orderslist1[0] != '') {
+					$orderslist1_data = array (
+						'orders_code' => $orderslist1[0],
+						'orders_category' => 'Laboratory',
+						'orders_vendor' => 'PeaceHealth',
+						'cpt' => ltrim($orderslist1[8]),
+						'orders_description' => $orderslist1[1],
+						'result_code' => $orderslist1[2],
+						'result_name' => $orderslist1[3],
+						'units' => $orderslist1[9]
+					);
+					$this->db->insert('orderslist1', $orderslist1_data);
+				}
+			}
+			fclose($orderslist1_csv);
+		}
+	}
 }
 /* End of file: setup.php */
 /* Location: application/controllers/admin/setup.php */
