@@ -46,6 +46,7 @@ class Fax extends Application
 						$info = imap_headerinfo($connection, $messageNumber);
 						$date = strtotime($info->date);
 						$data['fileDateTime'] = date('Y-m-d H:i:s', $date);
+						$data['practice_id'] = $this->session->userdata('practice_id');
 						foreach($flattenedParts as $partNumber => $part) {
 							if ($part->type === 0) {
 								if ($fax_type === "efaxsend.com") {

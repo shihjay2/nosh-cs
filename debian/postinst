@@ -223,6 +223,22 @@ configure)
 	invoke-rc.d apache2 restart >> $LOG 2>&1
 	log_only "Restarting SSH server service"
 	invoke-rc.d ssh restart >> $LOG 2>&1
+	#if [ -e $CONFIGDATABASEBACKUP ]; then
+		## setting wget options
+		#:> wgetrc
+		#echo "noclobber = off" >> wgetrc
+		#echo "dir_prefix = ." >> wgetrc
+		#echo "dirstruct = off" >> wgetrc
+		#echo "verbose = on" >> wgetrc
+		#echo "progress = dot:mega" >> wgetrc
+		#echo "tries = 2" >> wgetrc
+
+		## downloading jdk7
+		#echo "Running NOSH update..."
+		#WGETRC=wgetrc wget -O - -q -t 1 localhost/nosh/ \
+			#|| fp_exit_with_error "download failed"
+		#log_only "Update completed"
+	#fi
 ;;
 esac
 db_stop

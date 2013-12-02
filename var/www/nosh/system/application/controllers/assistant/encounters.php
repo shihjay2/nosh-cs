@@ -77,7 +77,8 @@ class Encounters extends Application
 			'user_id' => $user_query['id'],
 			'encounter_role' => $this->input->post('encounter_role'),
 			'referring_provider' => $this->input->post('referring_provider'),
-			'referring_provider_npi' => $this->input->post('referring_provider_npi')
+			'referring_provider_npi' => $this->input->post('referring_provider_npi'),
+			'practice_id' => $this->session->userdata('practice_id')
 		);
 		$eid = $this->encounters_model->addEncounter($data);
 		$this->audit_model->add();

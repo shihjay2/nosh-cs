@@ -1,3 +1,9 @@
+nosh-cs (1.7.2-0ubuntu9) precise; urgency=low
+
+  * Fixed - Creating new encounters and received faxes not assigned practice id. 
+
+ -- Michael Shihjay Chen <shihjay2@gmail.com>  Mon, 02 Dec 2013 15:32:55 -0800
+
 nosh-cs (1.7.2-0ubuntu8) precise; urgency=low
 
   * Fixed - Problem with mysqli driver with update detection script.
