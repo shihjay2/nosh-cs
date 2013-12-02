@@ -1,3 +1,10 @@
+nosh-cs (1.7.2-0ubuntu8) precise; urgency=low
+
+  * Fixed - Problem with mysqli driver with update detection script.
+  * Fixed - Problem with reminders not sending out. 
+
+ -- Michael Shihjay Chen <shihjay2@gmail.com>  Sun, 01 Dec 2013 18:28:40 -0800
+
 nosh-cs (1.7.2-0ubuntu7) precise; urgency=low
 
   * Update - Updated system to use mysqli driver instead of mysql as it is depreciated as of PHP 5.5.

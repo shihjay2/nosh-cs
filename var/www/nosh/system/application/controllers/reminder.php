@@ -78,7 +78,7 @@ class Reminder extends Application
 			}
 		}
 		$query3 = $this->db->query("SELECT * FROM practiceinfo");
-		foreach ($query3->result_array(); as $practice_row) {
+		foreach ($query3->result_array() as $practice_row) {
 			$updox = $this->check_extension('updox_extension', $practice_row['practice_id']);
 			if ($updox) {
 				$this->updox_sync($practice_row['practice_id']);
