@@ -6892,6 +6892,14 @@ class Chartmenu extends Application
 			$bill_Box10CP = 'No';
 		}
 		$provider = $encounterInfo->encounter_provider;
+		$this->db->select('id');
+		$this->db->where('displayname', $provider);
+		$user_id = $this->db->get('users')->row()->id;
+		$this->db->select('npi');
+		$this->db->where('id', $user_id);
+		$query4 = $this->db->get('providers');
+		$result4 = $query4->row();
+		$npi = $result4->npi;
 		if ($encounterInfo->referring_provider != 'Primary Care Provider' || $encounterInfo->referring_provider != '') {
 			$bill_Box17 = $this->string_format($encounterInfo->referring_provider, 26);
 			$bill_Box17A = $this->string_format($encounterInfo->referring_provider_npi, 17);
@@ -6901,14 +6909,6 @@ class Chartmenu extends Application
 				$bill_Box17A = $this->string_format('', 17);
 			} else {
 				$bill_Box17 = $this->string_format($provider, 26);
-				$this->db->select('id');
-				$this->db->where('displayname', $provider);
-				$user_id = $this->db->get('users')->row()->id;
-				$this->db->select('npi');
-				$this->db->where('id', $user_id);
-				$query4 = $this->db->get('providers');
-				$result4 = $query4->row();
-				$npi = $result4->npi;
 				$bill_Box17A = $this->string_format($npi, 17);
 			}
 		}

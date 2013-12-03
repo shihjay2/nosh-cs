@@ -388,7 +388,8 @@ class Messaging extends Application
 				'fileName' => $line,
 				'filePath' => $filePath,
 				'fileDateTime' => $fileDateTime,
-				'filePages' => $filePages
+				'filePages' => $filePages,
+				'practice_id' => $this->session->userdata('practice_id')
 			);
 			$this->messaging_model->addscan($data);
 			rename($filePath1, $filePath);

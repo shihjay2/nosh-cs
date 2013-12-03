@@ -25,6 +25,7 @@ class Reminder extends Application
 		$query1 = $this->db->query("SELECT demographics.reminder_to, demographics.reminder_method, schedule.appt_id, schedule.provider_id, schedule.start FROM schedule JOIN demographics ON schedule.pid=demographics.pid WHERE schedule.status='Pending' AND schedule.start BETWEEN $start AND $end");
 		$j=0;
 		$i=0;
+		$results_scan=0;
 		if ($query1->num_rows() > 0) {
 			foreach ($query1->result_array() as $row) {
 				$to = $row['reminder_to'];
@@ -87,9 +88,13 @@ class Reminder extends Application
 			if ($rcopia) {
 				$this->rcopia_sync($practice_row['practice_id']);
 			}
+			$results_scan = $this->get_scans($practice_row['practice_id']);
 		}
+		$results_count = $this->get_results();
 		$arr = "Number of appointments: " . $j . "<br>";
-		$arr .= "Number of appointment reminders sent: " . $i;
+		$arr .= "Number of appointment reminders sent: " . $i . "<br>";
+		$arr .= "Number of results obtained: " . $results_count . "<br>";
+		$arr .= "Number of documents scanned: " . $results_scan . "<br>";
 		echo $arr;
 		exit (0);
 	}
@@ -701,6 +706,7 @@ class Reminder extends Application
 		$dir = '/srv/ftp/shared/import/';
 		$files = scandir($dir);
 		$count = count($files);
+		$full_count=0;
 		for ($i = 2; $i < $count; $i++) {
 			$line = $files[$i];
 			$file = $dir . $line;
@@ -895,8 +901,9 @@ class Reminder extends Application
 			}
 			$cmd = 'rm ' . $file;
 			exec($cmd);
+			$full_count++;
 		}
-		echo $count;
+		return $full_count;
 	}
 	
 	function page_intro($title, $practice_id)
@@ -933,6 +940,36 @@ class Reminder extends Application
 		$body .= "</table><br>" . $from;
 		$body .= '</body></html>';
 		return $body;
+	}
+	
+	function get_scans($practice_id)
+	{
+		$query = $this->practiceinfo_model->get($practice_id);
+		$result = $query->row_array();
+		$dir = $result['documents_dir'] . 'scans/';
+		$files = scandir($dir);
+		$count = count($files);
+		$j=0;
+		for ($i = 2; $i < $count; $i++) {
+			$line = $files[$i];
+			$filePath = '/var/www/nosh/scans/' . $line;
+			$filePath1 = $dir . $line;
+			$date = fileatime($filePath1);
+			$fileDateTime = date('Y-m-d H:i:s', $date);
+			$pdftext = file_get_contents($filePath1);
+			$filePages = preg_match_all("/\/Page\W/", $pdftext, $dummy);
+			$data = array(
+				'fileName' => $line,
+				'filePath' => $filePath,
+				'fileDateTime' => $fileDateTime,
+				'filePages' => $filePages,
+				'practice_id' => $practice_id
+			);
+			$this->messaging_model->addscan($data);
+			rename($filePath1, $filePath);
+			$j++;
+		}
+		return $j;
 	}
 }
 /* End of file: reminder.php */

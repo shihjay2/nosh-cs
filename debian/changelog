@@ -1,3 +1,11 @@
+nosh-cs (1.7.2-0ubuntu10) precise; urgency=low
+
+  * New Feature - Scan documents folder is now regularly polled and pulled into the database.
+  * Fixed - Scanned documents not being assigned a practice id.
+  * Fixed - Missing NPI in billing compilation script.
+
+ -- Michael Shihjay Chen <shihjay2@gmail.com>  Tue, 03 Dec 2013 09:22:18 -0800
+
 nosh-cs (1.7.2-0ubuntu9) precise; urgency=low
 
   * Fixed - Creating new encounters and received faxes not assigned practice id. 
