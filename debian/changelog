@@ -1,3 +1,13 @@
+nosh-cs (1.7.2-0ubuntu11) precise; urgency=low
+
+  * Updated - Installation script now includes ability to run update script.
+  * Updated - Code for timed reminders, fax retrevials, and backups cleaned up.
+  * Fixed - Electronic order sending giving errors when just Bill Client for insurance.
+  * Fixed - Supplements purchased sending PHP error.
+  * Fixed - Inactivated supplements in inventory include those with negative quantities.
+
+ -- Michael Shihjay Chen <shihjay2@gmail.com>  Tue, 03 Dec 2013 10:17:06 -0800
+
 nosh-cs (1.7.2-0ubuntu10) precise; urgency=low
 
   * New Feature - Scan documents folder is now regularly polled and pulled into the database.

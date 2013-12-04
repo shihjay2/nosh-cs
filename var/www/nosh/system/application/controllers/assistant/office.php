@@ -182,7 +182,7 @@ class Office extends Application
 		$limit = $this->input->post('rows');
 		$sidx = $this->input->post('sidx');
 		$sord = $this->input->post('sord');
-		$query = $this->db->query("SELECT * FROM supplement_inventory WHERE quantity=0 AND practice_id=$practice_id");
+		$query = $this->db->query("SELECT * FROM supplement_inventory WHERE quantity<=0 AND practice_id=$practice_id");
 		$count = $query->num_rows(); 
 		if($count > 0) { 
 			$total_pages = ceil($count/$limit); 
@@ -192,7 +192,7 @@ class Office extends Application
 		if ($page > $total_pages) $page=$total_pages;
 		$start = $limit*$page - $limit;
 		if($start < 0) $start = 0;
-		$query1 = $this->db->query("SELECT * FROM supplement_inventory WHERE quantity=0 AND practice_id=$practice_id ORDER BY $sidx $sord LIMIT $start , $limit");
+		$query1 = $this->db->query("SELECT * FROM supplement_inventory WHERE quantity<=0 AND practice_id=$practice_id ORDER BY $sidx $sord LIMIT $start , $limit");
 		$response['page'] = $page;
 		$response['total'] = $total_pages;
 		$response['records'] = $count;

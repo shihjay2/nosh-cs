@@ -2551,7 +2551,7 @@ class Chartmenu extends Application
 					);
 					$this->db->insert('billing_core', $cpt);
 					$this->audit_model->add();
-					$sales_tax_check = $this->practiceinfo_model->get()->row_array();
+					$sales_tax_check = $this->practiceinfo_model->get($this->session->userdata('practice_id'))->row_array();
 					if ($sales_tax_check['sales_tax'] != '') {
 						$this->db->where('eid', $eid);
 						$this->db->like('cpt','sp','after');
@@ -5236,7 +5236,7 @@ class Chartmenu extends Application
 						$j++;
 					}
 				}
-				if ($row['orders_insurance'] != 'Bill Client' || $row['orders_insurance'] != '') {
+				if ($row['orders_insurance'] != 'Bill Client') {
 					$hl7 .= "\n";
 					$in1_array = explode("\n", $row['orders_insurance']);
 					$k = 1;
