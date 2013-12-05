@@ -318,7 +318,7 @@ $(document).ready(function() {
 						<table>
 							<tr>
 								<td>Billing Street Address:</td>
-								<td><input type="text" name="billing_street_address1" id="billing_street_address1" class="text ui-widget-content ui-corner-all" style="width:400px""/></td>
+								<td><input type="text" name="billing_street_address1" id="billing_street_address1" class="text ui-widget-content ui-corner-all" style="width:400px"/></td>
 							</tr>
 							<tr>
 								<td>Billing Street Address Line 2:</td>

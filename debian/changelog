@@ -1,3 +1,9 @@
+nosh-cs (1.7.2-0ubuntu12) precise; urgency=low
+
+  * Fixed - Error with receiving faxes. 
+
+ -- Michael Shihjay Chen <shihjay2@gmail.com>  Wed, 04 Dec 2013 16:18:28 -0800
+
 nosh-cs (1.7.2-0ubuntu11) precise; urgency=low
 
   * Updated - Installation script now includes ability to run update script.
