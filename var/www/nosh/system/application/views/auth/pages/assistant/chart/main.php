@@ -475,7 +475,10 @@ $(document).ready(function() {
 			<div style="float:left;margin:5px"><label for="encounter_time">Time of Service</label><br><input type="text" name="encounter_time" id="encounter_time" style="width:140px" class="text ui-widget-content ui-corner-all" /></div>
 			<div style="float:left;margin:5px"><label for="encounter_location">Encounter Location</label><br><input type="text" name="encounter_location" id="encounter_location" style="width:140px" class="text ui-widget-content ui-corner-all" /></div>
 		</div>
-		<div style="width:490px;float:left;margin:5px"><label for="encounter_type">Encounter Type</label><br><select name="encounter_type" id="encounter_type" class="text ui-widget-content ui-corner-all"></select></div>
+		<div style="width:490px">
+			<div style="float:left;margin:5px"><label for="encounter_provider">Encounter Provider</label><br><input type="text" name="encounter_provider" id="encounter_provider" style="width:140px" class="text ui-widget-content ui-corner-all" /></div>
+			<div style="float:left;margin:5px"><label for="encounter_type">Encounter Type</label><br><select name="encounter_type" id="encounter_type" class="text ui-widget-content ui-corner-all"></select></div>
+		</div>
 		<div style="width:490px">
 			<div style="float:left;margin:5px"><label for="encounter_role">Provider Role</label><br><select name="encounter_role" id="encounter_role" class="text ui-widget-content ui-corner-all"></select></div>
 			<div id="referring_provider_div">
