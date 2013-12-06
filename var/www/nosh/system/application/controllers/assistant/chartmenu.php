@@ -2320,7 +2320,7 @@ class Chartmenu extends Application
 						}
 					}
 				} else {
-					$sales_tax_check = $this->practiceinfo_model->get()->row_array();
+					$sales_tax_check = $this->practiceinfo_model->get($this->session->userdata('practice_id'))->row_array();
 					if ($sales_tax_check['sales_tax'] != '') {
 						$sales_tax_total2 = $inventory_result['charge'] * $amount;
 						$tax = number_format($sales_tax_total2 * $sales_tax_check['sales_tax'] / 100, 2);
