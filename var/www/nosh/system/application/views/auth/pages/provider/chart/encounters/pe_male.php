@@ -2326,7 +2326,7 @@
 	});
 	
 	$('#save_pe_gen').click(function(){
-		var a = $('#pe_gen1').val();
+		var a = encodeURIComponent($('#pe_gen1').val());
 		$.ajax({
 			type: "POST",
 			url: "<?php echo site_url('provider/encounters/pe_save/gen');?>",
@@ -2347,9 +2347,9 @@
 	});
 
 	$('#save_pe_eye').click(function(){
-		var a = $('#pe_eye1').val();
-		var b = $('#pe_eye2').val();
-		var c = $('#pe_eye3').val();
+		var a = encodeURIComponent($('#pe_eye1').val());
+		var b = encodeURIComponent($('#pe_eye2').val());
+		var c = encodeURIComponent($('#pe_eye3').val());
 		$.ajax({
 			type: "POST",
 			url: "<?php echo site_url('provider/encounters/pe_save/eye');?>",
@@ -2378,12 +2378,12 @@
 	});
 	
 	$('#save_pe_ent').click(function(){
-		var a = $('#pe_ent1').val();
-		var b = $('#pe_ent2').val();
-		var c = $('#pe_ent3').val();
-		var d = $('#pe_ent4').val();
-		var e = $('#pe_ent5').val();
-		var f = $('#pe_ent6').val();
+		var a = encodeURIComponent($('#pe_ent1').val());
+		var b = encodeURIComponent($('#pe_ent2').val());
+		var c = encodeURIComponent($('#pe_ent3').val());
+		var d = encodeURIComponent($('#pe_ent4').val());
+		var e = encodeURIComponent($('#pe_ent5').val());
+		var f = encodeURIComponent($('#pe_ent6').val());
 		$.ajax({
 			type: "POST",
 			url: "<?php echo site_url('provider/encounters/pe_save/ent');?>",
@@ -2424,8 +2424,8 @@
 	});
 	
 	$('#save_pe_neck').click(function(){
-		var a = $('#pe_neck1').val();
-		var b = $('#pe_neck2').val();
+		var a = encodeURIComponent($('#pe_neck1').val());
+		var b = encodeURIComponent($('#pe_neck2').val());
 		$.ajax({
 			type: "POST",
 			url: "<?php echo site_url('provider/encounters/pe_save/neck');?>",
@@ -2450,10 +2450,10 @@
 	});
 	
 	$('#save_pe_resp').click(function(){
-		var a = $('#pe_resp1').val();
-		var b = $('#pe_resp2').val();
-		var c = $('#pe_resp3').val();
-		var d = $('#pe_resp4').val();
+		var a = encodeURIComponent($('#pe_resp1').val());
+		var b = encodeURIComponent($('#pe_resp2').val());
+		var c = encodeURIComponent($('#pe_resp3').val());
+		var d = encodeURIComponent($('#pe_resp4').val());
 		$.ajax({
 			type: "POST",
 			url: "<?php echo site_url('provider/encounters/pe_save/resp');?>",
@@ -2486,12 +2486,12 @@
 	});
 	
 	$('#save_pe_cv').click(function(){
-		var a = $('#pe_cv1').val();
-		var b = $('#pe_cv2').val();
-		var c = $('#pe_cv3').val();
-		var d = $('#pe_cv4').val();
-		var e = $('#pe_cv5').val();
-		var f = $('#pe_cv6').val();
+		var a = encodeURIComponent($('#pe_cv1').val());
+		var b = encodeURIComponent($('#pe_cv2').val());
+		var c = encodeURIComponent($('#pe_cv3').val());
+		var d = encodeURIComponent($('#pe_cv4').val());
+		var e = encodeURIComponent($('#pe_cv5').val());
+		var f = encodeURIComponent($('#pe_cv6').val());
 		$.ajax({
 			type: "POST",
 			url: "<?php echo site_url('provider/encounters/pe_save/cv');?>",
@@ -2532,8 +2532,8 @@
 	});
 	
 	$('#save_pe_ch').click(function(){
-		var a = $('#pe_ch1').val();
-		var b = $('#pe_ch2').val();
+		var a = encodeURIComponent($('#pe_ch1').val());
+		var b = encodeURIComponent($('#pe_ch2').val());
 		$.ajax({
 			type: "POST",
 			url: "<?php echo site_url('provider/encounters/pe_save/ch');?>",
@@ -2558,10 +2558,10 @@
 	});
 	
 	$('#save_pe_gi').click(function(){
-		var a = $('#pe_gi1').val();
-		var b = $('#pe_gi2').val();
-		var c = $('#pe_gi3').val();
-		var d = $('#pe_gi4').val();
+		var a = encodeURIComponent($('#pe_gi1').val());
+		var b = encodeURIComponent($('#pe_gi2').val());
+		var c = encodeURIComponent($('#pe_gi3').val());
+		var d = encodeURIComponent($('#pe_gi4').val());
 		$.ajax({
 			type: "POST",
 			url: "<?php echo site_url('provider/encounters/pe_save/gi');?>",
@@ -2594,9 +2594,9 @@
 	});
 	
 	$('#save_pe_gu').click(function(){
-		var a = $('#pe_gu7').val();
-		var b = $('#pe_gu8').val();
-		var c = $('#pe_gu9').val();
+		var a = encodeURIComponent($('#pe_gu7').val());
+		var b = encodeURIComponent($('#pe_gu8').val());
+		var c = encodeURIComponent($('#pe_gu9').val());
 		$.ajax({
 			type: "POST",
 			url: "<?php echo site_url('provider/encounters/pe_save/gu');?>",
@@ -2631,9 +2631,9 @@
 	});
 	
 	$('#save_pe_lymph').click(function(){
-		var a = $('#pe_lymph1').val();
-		var b = $('#pe_lymph2').val();
-		var c = $('#pe_lymph3').val();
+		var a = encodeURIComponent($('#pe_lymph1').val());
+		var b = encodeURIComponent($('#pe_lymph2').val());
+		var c = encodeURIComponent($('#pe_lymph3').val());
 		$.ajax({
 			type: "POST",
 			url: "<?php echo site_url('provider/encounters/pe_save/lymph');?>",
@@ -2662,18 +2662,18 @@
 	});
 	
 	$('#save_pe_ms').click(function(){
-		var a = $('#pe_ms1').val();
-		var b = $('#pe_ms2').val();
-		var c = $('#pe_ms3').val();
-		var d = $('#pe_ms4').val();
-		var e = $('#pe_ms5').val();
-		var f = $('#pe_ms6').val();
-		var g = $('#pe_ms7').val();
-		var h = $('#pe_ms8').val();
-		var i = $('#pe_ms9').val();
-		var j = $('#pe_ms10').val();
-		var k = $('#pe_ms11').val();
-		var l = $('#pe_ms12').val();
+		var a = encodeURIComponent($('#pe_ms1').val());
+		var b = encodeURIComponent($('#pe_ms2').val());
+		var c = encodeURIComponent($('#pe_ms3').val());
+		var d = encodeURIComponent($('#pe_ms4').val());
+		var e = encodeURIComponent($('#pe_ms5').val());
+		var f = encodeURIComponent($('#pe_ms6').val());
+		var g = encodeURIComponent($('#pe_ms7').val());
+		var h = encodeURIComponent($('#pe_ms8').val());
+		var i = encodeURIComponent($('#pe_ms9').val());
+		var j = encodeURIComponent($('#pe_ms10').val());
+		var k = encodeURIComponent($('#pe_ms11').val());
+		var l = encodeURIComponent($('#pe_ms12').val());
 		$.ajax({
 			type: "POST",
 			url: "<?php echo site_url('provider/encounters/pe_save/ms');?>",
@@ -2738,9 +2738,9 @@
 	});
 	
 	$('#save_pe_neuro').click(function(){
-		var a = $('#pe_neuro1').val();
-		var b = $('#pe_neuro2').val();
-		var c = $('#pe_neuro3').val();
+		var a = encodeURIComponent($('#pe_neuro1').val());
+		var b = encodeURIComponent($('#pe_neuro2').val());
+		var c = encodeURIComponent($('#pe_neuro3').val());
 		$.ajax({
 			type: "POST",
 			url: "<?php echo site_url('provider/encounters/pe_save/neuro');?>",
@@ -2769,10 +2769,10 @@
 	});
 	
 	$('#save_pe_psych').click(function(){
-		var a = $('#pe_psych1').val();
-		var b = $('#pe_psych2').val();
-		var c = $('#pe_psych3').val();
-		var d = $('#pe_psych4').val();
+		var a = encodeURIComponent($('#pe_psych1').val());
+		var b = encodeURIComponent($('#pe_psych2').val());
+		var c = encodeURIComponent($('#pe_psych3').val());
+		var d = encodeURIComponent($('#pe_psych4').val());
 		$.ajax({
 			type: "POST",
 			url: "<?php echo site_url('provider/encounters/pe_save/psych');?>",
@@ -2805,8 +2805,8 @@
 	});
 	
 	$('#save_pe_skin').click(function(){
-		var a = $('#pe_skin1').val();
-		var b = $('#pe_skin2').val();
+		var a = encodeURIComponent($('#pe_skin1').val());
+		var b = encodeURIComponent($('#pe_skin2').val());
 		$.ajax({
 			type: "POST",
 			url: "<?php echo site_url('provider/encounters/pe_save/skin');?>",

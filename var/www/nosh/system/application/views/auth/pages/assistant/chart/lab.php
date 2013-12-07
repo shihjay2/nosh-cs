@@ -523,14 +523,14 @@
 		bValid = bValid && checkEmpty(location,"Laboratory Provider");
 		bValid = bValid && checkEmpty(insurance,"Insurance");
 		if (bValid) {
-			var a = $("#messages_lab_orders").val();
-			var b = $("#messages_lab_codes").val();
-			var c = $("#messages_lab_location").val();
-			var d = $("#messages_lab_t_messages_id").val();
-			var e = $("#messages_lab_orders_id").val();
-			var f = $("#messages_lab_insurance").val();
-			var g = $("#messages_lab_obtained").val();
-			var h = $("#messages_lab_provider_list").val();
+			var a = encodeURIComponent($("#messages_lab_orders").val());
+			var b = encodeURIComponent($("#messages_lab_codes").val());
+			var c = encodeURIComponent($("#messages_lab_location").val());
+			var d = encodeURIComponent($("#messages_lab_t_messages_id").val());
+			var e = encodeURIComponent($("#messages_lab_orders_id").val());
+			var f = encodeURIComponent($("#messages_lab_insurance").val());
+			var g = encodeURIComponent($("#messages_lab_obtained").val());
+			var h = encodeURIComponent($("#messages_lab_provider_list").val());
 			$.ajax({
 				type: "POST",
 				url: "<?php echo site_url('assistant/chartmenu/add_lab_order');?>",
@@ -795,18 +795,18 @@
 				var bValid = true;
 				bValid = bValid && checkEmpty(facility,"Facility");
 				if (bValid) {
-					var a = $("#messages_lab_location_facility").val();
-					var b = $("#messages_lab_location_address").val();
-					var c = $("#messages_lab_location_address2").val();
-					var d = $("#messages_lab_location_city").val();
-					var e = $("#messages_lab_location_state").val();
-					var f = $("#messages_lab_location_zip").val();
-					var g = $("#messages_lab_location_phone").val();
-					var h = $("#messages_lab_location_fax").val();
-					var i = $("#messages_lab_location_address_id").val();
-					var j = $("#messages_lab_location_comments").val();
-					var k = $("#messages_lab_location_ordering_id").val();
-					var l = $("#messages_lab_location_electronic_order").val();
+					var a = encodeURIComponent($("#messages_lab_location_facility").val());
+					var b = encodeURIComponent($("#messages_lab_location_address").val());
+					var c = encodeURIComponent($("#messages_lab_location_address2").val());
+					var d = encodeURIComponent($("#messages_lab_location_city").val());
+					var e = encodeURIComponent($("#messages_lab_location_state").val());
+					var f = encodeURIComponent($("#messages_lab_location_zip").val());
+					var g = encodeURIComponent($("#messages_lab_location_phone").val());
+					var h = encodeURIComponent($("#messages_lab_location_fax").val());
+					var i = encodeURIComponent($("#messages_lab_location_address_id").val());
+					var j = encodeURIComponent($("#messages_lab_location_comments").val());
+					var k = encodeURIComponent($("#messages_lab_location_ordering_id").val());
+					var l = encodeURIComponent($("#messages_lab_location_electronic_order").val());
 					$.ajax({
 						type: "POST",
 						url: "<?php echo site_url('assistant/chartmenu/edit_lab_provider');?>",
@@ -854,11 +854,11 @@
 		resizable: false,
 		buttons: {
 			'Save': function() {
-				var a = $("#messages_lab").val();
-				var b = $("#messages_lab_cpt").val();
-				var c = $("#messages_lab_orders_type").val();
+				var a = encodeURIComponent($("#messages_lab").val());
+				var b = encodeURIComponent($("#messages_lab_cpt").val());
+				var c = encodeURIComponent($("#messages_lab_orders_type").val());
 				var d = a + b;
-				var e = $("#messages_lab_snomed").val();
+				var e = encodeURIComponent($("#messages_lab_snomed").val());
 				$.ajax({
 					type: "POST",
 					url: "<?php echo site_url('assistant/chartmenu/add_orderslist');?>",

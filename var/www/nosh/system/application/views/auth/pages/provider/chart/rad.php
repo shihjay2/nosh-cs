@@ -489,12 +489,12 @@
 		bValid = bValid && checkEmpty(location,"Imaging Provider");
 		bValid = bValid && checkEmpty(insurance,"Insurance");
 		if (bValid) {
-			var a = $("#messages_rad_orders").val();
-			var b = $("#messages_rad_codes").val();
-			var c = $("#messages_rad_location").val();
-			var d = $("#messages_rad_t_messages_id").val();
-			var e = $("#messages_rad_orders_id").val();
-			var f = $("#messages_rad_insurance").val();
+			var a = encodeURIComponent($("#messages_rad_orders").val());
+			var b = encodeURIComponent($("#messages_rad_codes").val());
+			var c = encodeURIComponent($("#messages_rad_location").val());
+			var d = encodeURIComponent($("#messages_rad_t_messages_id").val());
+			var e = encodeURIComponent($("#messages_rad_orders_id").val());
+			var f = encodeURIComponent($("#messages_rad_insurance").val());
 			$.ajax({
 				type: "POST",
 				url: "<?php echo site_url('provider/chartmenu/add_rad_order');?>",
@@ -676,17 +676,17 @@
 				var bValid = true;
 				bValid = bValid && checkEmpty(facility,"Facility");
 				if (bValid) {
-					var a = $("#messages_rad_location_facility").val();
-					var b = $("#messages_rad_location_address").val();
-					var c = $("#messages_rad_location_address2").val();
-					var d = $("#messages_rad_location_city").val();
-					var e = $("#messages_rad_location_state").val();
-					var f = $("#messages_rad_location_zip").val();
-					var g = $("#messages_rad_location_phone").val();
-					var h = $("#messages_rad_location_fax").val();
-					var i = $("#messages_rad_location_address_id").val();
-					var j = $("#messages_rad_location_comments").val();
-					var k = $("#messages_rad_location_ordering_id").val();
+					var a = encodeURIComponent($("#messages_rad_location_facility").val());
+					var b = encodeURIComponent($("#messages_rad_location_address").val());
+					var c = encodeURIComponent($("#messages_rad_location_address2").val());
+					var d = encodeURIComponent($("#messages_rad_location_city").val());
+					var e = encodeURIComponent($("#messages_rad_location_state").val());
+					var f = encodeURIComponent($("#messages_rad_location_zip").val());
+					var g = encodeURIComponent($("#messages_rad_location_phone").val());
+					var h = encodeURIComponent($("#messages_rad_location_fax").val());
+					var i = encodeURIComponent($("#messages_rad_location_address_id").val());
+					var j = encodeURIComponent($("#messages_rad_location_comments").val());
+					var k = encodeURIComponent($("#messages_rad_location_ordering_id").val());
 					$.ajax({
 						type: "POST",
 						url: "<?php echo site_url('provider/chartmenu/edit_rad_provider');?>",
@@ -734,11 +734,11 @@
 		resizable: false,
 		buttons: {
 			'Save': function() {
-				var a = $("#messages_rad").val();
-				var b = $("#messages_rad_cpt").val();
-				var c = $("#messages_rad_orders_type").val();
+				var a = encodeURIComponent($("#messages_rad").val());
+				var b = encodeURIComponent($("#messages_rad_cpt").val());
+				var c = encodeURIComponent($("#messages_rad_orders_type").val());
 				var d = a + b;
-				var e = $("#messages_rad_snomed").val();
+				var e = encodeURIComponent($("#messages_rad_snomed").val());
 				$.ajax({
 					type: "POST",
 					url: "<?php echo site_url('provider/chartmenu/add_orderslist');?>",

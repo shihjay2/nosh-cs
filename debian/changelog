@@ -1,3 +1,9 @@
+nosh-cs (1.7.2-0ubuntu15) precise; urgency=low
+
+  * Fixed - Values not always saved properly if any special characters that are not encoded prior to post.  
+
+ -- Michael Shihjay Chen <shihjay2@gmail.com>  Fri, 06 Dec 2013 17:19:38 -0800
+
 nosh-cs (1.7.2-0ubuntu14) precise; urgency=low
 
   * Fixed - Sales tax not being calculated correctly in some instances.

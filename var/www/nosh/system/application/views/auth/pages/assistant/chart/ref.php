@@ -1167,13 +1167,13 @@
 		bValid = bValid && checkEmpty(location,"Referral Provider");
 		bValid = bValid && checkEmpty(insurance,"Insurance");
 		if (bValid) {
-			var a = $("#messages_ref_orders").val();
-			var b = $("#messages_ref_codes").val();
-			var c = $("#messages_ref_location").val();
-			var d = $("#messages_ref_t_messages_id").val();
-			var e = $("#messages_ref_orders_id").val();
-			var f = $("#messages_ref_insurance").val();
-			var g = $("#messages_ref_provider_list").val();
+			var a = encodeURIComponent($("#messages_ref_orders").val());
+			var b = encodeURIComponent($("#messages_ref_codes").val());
+			var c = encodeURIComponent($("#messages_ref_location").val());
+			var d = encodeURIComponent($("#messages_ref_t_messages_id").val());
+			var e = encodeURIComponent($("#messages_ref_orders_id").val());
+			var f = encodeURIComponent($("#messages_ref_insurance").val());
+			var g = encodeURIComponent($("#messages_ref_provider_list").val());
 			$.ajax({
 				type: "POST",
 				url: "<?php echo site_url('assistant/chartmenu/add_ref_order');?>",
@@ -1396,21 +1396,21 @@
 				bValid = bValid && checkEmpty(lastname,"Last Name");
 				bValid = bValid && checkEmpty(firstname,"First Name");
 				if (bValid) {
-					var a = $("#messages_ref_location_lastname").val();
-					var a1 = $("#messages_ref_location_firstname").val();
-					var a2 = $("#messages_ref_location_prefix").val();
-					var a3 = $("#messages_ref_location_suffix").val();
-					var a4 = $("#messages_ref_location_specialty").val();
-					var a5 = $("#messages_ref_location_facility").val();
-					var b = $("#messages_ref_location_address").val();
-					var c = $("#messages_ref_location_address2").val();
-					var d = $("#messages_ref_location_city").val();
-					var e = $("#messages_ref_location_state").val();
-					var f = $("#messages_ref_location_zip").val();
-					var g = $("#messages_ref_location_phone").val();
-					var h = $("#messages_ref_location_fax").val();
-					var i = $("#messages_ref_location_address_id").val();
-					var j = $("#messages_ref_location_comments").val();
+					var a = encodeURIComponent($("#messages_ref_location_lastname").val());
+					var a1 = encodeURIComponent($("#messages_ref_location_firstname").val());
+					var a2 = encodeURIComponent($("#messages_ref_location_prefix").val());
+					var a3 = encodeURIComponent($("#messages_ref_location_suffix").val());
+					var a4 = encodeURIComponent($("#messages_ref_location_specialty").val());
+					var a5 = encodeURIComponent($("#messages_ref_location_facility").val());
+					var b = encodeURIComponent($("#messages_ref_location_address").val());
+					var c = encodeURIComponent($("#messages_ref_location_address2").val());
+					var d = encodeURIComponent($("#messages_ref_location_city").val());
+					var e = encodeURIComponent($("#messages_ref_location_state").val());
+					var f = encodeURIComponent($("#messages_ref_location_zip").val());
+					var g = encodeURIComponent($("#messages_ref_location_phone").val());
+					var h = encodeURIComponent($("#messages_ref_location_fax").val());
+					var i = encodeURIComponent($("#messages_ref_location_address_id").val());
+					var j = encodeURIComponent($("#messages_ref_location_comments").val());
 					$.ajax({
 						type: "POST",
 						url: "<?php echo site_url('assistant/chartmenu/edit_ref_provider');?>",
@@ -1458,11 +1458,11 @@
 		resizable: false,
 		buttons: {
 			'Save': function() {
-				var a = $("#messages_ref").val();
-				var b = $("#messages_ref_cpt").val();
-				var c = $("#messages_ref_orders_type").val();
+				var a = encodeURIComponent($("#messages_ref").val());
+				var b = encodeURIComponent($("#messages_ref_cpt").val());
+				var c = encodeURIComponent($("#messages_ref_orders_type").val());
 				var d = a + b;
-				var e = $("#messages_ref_snomed").val();
+				var e = encodeURIComponent($("#messages_ref_snomed").val());
 				$.ajax({
 					type: "POST",
 					url: "<?php echo site_url('assistant/chartmenu/add_orderslist');?>",

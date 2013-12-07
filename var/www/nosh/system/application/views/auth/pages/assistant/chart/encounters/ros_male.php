@@ -1255,7 +1255,7 @@
 	});
 	
 	$('#save_ros_gen').click(function(){
-		var a1 = $('#ros_gen').val();
+		var a1 = encodeURIComponent($('#ros_gen').val());
 		$.ajax({
 			type: "POST",
 			url: "<?php echo site_url('assistant/encounters/ros_save/gen');?>",
@@ -1276,7 +1276,7 @@
 	});
 	
 	$('#save_ros_eye').click(function(){
-		var a1 = $('#ros_eye').val();
+		var a1 = encodeURIComponent($('#ros_eye').val());
 		$.ajax({
 			type: "POST",
 			url: "<?php echo site_url('assistant/encounters/ros_save/eye');?>",
@@ -1297,7 +1297,7 @@
 	});
 	
 	$('#save_ros_ent').click(function(){
-		var a1 = $('#ros_ent').val();
+		var a1 = encodeURIComponent($('#ros_ent').val());
 		$.ajax({
 			type: "POST",
 			url: "<?php echo site_url('assistant/encounters/ros_save/ent');?>",
@@ -1318,7 +1318,7 @@
 	});
 	
 	$('#save_ros_resp').click(function(){
-		var a1 = $('#ros_resp').val();
+		var a1 = encodeURIComponent($('#ros_resp').val());
 		$.ajax({
 			type: "POST",
 			url: "<?php echo site_url('assistant/encounters/ros_save/resp');?>",
@@ -1338,7 +1338,7 @@
 		$("#ros_resp_dialog").dialog('close');
 	});
 	$('#save_ros_cv').click(function(){
-		var a1 = $('#ros_cv').val();
+		var a1 = encodeURIComponent($('#ros_cv').val());
 		$.ajax({
 			type: "POST",
 			url: "<?php echo site_url('assistant/encounters/ros_save/cv');?>",
@@ -1359,7 +1359,7 @@
 	});
 	
 	$('#save_ros_gi').click(function(){
-		var a1 = $('#ros_gi').val();
+		var a1 = encodeURIComponent($('#ros_gi').val());
 		$.ajax({
 			type: "POST",
 			url: "<?php echo site_url('assistant/encounters/ros_save/gi');?>",
@@ -1380,7 +1380,7 @@
 	});
 	
 	$('#save_ros_gu').click(function(){
-		var a1 = $('#ros_gu').val();
+		var a1 = encodeURIComponent($('#ros_gu').val());
 		$.ajax({
 			type: "POST",
 			url: "<?php echo site_url('assistant/encounters/ros_save/gu');?>",
@@ -1401,7 +1401,7 @@
 	});
 	
 	$('#save_ros_mus').click(function(){
-		var a1 = $('#ros_mus').val();
+		var a1 = encodeURIComponent($('#ros_mus').val());
 		$.ajax({
 			type: "POST",
 			url: "<?php echo site_url('assistant/encounters/ros_save/mus');?>",
@@ -1422,7 +1422,7 @@
 	});
 	
 	$('#save_ros_neuro').click(function(){
-		var a1 = $('#ros_neuro').val();
+		var a1 = encodeURIComponent($('#ros_neuro').val());
 		$.ajax({
 			type: "POST",
 			url: "<?php echo site_url('assistant/encounters/ros_save/neuro');?>",
@@ -1443,7 +1443,7 @@
 	});
 	
 	$('#save_ros_psych').click(function(){
-		var a1 = $('#ros_psych').val();
+		var a1 = encodeURIComponent($('#ros_psych').val());
 		$.ajax({
 			type: "POST",
 			url: "<?php echo site_url('assistant/encounters/ros_save/psych');?>",
@@ -1464,7 +1464,7 @@
 	});
 	
 	$('#save_ros_heme').click(function(){
-		var a1 = $('#ros_heme').val();
+		var a1 = encodeURIComponent($('#ros_heme').val());
 		$.ajax({
 			type: "POST",
 			url: "<?php echo site_url('assistant/encounters/ros_save/heme');?>",
@@ -1485,7 +1485,7 @@
 	});
 	
 	$('#save_ros_endocrine').click(function(){
-		var a1 = $('#ros_endocrine').val();
+		var a1 = encodeURIComponent($('#ros_endocrine').val());
 		$.ajax({
 			type: "POST",
 			url: "<?php echo site_url('assistant/encounters/ros_save/endocrine');?>",
@@ -1506,7 +1506,7 @@
 	});
 	
 	$('#save_ros_skin').click(function(){
-		var a1 = $('#ros_skin').val();
+		var a1 = encodeURIComponent($('#ros_skin').val());
 		$.ajax({
 			type: "POST",
 			url: "<?php echo site_url('assistant/encounters/ros_save/skin');?>",
@@ -1527,7 +1527,7 @@
 	});
 	
 	$('#save_ros_wcc').click(function(){
-		var a1 = $('#ros_wcc').val();
+		var a1 = encodeURIComponent($('#ros_wcc').val());
 		$.ajax({
 			type: "POST",
 			url: "<?php echo site_url('assistant/encounters/ros_save/wcc');?>",

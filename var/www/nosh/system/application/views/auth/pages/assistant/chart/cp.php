@@ -504,13 +504,13 @@
 		bValid = bValid && checkEmpty(location,"Cardiopulmonary Provider");
 		bValid = bValid && checkEmpty(insurance,"Insurance");
 		if (bValid) {
-			var a = $("#messages_cp_orders").val();
-			var b = $("#messages_cp_codes").val();
-			var c = $("#messages_cp_location").val();
-			var d = $("#messages_cp_t_messages_id").val();
-			var e = $("#messages_cp_orders_id").val();
-			var f = $("#messages_cp_insurance").val();
-			var g = $("#messages_cp_provider_list").val();
+			var a = encodeURIComponent($("#messages_cp_orders").val());
+			var b = encodeURIComponent($("#messages_cp_codes").val());
+			var c = encodeURIComponent($("#messages_cp_location").val());
+			var d = encodeURIComponent($("#messages_cp_t_messages_id").val());
+			var e = encodeURIComponent($("#messages_cp_orders_id").val());
+			var f = encodeURIComponent($("#messages_cp_insurance").val());
+			var g = encodeURIComponent($("#messages_cp_provider_list").val());
 			$.ajax({
 				type: "POST",
 				url: "<?php echo site_url('assistant/chartmenu/add_cp_order');?>",
@@ -708,17 +708,17 @@
 				var bValid = true;
 				bValid = bValid && checkEmpty(facility,"Facility");
 				if (bValid) {
-					var a = $("#messages_cp_location_facility").val();
-					var b = $("#messages_cp_location_address").val();
-					var c = $("#messages_cp_location_address2").val();
-					var d = $("#messages_cp_location_city").val();
-					var e = $("#messages_cp_location_state").val();
-					var f = $("#messages_cp_location_zip").val();
-					var g = $("#messages_cp_location_phone").val();
-					var h = $("#messages_cp_location_fax").val();
-					var i = $("#messages_cp_location_address_id").val();
-					var j = $("#messages_cp_location_comments").val();
-					var k = $("#messages_cp_location_ordering_id").val();
+					var a = encodeURIComponent($("#messages_cp_location_facility").val());
+					var b = encodeURIComponent($("#messages_cp_location_address").val());
+					var c = encodeURIComponent($("#messages_cp_location_address2").val());
+					var d = encodeURIComponent($("#messages_cp_location_city").val());
+					var e = encodeURIComponent($("#messages_cp_location_state").val());
+					var f = encodeURIComponent($("#messages_cp_location_zip").val());
+					var g = encodeURIComponent($("#messages_cp_location_phone").val());
+					var h = encodeURIComponent($("#messages_cp_location_fax").val());
+					var i = encodeURIComponent($("#messages_cp_location_address_id").val());
+					var j = encodeURIComponent($("#messages_cp_location_comments").val());
+					var k = encodeURIComponent($("#messages_cp_location_ordering_id").val());
 					$.ajax({
 						type: "POST",
 						url: "<?php echo site_url('assistant/chartmenu/edit_cp_provider');?>",
@@ -766,11 +766,11 @@
 		resizable: false,
 		buttons: {
 			'Save': function() {
-				var a = $("#messages_cp").val();
-				var b = $("#messages_cp_cpt").val();
-				var c = $("#messages_cp_orders_type").val();
+				var a = encodeURIComponent($("#messages_cp").val());
+				var b = encodeURIComponent($("#messages_cp_cpt").val());
+				var c = encodeURIComponent($("#messages_cp_orders_type").val());
 				var d = a + b;
-				var e = $("#messages_cp_snomed").val();
+				var e = encodeURIComponent($("#messages_cp_snomed").val());
 				$.ajax({
 					type: "POST",
 					url: "<?php echo site_url('assistant/chartmenu/add_orderslist');?>",
