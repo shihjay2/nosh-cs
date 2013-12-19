@@ -128,13 +128,24 @@ class Auth
 			}
 			else
 			{
-				$practice_result = array(
-					'practice_id' => '1'
-				);
 				if ($practicehandle != '') {
-					$practice_query = $this->CI->db->query("SELECT * FROM practiceinfo WHERE practicehandle=$practicehandle");
+					$practice_query = $this->CI->db->query("SELECT * FROM `practiceinfo` WHERE `practicehandle`='$practicehandle'");
 					if ($practice_query->num_rows() > 0) {
 						$practice_result = $practice_query->row_array();
+						$data1 = array(
+							'practicehandle' => $practicehandle
+						);
+						$this->CI->session->set_userdata($data1);
+					}
+				} else {
+					if($this->CI->session->userdata('practicehandle') == FALSE) {
+						$practice_result = array(
+							'practice_id' => '1'
+						);
+					} else {
+						$practicehandle1 = $this->CI->session->userdata('practicehandle');
+						$practice_query1 = $this->CI->db->query("SELECT * FROM `practiceinfo` WHERE `practicehandle`='$practicehandle1'");
+						$practice_result = $practice_query1->row_array();
 					}
 				}
 				$this->view('login', $practice_result);

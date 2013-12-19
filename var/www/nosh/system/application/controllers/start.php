@@ -21,7 +21,8 @@ class Start extends Application
 	function index($practicehandle='')
 	{
 		if ($practicehandle != '') {
-			$practice_query = $this->db->query("SELECT * FROM practiceinfo WHERE practicehandle=$practicehandle");
+			$this->db->where('practicehandle', $practicehandle);
+			$practice_query = $this->db->get('practiceinfo');
 			if ($practice_query->num_rows == 0) {
 				$data_error = array(
 					'practicehandle' => $practicehandle
@@ -34,6 +35,7 @@ class Start extends Application
 			$settingsInfo = $this->practiceinfo_model->get($this->session->userdata('practice_id'));
 			$practice_id = $this->session->userdata('practice_id');
 			$data['practiceinfo'] = $settingsInfo->row();
+			$this->session->set_userdata('practice_active', $data['practiceinfo']->active);
 			$query = $this->users_model->get($user_id);
 			$result = $query->row();
 			$data['displayname'] = $result->displayname;
@@ -87,6 +89,13 @@ class Start extends Application
 				$this->db->where('id', $user_id);
 				$row = $this->db->get('demographics')->row_array();
 				$this->session->set_userdata('pid', $row['pid']);
+			}
+			if(user_group('admin')) {
+				if ($practice_id == '1') {
+					$data['saas_admin'] = 'y';
+				} else {
+					$data['saas_admin'] = 'n';
+				}
 			}
 			$this->auth->view('dashboard', $data);
 		} else {
@@ -398,39 +407,62 @@ class Start extends Application
 					$patient_result = $result->row_array();
 					$this->db->where('pid', $patient_result['pid']);
 					foreach ($this->db->get('demographics_relate')->result_array() as $demographics_relate_row) {
-						$data1 = array(
-							'username' => $this->input->post('username'),
-							'firstname' => $this->input->post('firstname'),
-							'lastname' => $this->input->post('lastname'),
-							'email' => $this->input->post('email'),
-							'group_id' => '100',
-							'active' => '1',
-							'displayname' => $displayname,
-							'practice_id' => $demographics_relate_row['practice_id']
-						);
-						$arr['id'] = $this->users_model->add($data1);
-						$data2 = array(
-							'id' => $arr['id']
-						);
-						$this->db->where('demographics_relate_id', $demographics_relate_row['demographics_relate_id']);
-						$this->db->update('demographics_relate', $data2);
-						$this->db->where('practice_id', $demographics_relate_row['practice_id']);
-						$row1 = $this->db->get('practiceinfo')->row_array();
-						$message = 'You are now registered to your patient portal for ' . $row1['practice_name'] . ". Your username is " . $this->input->post('username') . '.';
-						$config['protocol']='smtp';
-						$config['smtp_host']='ssl://smtp.googlemail.com';
-						$config['smtp_port']='465';
-						$config['smtp_timeout']='30';
-						$config['charset']='utf-8';
-						$config['newline']="\r\n";
-						$config['smtp_user']=$row1['smtp_user'];
-						$config['smtp_pass']=$row1['smtp_pass'];
-						$this->email->initialize($config);
-						$this->email->from($row1['email'], $row1['practice_name']);
-						$this->email->to($this->input->post('email'));
-						$this->email->subject('Patient Portal Registration Confirmation');
-						$this->email->message($message);
-						$this->email->send();
+						if ($demographics_relate_row['id'] != "") {
+							$arr['response'] = "5";
+							$this->db->where('practice_id', $demographics_relate_row['practice_id']);
+							$row2 = $this->db->get('practiceinfo')->row_array();
+							$this->db->where('id', $demographics_relate_row['id']);
+							$row3 = $this->db->get('users')->row_array();
+							$message = 'You tried to register for a patient portal for ' . $row2['practice_name'] . ". You already have a registered account with a username of " . $row3['username'] . '.';
+							$config['protocol']='smtp';
+							$config['smtp_host']='ssl://smtp.googlemail.com';
+							$config['smtp_port']='465';
+							$config['smtp_timeout']='30';
+							$config['charset']='utf-8';
+							$config['newline']="\r\n";
+							$config['smtp_user']=$row2['smtp_user'];
+							$config['smtp_pass']=$row2['smtp_pass'];
+							$this->email->initialize($config);
+							$this->email->from($row2['email'], $row2['practice_name']);
+							$this->email->to($this->input->post('email'));
+							$this->email->subject('Patient Portal Registration Message');
+							$this->email->message($message);
+							$this->email->send();
+						} else {
+							$data1 = array(
+								'username' => $this->input->post('username'),
+								'firstname' => $this->input->post('firstname'),
+								'lastname' => $this->input->post('lastname'),
+								'email' => $this->input->post('email'),
+								'group_id' => '100',
+								'active' => '1',
+								'displayname' => $displayname,
+								'practice_id' => $demographics_relate_row['practice_id']
+							);
+							$arr['id'] = $this->users_model->add($data1);
+							$data2 = array(
+								'id' => $arr['id']
+							);
+							$this->db->where('demographics_relate_id', $demographics_relate_row['demographics_relate_id']);
+							$this->db->update('demographics_relate', $data2);
+							$this->db->where('practice_id', $demographics_relate_row['practice_id']);
+							$row1 = $this->db->get('practiceinfo')->row_array();
+							$message = 'You are now registered to your patient portal for ' . $row1['practice_name'] . ". Your username is " . $this->input->post('username') . '.';
+							$config['protocol']='smtp';
+							$config['smtp_host']='ssl://smtp.googlemail.com';
+							$config['smtp_port']='465';
+							$config['smtp_timeout']='30';
+							$config['charset']='utf-8';
+							$config['newline']="\r\n";
+							$config['smtp_user']=$row1['smtp_user'];
+							$config['smtp_pass']=$row1['smtp_pass'];
+							$this->email->initialize($config);
+							$this->email->from($row1['email'], $row1['practice_name']);
+							$this->email->to($this->input->post('email'));
+							$this->email->subject('Patient Portal Registration Confirmation');
+							$this->email->message($message);
+							$this->email->send();
+						}
 					}
 				} else {
 					$arr['response'] = "2";
@@ -1146,6 +1178,28 @@ class Start extends Application
 		$body .= "</table><br>" . $from;
 		$body .= '</body></html>';
 		return $body;
+	}
+	
+	function login_practice_logo($practice_id)
+	{
+		$this->db->where('practice_id', $practice_id);
+		$row = $this->db->get('practiceinfo')->row_array();
+		$practicehandle = $this->session->userdata('practicehandle');
+		if ($practicehandle != FALSE) {
+			if ($practicehandle != $row['practicehandle']) {
+				$data1 = array(
+					'practicehandle' => $row['practicehandle']
+				);
+				$this->session->set_userdata($data1);
+			}
+		}
+		$html = "";
+		if ($row['practice_logo'] != '') {
+			$logo1 = str_replace("/var/www/nosh/","", $row['practice_logo']);
+			$logo = base_url() . $logo1;
+			$html = "<img src='" . $logo . "' border='0'>";
+		}
+		echo $html;
 	}
 }
 

@@ -95,14 +95,25 @@ $(document).ready(function() {
 	 	emptyrecords:"No medical providers",
 	 	height: "100%",
 	 	jsonReader: { repeatitems : false, id: "0" }
-	}).navGrid('#provider_list_pager',{edit:false,add:false,del:false
+	}).navGrid('#provider_list_pager',{search:false,edit:false,add:false,del:false
 	});
 	$("#add_provider").click(function(){
-		jQuery("#provider_list").editGridRow("new",{closeAfterAdd:true,width:'400',bottominfo:'Fields marked in (*) are required.',afterComplete: function(response, postdata){
-			var res = $.parseJSON(response.responseText);
-			$("#user_id").val(res.id);
-			$("#reset_password_dialog").dialog('open');
-		}});
+		$.ajax({
+			type: "POST",
+			url: "<?php echo site_url('admin/users/check_admin');?>",
+			success: function(data){
+				if (data == "OK") {
+					jQuery("#provider_list").editGridRow("new",{closeAfterAdd:true,width:'400',bottominfo:'Fields marked in (*) are required.',afterComplete: function(response, postdata){
+						var res = $.parseJSON(response.responseText);
+						$("#user_id").val(res.id);
+						$("#reset_password_dialog").dialog('open');
+					}});
+				} else {
+					$.jGrowl(data);
+					$("#practice_upgrade").show();
+				}
+			}
+		});
 	});
 	$("#edit_provider").click(function(){
 		var item = jQuery("#provider_list").getGridParam('selrow');
@@ -163,7 +174,7 @@ $(document).ready(function() {
 	 	emptyrecords:"No medical assistants",
 	 	height: "100%",
 	 	jsonReader: { repeatitems : false, id: "0" }
-	}).navGrid('#assistant_list_pager',{edit:false,add:false,del:false
+	}).navGrid('#assistant_list_pager',{search:false,edit:false,add:false,del:false
 	});
 	$("#add_assistant").click(function(){
 		jQuery("#assistant_list").editGridRow("new",{closeAfterAdd:true,width:'400',bottominfo:'Fields marked in (*) are required.',afterComplete: function(response, postdata){
@@ -231,7 +242,7 @@ $(document).ready(function() {
 	 	emptyrecords:"No medical billers",
 	 	height: "100%",
 	 	jsonReader: { repeatitems : false, id: "0" }
-	}).navGrid('#billing_list_pager',{edit:false,add:false,del:false
+	}).navGrid('#billing_list_pager',{search:false,edit:false,add:false,del:false
 	});
 	$("#add_billing").click(function(){
 		jQuery("#billing_list").editGridRow("new",{closeAfterAdd:true,width:'400',bottominfo:'Fields marked in (*) are required.',afterComplete: function(response, postdata){
@@ -329,7 +340,7 @@ $(document).ready(function() {
 	 	emptyrecords:"No patients",
 	 	height: "100%",
 	 	jsonReader: { repeatitems : false, id: "0" }
-	}).navGrid('#patient_list_pager',{edit:false,add:false,del:false
+	}).navGrid('#patient_list_pager',{search:false,edit:false,add:false,del:false
 	});
 	$("#add_patient").click(function(){
 		jQuery("#patient_list").editGridRow("new",{closeAfterAdd:true,width:'400',bottominfo:'Fields marked in (*) are required.',afterComplete: function(response, postdata){
@@ -418,6 +429,7 @@ $(document).ready(function() {
 					<li><?php echo anchor('admin/users/inactive/', 'Inactive Users');?></li>
 				</ul>
 				<div id="users_tabs_1">
+					<div id="practice_upgrade" style="display:none;"><a href="<?php echo site_url('registerpractice/' . $this->session->userdata('practice_id'));?>">Upgrade your practice for more providers.</a></div>
 					<table id="provider_list" class="scroll" cellpadding="0" cellspacing="0"></table>
 					<div id="provider_list_pager" class="scroll" style="text-align:center;"></div><br>
 					<input type="button" id="add_provider" value="Add Provider" class="ui-button ui-state-default ui-corner-all"/>

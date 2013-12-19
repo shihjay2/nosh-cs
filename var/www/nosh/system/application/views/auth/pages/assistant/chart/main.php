@@ -394,6 +394,204 @@ $(document).ready(function() {
 	$("#print_ccr").click(function() {
 		window.open("<?php echo site_url('assistant/chartmenu/print_ccr');?>/");
 	});
+	$("#internal_messages_dialog").dialog({ 
+		bgiframe: true, 
+		autoOpen: false, 
+		height: 500, 
+		width: 800, 
+		modal: true,
+		draggable: false,
+		resizable: false
+	});
+	function split1( val ) {
+		return val.split( /;\s*/ );
+	}
+	function extractLast1( term ) {
+		return split( term ).pop();
+	}
+	$("#messages_to").autocomplete({
+		source: function (req, add){
+			$.ajax({
+				url: "<?php echo site_url('search/all_users');?>",
+				dataType: "json",
+				type: "POST",
+				data: "term=" + extractLast1(req.term),
+				success: function(data){
+					if(data.response =='true'){
+						add(data.message);
+					}				
+				}
+			});
+		},
+		search: function() {
+			var term = extractLast1( this.value );
+			if ( term.length < 2 ) {
+				return false;
+			}
+		},
+		focus: function() {
+			return false;
+		},
+		select: function(event, ui){
+			var terms = split1( this.value );
+			terms.pop();
+			terms.push( ui.item.value );
+			terms.push( "" );
+			this.value = terms.join( ";" );
+			return false;
+		}
+	});
+	$("#messages_cc").autocomplete({
+		source: function (req, add){
+			$.ajax({
+				url: "<?php echo site_url('search/all_users');?>",
+				dataType: "json",
+				type: "POST",
+				data: "term=" + extractLast1(req.term),
+				success: function(data){
+					if(data.response =='true'){
+						add(data.message);
+					}				
+				}
+			});
+		},
+		search: function() {
+			var term = extractLast1( this.value );
+			if ( term.length < 2 ) {
+				return false;
+			}
+		},
+		focus: function() {
+			return false;
+		},
+		select: function(event, ui){
+			var terms = split1( this.value );
+			terms.pop();
+			terms.push( ui.item.value );
+			terms.push( "" );
+			this.value = terms.join( ";" );
+			return false;
+		}
+	});
+	$("#messages_patient").autocomplete({
+		source: function (req, add){
+			$.ajax({
+				url: "<?php echo site_url('search');?>",
+				dataType: "json",
+				type: "POST",
+				data: req,
+				success: function(data){
+					if(data.response =='true'){
+						add(data.message);
+					}				
+				}
+			});
+		},
+		minLength: 1,
+		select: function(event, ui){
+			$("#messages_pid").val(ui.item.id);
+			$("messages_to").focus();
+		}
+	});
+	$("#send_message1").button({
+		icons: {
+			primary: "ui-icon-mail-closed"
+		}
+	});
+	$("#send_message1").click(function(){
+		var a = $("#messages_to");
+		var b = $("#messages_subject");
+		var c = $("#messages_body");
+		var bValid = true;
+		bValid = bValid && checkEmpty(a,"To");
+		bValid = bValid && checkEmpty(b,"Subject");
+		bValid = bValid && checkEmpty(c,"Message");
+		if (bValid) {
+			var str = $("#internal_messages_form_id").serialize();
+			if(str){
+				$.ajax({
+					type: "POST",
+					url: "<?php echo site_url('assistant/messaging/send_message/');?>",
+					data: str,
+					success: function(data){
+						$.jGrowl(data);
+						$("#internal_messages_form_id").clearForm();
+						$("#internal_messages_form_id").hide('fast');
+						$("#internal_messages_dialog").dialog('close');
+					}
+				});
+			} else {
+				$.jGrowl("Please complete the form");
+			}
+		}
+	});
+	$("#draft_message1").button({
+		icons: {
+			primary: "ui-icon-disk"
+		}
+	});
+	$("#draft_message1").click(function(){
+		var str = $("#internal_messages_form_id").serialize();
+		if(str){
+			$.ajax({
+				type: "POST",
+				url: "<?php echo site_url('assistant/messaging/draft_message/');?>",
+				data: str,
+				success: function(data){
+					$.jGrowl(data);
+					$("#internal_messages_form_id").clearForm();
+					$("#internal_messages_form_id").hide('fast');
+					$("#internal_messages_dialog").dialog('close');
+				}
+			});
+		} else {
+			$.jGrowl("Please complete the form");
+		}
+	});
+	$("#cancel_message1").button({
+		icons: {
+			primary: "ui-icon-close"
+		}
+	});
+	$("#cancel_message1").click(function(){
+		var message_id = $("#messages_message_id").val();
+		if (message_id == '') {
+			$("#internal_messages_form_id").clearForm();
+			$("#internal_messages_form_id").hide('fast');
+			$("#internal_messages_dialog").dialog('close');
+		} else {
+			$.ajax({
+				type: "POST",
+				url: "<?php echo site_url('assistant/messaging/delete_message/');?>",
+				data: "message_id=" + message_id,
+				success: function(data){
+					$.jGrowl(data);
+					$("#internal_messages_form_id").clearForm();
+					$("#internal_messages_form_id").hide('fast');
+					$("#internal_messages_dialog").dialog('close');
+				}
+			});
+		}
+	});
+	$("#create_patient_message").click(function() {
+		$.ajax({
+			type: "POST",
+			url: "<?php echo site_url('search/patient_is_user');?>",
+			dataType: 'json',
+			success: function(data){
+				if (data.message == 'yes') {
+					$("#internal_messages_form").clearForm();
+					$("#messages_to").val(data.messages_to);
+					$("#messages_patient").val(data.messages_patient);
+					$("#messages_pid").val(data.pid);
+					$("#internal_messages_dialog").dialog('open');
+					$("#messages_subject").focus();
+				} else {
+					$.jGrowl("Patient is not a portal user.  Register the patient so that you can send a secure direct message to the patient.");
+				}
+			}
+		});
+	});
 	$(document).ajaxStop(function(){
 		$("#dialog_load2").dialog("close");
 	});
@@ -445,6 +643,10 @@ $(document).ready(function() {
 				<td valign="top">
 					<table id="main_column2">
 						<tbody>
+							<tr>
+								<td><img src="<?php echo base_url().'images/email.png';?>" border="0"></td>
+								<td><a href="#" id="create_patient_message">Send Message to Patient</a></td>
+							</tr>
 							<tr>
 								<td><img src="<?php echo base_url().'images/users.png';?>" border="0"></td>
 								<td>
@@ -542,4 +744,39 @@ $(document).ready(function() {
 <div id="mtm_dialog" title="Medication Therapy Management">
 	<table id="mtm_list" class="scroll" cellpadding="0" cellspacing="0"></table>
 	<div id="mtm_pager" class="scroll" style="text-align:center;"></div><br>
+</div>
+<div id="internal_messages_dialog" title="Internal Message">
+	<form name="internal_messages_form" id="internal_messages_form_id">
+		<input type="hidden" name="message_id" id="messages_message_id"/>
+		<input type="hidden" name="pid" id="messages_pid">
+		<input type="hidden" name="t_messages_id" id="messages_t_messages_id">
+		<button type="button" id="send_message1">Send</button>
+		<button type="button" id="draft_message1">Save Draft</button>
+		<button type="button" id="cancel_message1">Cancel</button>
+		<hr class="ui-state-default"/>
+		<table>
+			<tbody>
+				<tr>
+					<td>Subject:<br>
+					<input type="text" name="subject" id="messages_subject" style="width:400px" class="text ui-widget-content ui-corner-all"/></td>
+				</tr>
+				<tr>
+					<td>Concerning this patient (optional):<br>
+					<input type="text" name="patient_name" id="messages_patient" style="width:400px" class="text ui-widget-content ui-corner-all"/></td>
+				</tr>
+				<tr>
+					<td>To:<br>
+					<input type="text" id="messages_to" name="message_to" style="width:400px"class="text ui-widget-content ui-corner-all"/></td>
+				</tr>
+				<tr>
+					<td>CC:<br>
+					<input type="text" id="messages_cc" name="cc" style="width:400px"class="text ui-widget-content ui-corner-all"/></td>
+				</tr>
+				<tr>
+					<td>Message:<br>
+					<textarea name="body" id="messages_body" rows="12" style="width:400px" class="text ui-widget-content ui-corner-all"></textarea></td>
+				</tr>
+			</tbody>
+		</table>
+	</form>
 </div>

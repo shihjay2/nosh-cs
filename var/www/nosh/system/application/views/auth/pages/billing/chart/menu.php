@@ -1299,9 +1299,21 @@
 		},
 		buttons: {
 			'Save': function() {
-				var facility = $("#menu_insurance_plan_facility");
+				var a = $("#menu_insurance_plan_facility");
+				var b = $("#menu_insurance_plan_type");
+				var c = $("#menu_insurance_plan_assignment");
+				var d = $("#menu_insurance_plan_address");
+				var e = $("#menu_insurance_plan_city");
+				var f = $("#menu_insurance_plan_state");
+				var g = $("#menu_insurance_plan_zip");
 				var bValid = true;
-				bValid = bValid && checkEmpty(facility,"Insurance Plan Name");
+				bValid = bValid && checkEmpty(a,"Insurance Plan Name");
+				bValid = bValid && checkEmpty(b,"Insurance Plan Type");
+				bValid = bValid && checkEmpty(c,"Accept Assignment");
+				bValid = bValid && checkEmpty(d,"Street Address");
+				bValid = bValid && checkEmpty(e,"City");
+				bValid = bValid && checkEmpty(f,"State");
+				bValid = bValid && checkEmpty(g,"Zip");
 				if (bValid) {
 					var str = $("#edit_menu_insurance_plan_form").serialize();
 					if(str){

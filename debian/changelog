@@ -1,3 +1,15 @@
+nosh-cs (1.7.3-0ubuntu1) precise; urgency=low
+
+  * New Feature - Ability to export all charts as a ZIP file, individual PDF.
+  * New Feature - Ability to export patient demographics as CSV files.
+  * New Feature - Ability to message to patient directly from the chart.
+  * New Feature - Ability to enter fields 32B and 33B in HCFA PDF form.
+  * Updated - Prevent installation controller from activating if NOSH is already installed.
+  * Updated - Prevent the mixing of 1-4 diagnosis codes with 5-8 diagnosis codes with billing.
+  * Updated - Prevent patients from registering for patient portal more than once.
+
+ -- Michael Shihjay Chen <shihjay2@gmail.com>  Thu, 19 Dec 2013 13:20:46 -0800
+
 nosh-cs (1.7.2-0ubuntu15) precise; urgency=low
 
   * Fixed - Values not always saved properly if any special characters that are not encoded prior to post.  

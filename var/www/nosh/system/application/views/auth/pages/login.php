@@ -10,7 +10,24 @@ $(document).ready(function() {
 		success: function(data){
 			$("#practice_id").addOption(data.message);
 			$("#practice_id").val("<?php echo $practice_id;?>");
+			$.ajax({
+				type: "POST",
+				url: "<?php echo site_url('start/login_practice_logo/' . $practice_id);?>",
+				success: function(data){
+					$("#login_practice_logo").html(data);
+				}
+			});
 		}
+	});
+	$("#practice_id").change(function(){
+		var a = $("#practice_id").val();
+		$.ajax({
+			type: "POST",
+			url: "<?php echo site_url('start/login_practice_logo');?>/" + a,
+			success: function(data){
+				$("#login_practice_logo").html(data);
+			}
+		});
 	});
 	$.ajax({
 		type: "POST",
@@ -77,6 +94,8 @@ $(document).ready(function() {
 						} else if (data.response == "3") {
 							$.jGrowl("Too many tries.  Contact the practice administrator to manually reset your password.");
 							$("#register_dialog").dialog('close');
+						} else if (data.response == "5") {
+							$.jGrowl("You already have a registered account.  An e-mail has been sent to you with the username registered in your account.");
 						} else {
 							$.jGrowl('Your registration information has been sent to the administrator and you will receive your registration code within 48-72 hours by e-mail after confirmation of your idenity.<br>Thank you!');
 						}
@@ -247,7 +266,8 @@ $(document).ready(function() {
 });
 </script>
 <div id="login">
-	<div id="logo" align="center">Nosh</div><br>
+	<div id="logo" align="center" style="width:100%;">Nosh</div><br>
+	<div style="width:100%"><div id="login_practice_logo" align="center" style="max-height:100px;"></div></div><br>
 	<div align="center" >
 		<div id="box" align="left" class="ui-corner-all">
 			<form method="POST">
@@ -277,7 +297,8 @@ $(document).ready(function() {
 			Registration code:<br><input type="password" style="width:200px" id="registration_code" name="registration_code" class="text ui-widget-content ui-corner-all" placeholder="Optional"/><br><br><br>
 			CAPTCHA<br><div style="width:201px"><input type="text" style="width:200px" id="numberReal" name="numberReal" class="text ui-widget-content ui-corner-all" /><br></div>
 			If you don't have a registration code, a registration request will be sent to the practice administrator.<br>
-			You will then receive a registration code sent to your e-mail address before you proceed further.
+			You will then receive a registration code sent to your e-mail address before you proceed further.<br>
+			Keep in mind that this may take some time depending on the response time of the practice administrator.
 			<hr/>
 			<button type="button" id="submit1">Register</button>
 		</form>

@@ -36,7 +36,7 @@ $(document).ready(function() {
 	 	emptyrecords:"No inactive medical providers",
 	 	height: "100%",
 	 	jsonReader: { repeatitems : false, id: "0" }
-	}).navGrid('#provider_list_inactive_pager',{edit:false,add:false,del:false
+	}).navGrid('#provider_list_inactive_pager',{search:false,edit:false,add:false,del:false
 	});
 	
 	$("#view_provider").click(function(){
@@ -49,14 +49,25 @@ $(document).ready(function() {
 	});
 	
 	$("#enable_provider").click(function(){
-		var item = jQuery("#provider_list_inactive").getGridParam('selrow');
-		if(item){
-			jQuery("#provider_list_inactive").editGridRow(item,{closeAfterEdit:true});
-			$("#password").val('');
-			jQuery("#provider_list_inactive").trigger("reloadGrid");
-		} else {
-			$.jgrowl("Please select provider to reactivate!");
-		}
+		$.ajax({
+			type: "POST",
+			url: "<?php echo site_url('admin/users/check_admin');?>",
+			success: function(data){
+				if (data == "OK") {
+					var item = jQuery("#provider_list_inactive").getGridParam('selrow');
+					if(item){
+						jQuery("#provider_list_inactive").editGridRow(item,{closeAfterEdit:true});
+						$("#password").val('');
+						jQuery("#provider_list_inactive").trigger("reloadGrid");
+					} else {
+						$.jgrowl("Please select provider to reactivate!");
+					}
+				} else {
+					$.jGrowl(data);
+					$("#practice_upgrade1").show();
+				}
+			}
+		});
 	});
 	
 	jQuery("#assistant_list_inactive").jqGrid({
@@ -86,7 +97,7 @@ $(document).ready(function() {
 	 	emptyrecords:"No inactivemedical assistants",
 	 	height: "100%",
 	 	jsonReader: { repeatitems : false, id: "0" }
-	}).navGrid('#assistant_list_inactive_pager',{edit:false,add:false,del:false
+	}).navGrid('#assistant_list_inactive_pager',{search:false,edit:false,add:false,del:false
 	});
 	
 	$("#view_assistant").click(function(){
@@ -136,7 +147,7 @@ $(document).ready(function() {
 	 	emptyrecords:"No medical inactive billers",
 	 	height: "100%",
 	 	jsonReader: { repeatitems : false, id: "0" }
-	}).navGrid('#billing_list_inactive_pager',{edit:false,add:false,del:false
+	}).navGrid('#billing_list_inactive_pager',{search:false,edit:false,add:false,del:false
 	});
 	
 	$("#view_billing").click(function(){
@@ -187,7 +198,7 @@ $(document).ready(function() {
 	 	emptyrecords:"No inactive patients",
 	 	height: "100%",
 	 	jsonReader: { repeatitems : false, id: "0" }
-	}).navGrid('#patient_list_inactive_pager',{edit:false,add:false,del:false
+	}).navGrid('#patient_list_inactive_pager',{search:false,edit:false,add:false,del:false
 	});
 	
 	$("#view_patient").click(function(){
@@ -211,6 +222,7 @@ $(document).ready(function() {
 	});	
 });
 </script>
+<div id="practice_upgrade1" style="display:none;"><a href="<?php echo site_url('registerpractice/' . $this->session->userdata('practice_id'));?>">Upgrade your practice for more providers.</a></div>
 <table id="provider_list_inactive" class="scroll" cellpadding="0" cellspacing="0"></table>
 <div id="provider_list_inactive_pager" class="scroll" style="text-align:center;"></div><br>
 <input type="button" id="view_provider" value="View Details" class="ui-button ui-state-default ui-corner-all"/>

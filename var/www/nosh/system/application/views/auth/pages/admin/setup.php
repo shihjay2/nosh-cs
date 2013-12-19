@@ -1,6 +1,32 @@
 <script type="text/javascript">
 $(document).ready(function() {
 	$("#heading2").load('<?php echo site_url("search/loadpage");?>');
+	$.ajax({
+		url: "<?php echo site_url('admin/setup/check_admin');?>",
+		type: "POST",
+		success: function(data){
+			if (data == "Yes") {
+				$("#setup_cpt").show();
+				$("#setup_update").show();
+				//$("#setup_cancel").hide();
+			} else {
+				$("#setup_cpt").hide();
+				$("#setup_update").hide();
+				$(".practice_exclude").hide();
+				//$("#setup_cancel").show();
+				var practice_active = "<?php $this->session->userdata('practice_active');?>";
+				if (practice_active == "Y") {
+					$("#setup_cancel_div").show();
+					$("#setup_restart_div").hide();
+					$("#subscription text").text("Cancel Subscription");
+				} else {
+					$("#setup_cancel_div").hide();
+					$("#setup_restart_div").show();
+					$("#subscription text").text("Restart Subscription");
+				}
+			}
+		}
+	});
 	$(".save_admin_tab1").click(function(){
 		var str = $("#admin_form_1").serialize();		
 		if(str){
@@ -196,6 +222,23 @@ $(document).ready(function() {
 			}
 		});
 	});
+	$('#cancel_button').button().click(function() {
+		if ($('#cancel_confirm').is(':checked')) {
+			$.ajax({
+				type: "POST",
+				url: "<?php echo site_url('registerpractice/cancel_subscription');?>",
+				success: function(data){
+					if (data == "Your account has been canceled!") {
+						window.location="<?php echo site_url('admin/setup');?>";
+					} else {
+						$.jGrowl(data);
+					}
+				}
+			});
+		} else {
+			$.jGrowl('You need to check mark the confirmation statement to cancel your subscription!');
+		}
+	});
 	function updateCoords(c) {
 		$('#x').val(c.x);
 		$('#y').val(c.y);
@@ -217,8 +260,9 @@ $(document).ready(function() {
 					<li><a href="#admin_tabs_4">Fax Service</a></li>
 					<li><a href="#admin_tabs_5">Practice Billing</a></li>
 					<li><?php echo anchor('admin/setup/extensions/', 'Extensions and Accounts');?></li>
-					<li><?php echo anchor('admin/setup/cpt/', 'CPT Codes');?></li>
-					<li><?php echo anchor('admin/setup/update/', 'Update ');?></li>
+					<li id="setup_cpt"><?php echo anchor('admin/setup/cpt/', 'CPT Codes');?></li>
+					<li id="setup_update"><?php echo anchor('admin/setup/update/', 'Update ');?></li>
+					<li id="setup_cancel"><a href="#admin_tabs_9" id="subscription_text">Cancel Subscription</a></li>
 				</ul>
 				<form id="admin_form_1" />
 					<div id="admin_tabs_1">
@@ -267,19 +311,19 @@ $(document).ready(function() {
 								<td>Website:</td>
 								<td><input type="text" name="website" id="website" class="text ui-widget-content ui-corner-all" style="width:400px"/></td>
 							</tr>
-							<tr>
+							<tr class="practice_exclude">
 								<td>Gmail username for sending e-mail:</td>
 								<td><input type="text" name="smtp_user" id="smtp_user" class="text ui-widget-content ui-corner-all" style="width:400px"/></td>
 							</tr>
-							<tr>
+							<tr class="practice_exclude">
 								<td>Gmail password for sending e-mail:</td>
-								<td><input type="text" name="smtp_pass" id="smtp_pass" class="text ui-widget-content ui-corner-all" style="width:400px"/></td>
+								<td><input type="password" name="smtp_pass" id="smtp_pass" class="text ui-widget-content ui-corner-all" style="width:400px"/></td>
 							</tr>
 							<tr>
 								<td>Additional message for e-mailed<br>appointment reminders:</td>
 								<td><textarea name="additional_message" id="additional_message" class="text ui-widget-content ui-corner-all" rows="4" style="width:400px"></textarea></td>
 							</tr>
-							<tr>
+							<tr class="practice_exclude">
 								<td>Patient Portal web address</td>
 								<td><input type="text" name="patient_portal" id="patient_portal" class="text ui-widget-content ui-corner-all" style="width:400px"/></td>
 							</tr>
@@ -350,6 +394,34 @@ $(document).ready(function() {
 						<input type="file" name="fileToUpload" id="fileToUpload"> <input type="submit" id="practice_logo_upload_submit" value="Upload"> 
 					</form>
 					<input style="float:left;" type="button" id="practice_logo_none" value="No Logo"/>
+				</div>
+				<div id="admin_tabs_9" style="overflow:auto;"> 
+					<div id="setup_cancel_div">
+						<h4>We're so sorry to see you go!</h4>
+						Before you cancel your subscription to NOSH ChartingSystem, please make sure you have reviewed this checklist.  You are responsible for reviewing and completing these prior to cancellation.  It is suggested that you run through these items and return back to this page before commiting your cancellation.<br>
+						<ul>
+							<li>Ensure all <strong>encounters</strong> (drafts, or otherwise) have been signed by all of your providers.</li>
+							<li>Ensure that all <strong>orders and prescriptions</strong> have been accounted for so that they can be tracked by you on your transition to another system.</li>
+							<li>Ensure that all <strong>pending claims</strong> have been accounted for so that they can be tracked by you on your transition to another system.</li>
+							<li><strong>Notify your patients</strong> that your system will no longer be active.  Patients will not be able to access the practice portal after cancellation takes place.</li>
+							<li>Remove any <strong>links</strong> to your NOSH instance such as you practice website, business cards, and email signatures.</li>
+							<li>Keep in mind, the administrator account (the username and password for which the practice account was first set up with), will always be active, even after cancellation.  After all, the data belongs to you and we will not erase or destroy your data and we will not take your data hostage for any reason.  You will not be charged for having this active administrator account.  It is our commitment to making sure that you have full access to your data.  With this active account, your practice administrator can print (to PDF) any or all patient records for future records requests, or to incorporate the records with another electronic health record system.</li>
+						</ul>
+						If you change your mind after cancellation, you are always welcome to re-register.  With your one active administrator account, you can re-register at any time.<br>
+						<br><input type="checkbox" id="cancel_confirm" value="y"/> I confirm that I want to cancel my NOSH ChartingSystem subscription for my practice.<br>
+						<br><button type="button" id="cancel_button">Cancel Subscription</button>
+					</div>
+					<div id="setup_restart_div">
+						<h4>We're so happy you'd like to return to using NOSH ChartingSystem.</h4>
+						Once you click the button below, you'll be sent to the registration page.  Don't worry, all of your previous data is still intact and will be re-opened for editing once you receive your activation confirmation e-mail from us.  Once you are activated, please make sure you re-activate all exisiting users and designate new passwords.  Other things to check after you activate:
+						<ul>
+							<li>Ensure that your online fax system is still current and is accurately entered in the NOSH ChartingSystem Admin Setup page.</li>
+							<li>Ensure that all <strong>orders and prescriptions</strong> from your previous system (if applicable) has been accounted for and immediately entered in NOSH ChartingSystem to the correct patient.</li>
+							<li>Ensure that all <strong>pending claims</strong> from your previous system (if applicable) has been accounted for and immediately entered in NOSH ChartingSystem to the correct patient so that they can be tracked by your practice.</li>
+							<li>Remember that you can upload PDF documents of previous medical records from your previous system (if applicable) in the patient chart dashboard.</li>
+						</ul>
+						<br><button type="button" id="restart_button">Restart My Subscription</button>
+					</div>
 				</div>
 			</div>
 		</div>

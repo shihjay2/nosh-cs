@@ -3828,30 +3828,30 @@ class Encounters extends Application
 			$data = $query->row_array();
 			$data1['message'] = "OK";
 			if ($data['assessment_1'] != '') {
-				$data1['1'] = $data['assessment_1'];
+				$data1['1'] = "1 - " . $data['assessment_1'];
 			} else {
 				$data1['message'] = "No diagnoses available.";
 			}
 			if ($data['assessment_2'] != '') {
-				$data1['2'] = $data['assessment_2'];
+				$data1['2'] = "2 - " . $data['assessment_2'];
 			}
 			if ($data['assessment_3'] != '') {
-				$data1['3'] = $data['assessment_3'];
+				$data1['3'] = "3 - " . $data['assessment_3'];
 			}
 			if ($data['assessment_4'] != '') {
-				$data1['4'] = $data['assessment_4'];
+				$data1['4'] = "4 - " . $data['assessment_4'];
 			}
 			if ($data['assessment_5'] != '') {
-				$data1['5'] = $data['assessment_5'];
+				$data1['5'] = "5 - " . $data['assessment_5'];
 			}
 			if ($data['assessment_6'] != '') {
-				$data1['6'] = $data['assessment_6'];
+				$data1['6'] = "6 - " . $data['assessment_6'];
 			}
 			if ($data['assessment_7'] != '') {
-				$data1['7'] = $data['assessment_7'];
+				$data1['7'] = "7 - " . $data['assessment_7'];
 			}
 			if ($data['assessment_8'] != '') {
-				$data1['8'] = $data['assessment_8'];
+				$data1['8'] = "8 - " . $data['assessment_8'];
 			}
 		} else {
 			$data1['message'] = "No diagnoses available.";
@@ -5045,10 +5045,10 @@ class Encounters extends Application
 		if ($num_rows7 > 0) {
 			$query8= $this->encounters_model->getAssessment($eid);
 			$result8 = $query8->row_array();
-			$bill_Box21_1 = $this->string_format($result8['assessment_icd1'], 8);
-			$bill_Box21_2 = $this->string_format($result8['assessment_icd2'], 8);
-			$bill_Box21_3 = $this->string_format($result8['assessment_icd3'], 8);
-			$bill_Box21_4 = $this->string_format($result8['assessment_icd4'], 8);
+			$bill_Box21_1 = $this->string_format($result8['assessment_icd5'], 8);
+			$bill_Box21_2 = $this->string_format($result8['assessment_icd6'], 8);
+			$bill_Box21_3 = $this->string_format($result8['assessment_icd7'], 8);
+			$bill_Box21_4 = $this->string_format($result8['assessment_icd8'], 8);
 			$i = 0;
 			foreach ($result7 as $key7 => $value7) {
 				$cpt_charge7[$key7]  = $value7['cpt_charge'];
@@ -5069,7 +5069,11 @@ class Encounters extends Application
 				$cpt_final[$i]['cpt_charge1'] = $cpt_final[$i]['cpt_charge'];
 				$cpt_final[$i]['cpt_charge'] = $this->string_format($cpt_final[$i]['cpt_charge'], 8);
 				$cpt_final[$i]['npi'] = $this->string_format($npi, 11);
-				$cpt_final[$i]['icd_pointer'] =  $this->string_format($cpt_final[$i]['icd_pointer'], 4);
+				$icd_pointer_final = '';
+				foreach (str_split($cpt_final[$i]['icd_pointer']) as $icd_element) {
+					$icd_pointer_final .= $icd_element - 4;
+				}
+				$cpt_final[$i]['icd_pointer'] =  $this->string_format($icd_pointer_final, 4);
 				$i++;
 			}
 			if ($num_rows7 < 6) {

@@ -17,6 +17,14 @@ class Install extends Controller {
 
 	function index()
 	{
+		include(APPPATH.'config/database'.EXT);
+		if ($db['default']['username'] != "") {
+			$db_selected = mysqli_connect('localhost', $db['default']['username'], $db['default']['password'], 'nosh');
+			if ($db_selected) {
+				echo "NOSH ChartingSystem is already installed.";
+				exit (0);
+			}
+		}
 		$this->load->library('form_validation');
 		$this->form_validation->set_rules('username', 'Username', 'trim|required|min_length[4]|max_length[40]|callback_reg_username_check');
 		$this->form_validation->set_rules('password', 'Password', 'trim|required|min_length[4]|max_length[12]|matches[conf_password]');
@@ -300,7 +308,8 @@ class Install extends Controller {
 			'vivacare' => array('type' => 'VARCHAR', 'constraint' => 255),
 			'sales_tax' => array('type' => 'VARCHAR', 'constraint' => 10, 'default' => ''),
 			'practicehandle' => array('type' => 'VARCHAR', 'constraint' => 255),
-			'peacehealth_id' => array('type' => 'VARCHAR', 'constraint' => 100)
+			'peacehealth_id' => array('type' => 'VARCHAR', 'constraint' => 100),
+			'active' => array('type' => 'VARCHAR', 'constraint' => 10)
 		);
 		$this->dbforge->add_field($practiceinfo_definition);
 		$this->dbforge->add_key('practice_id', TRUE);
@@ -1512,7 +1521,8 @@ class Install extends Controller {
 			'smtp_user' => $smtp_user,
 			'smtp_pass' => $smtp_pass,
 			'vivacare' => '',
-			'version' => '1.7.2'
+			'version' => '1.7.3',
+			'active' => 'Y'
 		);
 		$this->db->insert('practiceinfo', $data2);
 		$scans_directory = $documents_dir1 . 'scans';
@@ -1550,7 +1560,8 @@ class Install extends Controller {
 		$data8 = array(
 			'visit_type' => 'Closed',
 			'classname' => 'colorblack',
-			'active' => 'y'
+			'active' => 'y',
+			'practice_id' => '1'
 		);
 		$this->db->insert('calendar', $data8);
 		

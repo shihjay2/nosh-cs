@@ -974,8 +974,8 @@ $(document).on("click", ".ui-jqgrid-titlebar", function() {
 			<div id="header_left">
 				<strong><?php echo anchor('start', 'Tasks') . ' '; ?></strong>
 				<?php if(user_group('admin')) { echo anchor('admin/setup', 'Setup'); } ?>
-				<?php if(user_group('admin')) { echo anchor('admin/users', 'Users'); } ?>
-				<?php if(user_group('admin')) { echo anchor('admin/schedule', 'Schedule'); } ?>
+				<?php if(user_group('admin') && $this->session->userdata('practice_active') == 'Y') { echo anchor('admin/users', 'Users'); } ?>
+				<?php if(user_group('admin') && $this->session->userdata('practice_active') == 'Y') { echo anchor('admin/schedule', 'Schedule'); } ?>
 				<?php if(user_group('admin')) { echo anchor('admin/logs', 'Logs'); } ?>
 				<?php if(user_group('assistant')) { echo anchor('assistant/messaging', 'Messages'); } ?>
 				<?php if(user_group('assistant')) { echo anchor('assistant/schedule', 'Schedule'); } ?>

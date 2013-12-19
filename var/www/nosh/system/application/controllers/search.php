@@ -4074,6 +4074,29 @@ class Search extends Application
 		$body .= '</table></body></html>';
 		return $body;
 	}
+	
+	function patient_is_user()
+	{
+		$pid = $this->session->userdata('pid');
+		$this->db->where('pid', $pid);
+		$row = $this->db->get('demographics')->row_array();
+		$data = array();
+		$data['message'] = 'no';
+		if ($row['id'] != '') {
+			$data['message'] = "yes";
+			$this->db->where('id', $row['id']);
+			$row1 = $this->db->get('users')->row_array();
+			$data['messages_to'] = $row1['displayname'] . ' (' . $row1['id'] . ')';
+			$dob1 = $row['DOB'];
+			$dob2 = strtotime($dob1);
+			$datestring = "%m/%d/%Y";
+			$dob = mdate($datestring, $dob2);
+			$data['messages_patient'] = $row['lastname'] . ', ' . $row['firstname'] . ' (DOB: ' . $dob . ') (ID: ' . $row['pid'] . ')';
+			$data['pid'] = $pid;
+		}
+		echo json_encode($data);
+		exit (0);
+	}
 }
 /* End of file: search.php */
 /* Location: application/controllers/search.php */

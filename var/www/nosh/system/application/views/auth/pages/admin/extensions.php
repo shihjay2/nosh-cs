@@ -1,5 +1,14 @@
 <script type="text/javascript">
 $(document).ready(function() {
+	$.ajax({
+		url: "<?php echo site_url('admin/setup/check_admin');?>",
+		type: "POST",
+		success: function(data){
+			if (data != "Yes") {
+				$(".practice_exclude").hide();
+			}
+		}
+	});
 	$("#extensions_accordion").accordion({active: false, fillSpace: true, heightStyle: "content"});
 	$("#save_extensions_tab").click(function(){
 		var str = $("#extensions_form").serialize();
@@ -129,8 +138,8 @@ $(document).ready(function() {
 			<input type="text" name="vivacare" id="vivacare" class="text ui-widget-content ui-corner-all" size="42" value=""/><br><br>
 			<a href="https://vivacare.com/provider/register/register.jsp" target="_blank">Register at Vivacare for free.</a>
 		</div>
-		<h3>SNOMED-CT</h3>
-		<div>
+		<h3 class="practice_exclude">SNOMED-CT</h3>
+		<div class="practice_exclude">
 			Enable SNOMED-CT Extension:<br>
 			<select name="snomed_extension" id="snomed_extension" class="text ui-widget-content ui-corner-all"></select>
 		</div>

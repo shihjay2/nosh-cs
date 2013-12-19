@@ -3,6 +3,15 @@ $(function() {
 	$("#dashboard_admin_tabs").tabs();
 });
 $(document).ready(function() {
+	$.ajax({
+		url: "<?php echo site_url('admin/setup/check_admin');?>",
+		type: "POST",
+		success: function(data){
+			if (data != "Yes") {
+				$(".practice_exclude").hide();
+			}
+		}
+	});
 	$("#save_admin_tab2").click(function(){
 		var dir1 = $("#documents_dir");
 		var bValid = true;
@@ -129,7 +138,7 @@ $(document).ready(function() {
 		<td>Default Practice Location:</td>
 		<td><input type="text" name="default_pos_id" id="default_pos_id" class="text ui-widget-content ui-corner-all" size="42" value="<?php if ($admin->default_pos_id != '') {echo $admin->default_pos_id;}?>"/></td>
 	</tr>
-	<tr>
+	<tr class="practice_exclude">
 		<td>Documents Directory:</td>
 		<td><input type="text" name="documents_dir" id="documents_dir" class="text ui-widget-content ui-corner-all" size="42" value="<?php if ($admin->documents_dir != '') {echo $admin->documents_dir;}?>"/></td>
 	</tr>

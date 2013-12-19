@@ -37,12 +37,20 @@ class Setup extends Application
 	
 	function cpt()
 	{
-		$this->load->view('auth/pages/admin/cpt');
+		if ($this->session->userdata('practice_id') == '1') {
+			$this->load->view('auth/pages/admin/cpt');
+		} else {
+			$this->auth->view('admin/setup');
+		}
 	}
 	
 	function update()
 	{
-		$this->load->view('auth/pages/admin/update');
+		if ($this->session->userdata('practice_id') == '1') {
+			$this->load->view('auth/pages/admin/update');
+		} else {
+			$this->auth->view('admin/setup');
+		}
 	}
 
 	// --------------------------------------------------------------------
@@ -77,6 +85,21 @@ class Setup extends Application
 		$this->db->where('practice_id', $this->session->userdata('practice_id'));
 		$this->db->update('practiceinfo', $data);
 		$this->audit_model->update();
+		$count = $this->db->get('practiceinfo')->num_rows();
+		if ($count > 1) {
+			$this->db->where('practice_id !=', '1');
+			foreach ($this->db->get('practiceinfo')->result_array() as $practice_row) {
+				$portal_array = explode("/", $practice_row['patient_portal']);
+				$new_portal = $this->input->post('patient_portal') . "/" . $portal_array[4] . "/" . $portal_array[5] . "/" . $portal_array[6];
+				$data1 = array(
+					'smtp_user' => $this->input->post('smtp_user'),
+					'smtp_pass' => $this->input->post('smtp_pass'),
+					'patient_portal' => $new_portal
+				);
+				$this->db->where('practice_id', $practice_row['practice_id']);
+				$this->db->update('practiceinfo', $data1);
+			}
+		}
 		$result = 'Practice Settings Updated';
 		echo $result;
 	}
@@ -118,6 +141,13 @@ class Setup extends Application
 		$this->db->where('practice_id', $this->session->userdata('practice_id'));
 		$this->db->update('practiceinfo', $data);
 		$this->audit_model->update();
+		$count = $this->db->get('practiceinfo')->num_rows();
+		if ($count > 1) {
+			$data1 = array(
+				'snomed_extension' => $this->input->post('snomed_extension')
+			);
+			$this->db->update('practiceinfo', $data1);
+		}
 		$result = 'Extensions Updated';
 		echo $result;
 	}
@@ -838,6 +868,29 @@ class Setup extends Application
 			}
 			fclose($orderslist1_csv);
 		}
+	}
+	
+	function check_admin()
+	{
+		$practice_id = $this->session->userdata('practice_id');
+		if ($practice_id == '1') {
+			$arr = "Yes";
+		} else {
+			$arr = "No";
+		}
+		echo $arr;
+	}
+	
+	function check_active()
+	{
+		$this->db->where('practice_id', $this->session->userdata('practice_id'));
+		$row = $this->db->get('practiceinfo')->row_array();
+		if ($row['active'] == 'Y') {
+			$arr = "Yes";
+		} else {
+			$arr = "No";
+		}
+		echo $arr;
 	}
 }
 /* End of file: setup.php */

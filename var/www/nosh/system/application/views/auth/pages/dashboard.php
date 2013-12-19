@@ -1317,9 +1317,21 @@ $(document).ready(function() {
 		},
 		buttons: {
 			'Save': function() {
-				var facility = $("#menu_insurance_plan_facility");
+				var a = $("#menu_insurance_plan_facility");
+				var b = $("#menu_insurance_plan_type");
+				var c = $("#menu_insurance_plan_assignment");
+				var d = $("#menu_insurance_plan_address");
+				var e = $("#menu_insurance_plan_city");
+				var f = $("#menu_insurance_plan_state");
+				var g = $("#menu_insurance_plan_zip");
 				var bValid = true;
-				bValid = bValid && checkEmpty(facility,"Insurance Plan Name");
+				bValid = bValid && checkEmpty(a,"Insurance Plan Name");
+				bValid = bValid && checkEmpty(b,"Insurance Plan Type");
+				bValid = bValid && checkEmpty(c,"Accept Assignment");
+				bValid = bValid && checkEmpty(d,"Street Address");
+				bValid = bValid && checkEmpty(e,"City");
+				bValid = bValid && checkEmpty(f,"State");
+				bValid = bValid && checkEmpty(g,"Zip");
 				if (bValid) {
 					var str = $("#edit_menu_insurance_plan_form").serialize();
 					if(str){
@@ -1648,7 +1660,7 @@ $(document).ready(function() {
 	}).click(function(){
 		var click_id = jQuery("#tests_reconcile_list").getGridParam('selarrrow');
 		if(click_id.length > 0){
-			if(confirm('Are you sure you want to delete the seletected tests?')){ 
+			if(confirm('Are you sure you want to delete the selected tests?')){ 
 				var count = click_id.length;
 				for (var i = 0; i < count; i++) {
 					$.ajax({
@@ -1666,6 +1678,90 @@ $(document).ready(function() {
 			$.jGrowl("Please select test to delete!");
 		}
 	});
+	$("#print_entire_charts_progressbar").progressbar({
+		value: false,
+		change: function() {
+			var value = $("#print_entire_charts_progressbar").progressbar("option", "value");
+			$(".print_entire_charts_progressbar_label").text(value + "%" );
+		},
+		complete: function() {
+			$(".print_entire_charts_progressbar_label").text( "Complete!" );
+		}
+	});
+	$("#print_entire_charts").click(function(){
+		$.ajax({
+			type: "POST",
+			url: "<?php echo site_url('admin/chartmenu/check_print_entire_chart');?>",
+			success: function(data){
+				if (data == "OK") {
+					$("#print_entire_charts_progress_div").show();
+					$.ajax({
+						type: "POST",
+						url: "<?php echo site_url('admin/chartmenu/print_entire_chart');?>",
+						dataType: 'json',
+						success: function(data1){
+							if (data1.message="OK") {
+								$("#print_download").html(data1.html);
+							}
+						}
+					});
+					setTimeout(print_chart_progress, 1000);
+				} else {
+					$.jGrowl(data);
+				}
+			}
+		});
+	}).tooltip({ content: "Clicking on this will create a ZIP file with individual PDF files of complete medical records for every patient in your practice." });
+	function print_chart_progress() {
+		var val = $("#print_entire_charts_progressbar").progressbar("option", "value" ) || 0;
+		$.ajax({
+			type: "POST",
+			url: "<?php echo site_url('admin/chartmenu/print_entire_chart_progress');?>",
+			success: function(data){
+				$("#print_entire_charts_progressbar").progressbar("option","value", parseInt(data));
+				if (data < 99) {
+					setTimeout(print_chart_progress, 1000);
+				}
+			}
+		});
+	}
+	$("#generate_csv_patient_demographics").click(function(){
+		$.ajax({
+			type: "POST",
+			url: "<?php echo site_url('admin/chartmenu/check_csv_patient_demographics');?>",
+			success: function(data){
+				if (data == "OK") {
+					$("#print_entire_charts_progress_div").show();
+					$.ajax({
+						type: "POST",
+						url: "<?php echo site_url('admin/chartmenu/generate_csv_patient_demographics');?>",
+						dataType: 'json',
+						success: function(data1){
+							if (data1.message="OK") {
+								$("#print_download").html(data1.html);
+							}
+						}
+					});
+					setTimeout(csv_progress, 1000);
+				} else {
+					$.jGrowl(data);
+				}
+			}
+		});
+	}).tooltip({ content: "Clicking on this will create a CSV file of demographic information for every patient in your practice." });
+	function csv_progress() {
+		var val = $("#print_entire_charts_progressbar").progressbar("option", "value" ) || 0;
+		$.ajax({
+			type: "POST",
+			url: "<?php echo site_url('admin/chartmenu/csv_progress');?>",
+			success: function(data){
+				$("#print_entire_charts_progressbar").progressbar("option","value", parseInt(data));
+				if (data < 99) {
+					setTimeout(csv_progress, 1000);
+				}
+			}
+		});
+	}
 });
 </script>
 <?php if(user_group('admin') || user_group('provider') || user_group('assistant') || user_group('billing')) { echo '<div id ="heading2"></div>';}?>
@@ -1681,7 +1777,9 @@ $(document).ready(function() {
 						<?php if(user_group('admin')) { echo '<tr><td><img src="' . base_url().'images/usersadmin.png' . '" height="40" width="40" border="0"></td><td>' . anchor('admin/users', 'Administer users') . '.</td></tr>';}?>
 						<?php if(user_group('admin')) { echo '<tr><td><img src="' . base_url().'images/schedule.png' . '" height="40" width="40" border="0"></td><td>' . anchor('admin/schedule', 'Setup schedule') . '.</td></tr>';}?>
 						<?php if(user_group('admin')) { echo '<tr><td><img src="' . base_url().'images/newencounter.png' . '" height="40" width="40" border="0"></td><td>' . anchor('admin/logs', 'View system logs') . '.</td></tr>';}?>
-						<?php if(user_group('admin')) { echo '<tr><td><img src="' . base_url().'images/kdisknav.png' . '" height="40" width="40" border="0"></td><td><a href="#" id="restore_database_link">Restore the database</a>.</td></tr>';}?>
+						<?php if(user_group('admin')) { echo '<tr><td><img src="' . base_url().'images/printmgr.png' . '" height="40" width="40" border="0"></td><td><a href="#" id="print_entire_charts" title="">Export All Charts</a>.</td></tr>';}?>
+						<?php if(user_group('admin')) { echo '<tr><td><img src="' . base_url().'images/download.png' . '" height="40" width="40" border="0"></td><td><a href="#" id="generate_csv_patient_demographics" title="">Export All Patient Demographics</a>.</td></tr>';}?>
+						<?php if(user_group('admin') && $saas_admin == "y") { echo '<tr><td><img src="' . base_url().'images/kdisknav.png' . '" height="40" width="40" border="0"></td><td><a href="#" id="restore_database_link">Restore the database</a>.</td></tr>';}?>
 						<?php if(user_group('provider')) { echo '<tr><td><img src="' . base_url().'images/personal.png' . '" height="40" width="40" border="0"></td><td><a href="#" id="provider_info">Update your user information</a>.</td></tr>';}?>
 						<?php if(user_group('provider')) { echo '<tr><td><img src="' . base_url().'images/email.png' . '" height="40" width="40" border="0"></td><td>You have ' . $number_messages . ' ' . anchor('provider/messaging', 'messages to view') . '.</td></tr>';}?>
 						<?php if(user_group('provider')) { echo '<tr><td><img src="' . base_url().'images/scanner.png' . '" height="40" width="40" border="0"></td><td>You have ' . $number_documents . ' ' . anchor('provider/messaging', 'new documents from the fax or scanner to view') . '.</td></tr>';}?>
@@ -1722,6 +1820,12 @@ $(document).ready(function() {
 					<div id="mtm_alert_div" style="display:none;">
 						<table id="dashboard_mtm_alert" class="scroll" cellpadding="0" cellspacing="0"></table>
 						<div id="dashboard_mtm_alert_pager" class="scroll" style="text-align:center;"></div><br>
+					</div>
+					<div id="print_entire_charts_progress_div" style="display:none;">
+						<div id="print_entire_charts_progressbar" style="width:600px";>
+							<div class="print_entire_charts_progressbar_label">Loading...</div>
+						</div>
+						<div id="print_download"></div>
 					</div>
 				</td>
 			</tr>

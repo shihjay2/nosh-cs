@@ -24,7 +24,6 @@ class Front extends Controller {
 		} else {
 			$this->check_version($practicehandle);
 		}
-		
 	}
 	
 	// --------------------------------------------------------------------
@@ -105,7 +104,11 @@ class Front extends Controller {
 		if ($row1['version'] < "1.7.2") {
 			$this->system_update1_7_2();
 		}
-		$this->run();
+		// Check for version 1.7.3
+		if ($row1['version'] < "1.7.3") {
+			$this->system_update1_7_3();
+		}
+		//$this->run();
 		redirect('start/' . $practicehandle);
 	}
 	
@@ -1392,7 +1395,7 @@ class Front extends Controller {
 		$this->db->update('practiceinfo', $version_data);
 	}
 	
-	function run()
+	function system_update1_7_3()
 	{
 		$this->load->dbforge();
 		$this->load->database();
@@ -1406,6 +1409,31 @@ class Front extends Controller {
 			);
 			$this->dbforge->modify_column('messaging', $fields);
 		}
+		$calendar_data = array(
+			'practice_id' => '1'
+		);
+		$this->db->where('calendar_id', '1');
+		$this->db->update('calendar', $calendar_data);
+		if (!$this->db->field_exists('active','practiceinfo')) {
+			$practiceinfo_definition = array(
+				'active' => array('type' => 'VARCHAR', 'constraint' => 10)
+			);
+			$this->dbforge->add_column('practiceinfo', $practiceinfo_definition);
+		}
+		$practice_data = array(
+			'active' => 'Y'
+		);
+		$this->db->update('practiceinfo', $practice_data);
+		$version_data = array(
+			'version' => '1.7.3'
+		);
+		$this->db->update('practiceinfo', $version_data);
+	}
+	
+	function run()
+	{
+		$this->load->dbforge();
+		$this->load->database();
 	}
 }
 

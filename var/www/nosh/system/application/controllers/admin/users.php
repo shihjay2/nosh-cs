@@ -433,6 +433,17 @@ class Users extends Application
 			'password' => $password
 		);
 		$this->users_model->update($this->input->post('id'), $data);
+		$this->db->where('id', $this->input->post('id'));
+		$this->db->where('practice_id', $this->session->userdata('practice_id'));
+		$query = $this->db->get('demographics_relate');
+		if ($query->num_rows() > 0) {
+			$data1 = array(
+				'id' => NULL
+			);
+			$row = $query->row_array();
+			$this->db->where('demographics_relate_id', $row['demographics_relate_id']);
+			$this->db->update('demographics_relate', $data1);
+		}
 	}
 	
 	function reset_password()
@@ -440,6 +451,25 @@ class Users extends Application
 		$data['password'] = $this->auth->_salt($this->input->post('password'));
 		$this->users_model->update($this->input->post('id'), $data);
 		echo "Password changed!";
+	}
+	
+	function check_admin()
+	{
+		$practice_id = $this->session->userdata('practice_id');
+		if ($practice_id == '1') {
+			$arr = "OK";
+		} else {
+			$this->db->where('practice_id', $practice_id);
+			$row = $this->db->get('practiceinfo')->row_array();
+			$query = $this->db->query("SELECT * FROM users, providers WHERE users.group_id=2 AND users.id=providers.id AND users.active=1 AND users.practice_id=$practice_id");
+			$count = $query->num_rows(); 
+			if ($row['provider_limit'] <= $count) {
+				$arr = "No more providers can be added based on your provider limit for your practice account.  Please upgrade your subscription to enable additional providers!";
+			} else {
+				$arr = "OK";
+			}
+		}
+		echo $arr;
 	}
 } 
 /* End of file: users.php */

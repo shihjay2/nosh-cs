@@ -1440,6 +1440,21 @@ $(document).ready(function() {
 		}
 	});
 	$("#billing_icd1").chosen();
+	$("#billing_icd1").change(function() {
+		var a = $(this).val();
+		if (a != '') {
+			var b = ["1","2","3","4"];
+			var c = 0;
+			for (var i=0;i<a.length;i++) {
+				if (b.indexOf(a[i]) > 0) {
+					c++;
+				}
+			}
+			if (c != 0 && c<a.length) {
+				$.jGrowl("You must choose diagnoses grouped 1-4 or 5-6!");
+			}
+		}
+	});
 	$("#add_billing_cpt1").button();
 	$("#add_billing_cpt1").click(function(){
 		$('#billing_form1').clearForm();
