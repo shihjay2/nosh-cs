@@ -1,3 +1,9 @@
+nosh-cs (1.7.3-0ubuntu2) precise; urgency=low
+
+  * Fixed - Hide last tab in admin setup panel.
+
+ -- Michael Shihjay Chen <shihjay2@gmail.com>  Thu, 19 Dec 2013 15:29:11 -0800
+
 nosh-cs (1.7.3-0ubuntu1) precise; urgency=low
 
   * New Feature - Ability to export all charts as a ZIP file, individual PDF.

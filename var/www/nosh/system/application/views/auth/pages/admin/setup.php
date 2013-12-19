@@ -8,12 +8,12 @@ $(document).ready(function() {
 			if (data == "Yes") {
 				$("#setup_cpt").show();
 				$("#setup_update").show();
-				//$("#setup_cancel").hide();
+				$("#setup_cancel").hide();
 			} else {
 				$("#setup_cpt").hide();
 				$("#setup_update").hide();
 				$(".practice_exclude").hide();
-				//$("#setup_cancel").show();
+				$("#setup_cancel").show();
 				var practice_active = "<?php $this->session->userdata('practice_active');?>";
 				if (practice_active == "Y") {
 					$("#setup_cancel_div").show();
