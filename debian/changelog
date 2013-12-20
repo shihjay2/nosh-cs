@@ -1,3 +1,9 @@
+nosh-cs (1.7.3-0ubuntu4) precise; urgency=low
+
+  * Fixed - Multiple encounters printed in batch file for billing if there were addendums made.
+
+ -- Michael Shihjay Chen <shihjay2@gmail.com>  Fri, 20 Dec 2013 12:06:45 -0800
+
 nosh-cs (1.7.3-0ubuntu3) precise; urgency=low
 
   * Fixed - Restart button defined.
