@@ -367,7 +367,7 @@ class Billing extends Application
 	function check_batch()
 	{
 		$practice_id = $this->session->userdata('practice_id');
-		$query = $this->db->query("SELECT * FROM encounters WHERE bill_submitted='Pend' AND practice_id=$practice_id");
+		$query = $this->db->query("SELECT * FROM encounters WHERE bill_submitted='Pend' AND addendum='n' AND practice_id=$practice_id");
 		if ($query->num_rows() > 0) {
 			echo 'OK';
 		} else {
@@ -379,7 +379,7 @@ class Billing extends Application
 	function check_batch1()
 	{
 		$practice_id = $this->session->userdata('practice_id');
-		$query = $this->db->query("SELECT * FROM encounters WHERE bill_submitted='HCFA' AND practice_id=$practice_id");
+		$query = $this->db->query("SELECT * FROM encounters WHERE bill_submitted='HCFA' AND addendum='n' AND practice_id=$practice_id");
 		if ($query->num_rows() > 0) {
 			echo 'OK';
 		} else {
@@ -391,7 +391,7 @@ class Billing extends Application
 	function printimage_batch()
 	{
 		$practice_id = $this->session->userdata('practice_id');
-		$result = $this->db->query("SELECT * FROM encounters WHERE bill_submitted='Pend' AND practice_id=$practice_id")->result_array();
+		$result = $this->db->query("SELECT * FROM encounters WHERE bill_submitted='Pend' AND addendum='n' AND practice_id=$practice_id")->result_array();
 		$entire = '';
 		foreach ($result as $row) {
 			$entire .= $this->printimage($row['eid']);
@@ -410,7 +410,7 @@ class Billing extends Application
 	function printhcfa_batch()
 	{
 		$practice_id = $this->session->userdata('practice_id');
-		$result = $this->db->query("SELECT * FROM encounters WHERE bill_submitted='HCFA' AND practice_id=$practice_id")->result_array();
+		$result = $this->db->query("SELECT * FROM encounters WHERE bill_submitted='HCFA' AND addendum='n' AND practice_id=$practice_id")->result_array();
 		$entire = '';
 		foreach ($result as $row) {
 			if ($entire === '') {
