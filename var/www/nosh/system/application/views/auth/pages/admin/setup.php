@@ -239,6 +239,9 @@ $(document).ready(function() {
 			$.jGrowl('You need to check mark the confirmation statement to cancel your subscription!');
 		}
 	});
+	$('#restart_button').button().click(function() {
+		window.location="<?php echo site_url('registerpractice/') . "/" . $this->session->userdata('practice_id');?>";
+	});
 	function updateCoords(c) {
 		$('#x').val(c.x);
 		$('#y').val(c.y);

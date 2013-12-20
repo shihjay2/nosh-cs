@@ -1,3 +1,9 @@
+nosh-cs (1.7.3-0ubuntu3) precise; urgency=low
+
+  * Fixed - Restart button defined.
+
+ -- Michael Shihjay Chen <shihjay2@gmail.com>  Thu, 19 Dec 2013 17:08:54 -0800
+
 nosh-cs (1.7.3-0ubuntu2) precise; urgency=low
 
   * Fixed - Hide last tab in admin setup panel.
