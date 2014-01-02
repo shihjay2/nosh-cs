@@ -1,3 +1,9 @@
+nosh-cs (1.7.3-0ubuntu5) precise; urgency=low
+
+  * Fixed - Error with creating database installs on some systems.
+
+ -- Michael Shihjay Chen <shihjay2@gmail.com>  Wed, 01 Jan 2014 17:06:20 -0800
+
 nosh-cs (1.7.3-0ubuntu4) precise; urgency=low
 
   * Fixed - Multiple encounters printed in batch file for billing if there were addendums made.

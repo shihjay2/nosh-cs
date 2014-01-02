@@ -64,12 +64,13 @@ class Install extends Controller {
 			$smtp_user = set_value('smtp_user');
 			$smtp_pass = set_value('smtp_pass');
 			$con = mysqli_connect("localhost",$db_username,$db_password);
-			if (!$con){
-				die('Could not connect: ' . mysql_error());
+			if (mysqli_connect_errno()) {
+				die('Could not connect: ' . mysqli_connect_error());
 			}
-			$create = mysql_query("CREATE DATABASE nosh",$con);
+			$sql = "CREATE DATABASE nosh";
+			$create = mysqli_query($con, $sql);
 			if (!$create) {
-				die('Error creating database: ' . mysql_error());
+				die('Error creating database: ' . mysqli_error($con));
 			}
 			mysqli_close($con);
 			$filename = '/var/www/nosh/system/application/config/database.php';
