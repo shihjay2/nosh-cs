@@ -453,7 +453,7 @@ $(document).ready(function() {
 				var date = $("#message_view_date").val();
 				var body = $("#message_view_body").val();
 				var newbody = '\n\n' + 'On ' + date + ', ' + data + ' wrote:\n---------------------------------\n' + body;
-				$("#messages_body").val(newbody)caret(0);
+				$("#messages_body").val(newbody);
 			}
 		});
 		var subject = 'Re: ' + $("#message_view_subject").val();
@@ -510,7 +510,7 @@ $(document).ready(function() {
 				var date = $("#message_view_date").val();
 				var body = $("#message_view_body").val();
 				var newbody = '\n\n' + 'On ' + date + ', ' + data + ' wrote:\n---------------------------------\n' + body;
-				$("#messages_body").val(newbody).caret(0);
+				$("#messages_body").val(newbody);
 			}
 		});
 		var subject = 'Re: ' + $("#message_view_subject").val();

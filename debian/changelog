@@ -1,3 +1,9 @@
+nosh-cs (1.7.3-0ubuntu8) precise; urgency=low
+
+  * Fixed - Issue with messaging functions not working in assistant user.
+
+ -- Michael Shihjay Chen <shihjay2@gmail.com>  Wed, 08 Jan 2014 15:24:58 -0800
+
 nosh-cs (1.7.3-0ubuntu7) precise; urgency=low
 
   * Fixed - Issue with special characters truncating messasges to patients with lab results. 
