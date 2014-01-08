@@ -453,7 +453,7 @@ $(document).ready(function() {
 				var date = $("#message_view_date").val();
 				var body = $("#message_view_body").val();
 				var newbody = '\n\n' + 'On ' + date + ', ' + data + ' wrote:\n---------------------------------\n' + body;
-				$("#messages_body").val(newbody);
+				$("#messages_body").val(newbody)caret(0);
 			}
 		});
 		var subject = 'Re: ' + $("#message_view_subject").val();
@@ -485,17 +485,19 @@ $(document).ready(function() {
 				url: "<?php echo site_url('assistant/messaging/get_displayname');?>",
 				data: "id=" + to,
 				success: function(data){
-					$("#messages_to").val(data);
+					var a = data + ';';
+					$("#messages_to").val(a);
 				}
 			});
 		} else {
-			var to1 = to + ',' + cc;
+			var to1 = to + ';' + cc;
 			$.ajax({
 				type: "POST",
 				url: "<?php echo site_url('assistant/messaging/get_displayname1');?>",
-				data: "id=" + to,
+				data: "id=" + to1,
 				success: function(data){
-					$("#messages_to").val(data);
+					var a = data + ';';
+					$("#messages_to").val(a);
 				}
 			});
 		}
@@ -508,7 +510,7 @@ $(document).ready(function() {
 				var date = $("#message_view_date").val();
 				var body = $("#message_view_body").val();
 				var newbody = '\n\n' + 'On ' + date + ', ' + data + ' wrote:\n---------------------------------\n' + body;
-				$("messages_body").val(newbody);
+				$("#messages_body").val(newbody).caret(0);
 			}
 		});
 		var subject = 'Re: ' + $("#message_view_subject").val();

@@ -87,7 +87,7 @@ class Start extends Application
 			}
 			if(user_group('patient')) {
 				$this->db->where('id', $user_id);
-				$row = $this->db->get('demographics')->row_array();
+				$row = $this->db->get('demographics_relate')->row_array();
 				$this->session->set_userdata('pid', $row['pid']);
 			}
 			if(user_group('admin')) {
@@ -857,11 +857,15 @@ class Start extends Application
 	
 	function check_username()
 	{
-		$this->db->where('username', $this->input->post('username'));
-		if ($this->db->get('users')->num_rows() > 0) {
-			echo "Username already exists!";
+		if (strlen($this->input->post('username')) < 4) {
+			echo "Username needs to be more than 4 characters long!";
 		} else {
-			echo "OK";
+			$this->db->where('username', $this->input->post('username'));
+			if ($this->db->get('users')->num_rows() > 0) {
+				echo "Username already exists!";
+			} else {
+				echo "OK";
+			}
 		}
 	}
 	
@@ -1140,7 +1144,7 @@ class Start extends Application
 				'practice_id' => $practice_id,
 				'documents_id' => $documents_id
 			);
-			$this->db->insert('messages', $data_message);
+			$this->db->insert('messaging', $data_message);
 		}
 	}
 	

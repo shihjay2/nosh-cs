@@ -41,7 +41,7 @@ $(document).ready(function() {
 	$("#register_dialog").dialog({ 
 		bgiframe: true, 
 		autoOpen: false, 
-		height: 450, 
+		height: 500, 
 		width: 600, 
 		modal: true,
 		draggable: false,
@@ -281,7 +281,7 @@ $(document).ready(function() {
 			</form>
 		</div>
 		<br>
-		<a href="#" id="register" style="font-size:14px;">Are you new to the Patient Portal?</a><br>
+		<a href="#" id="register" style="font-size:14px;">Are you new to the Patient Portal?</a><br><br>
 		<a href="#" id="forgot_password"style="font-size:14px;">Did you forget your password?</a><br><br>
 		<img src="<?php echo base_url(). 'images/important.png';?>" height="40" width="40" border="0"> NOSH ChartingSystem is compatible with Mozilla Firefox, Google Chrome, Apple Safari, Internet Explorer 8 and up, and Opera web browsers only.
 	</div>
@@ -289,17 +289,19 @@ $(document).ready(function() {
 		<form id="register_form">
 			<input type="hidden" name="count" id="new_password_count" value="" />
 			<input type="hidden" name="practice_id" id="register_practice_id" value="" />
-			Last name:<br><input type="text" style="width:200px" id="lastname" name="lastname" class="text ui-widget-content ui-corner-all" /><br>
-			First name:<br><input type="text" style="width:200px" id="firstname" name="firstname" class="text ui-widget-content ui-corner-all" /><br>
-			Date of birth:<br><input type="text" style="width:200px" id="dob" name="dob" class="text ui-widget-content ui-corner-all" /><br>
-			E-mail address:<br><input type="text" style="width:200px" id="email" name="email" class="text ui-widget-content ui-corner-all" /><br>
-			Desired username:<br><input type="text" style="width:200px" id="username1" name="username" class="text ui-widget-content ui-corner-all" /><br>
-			Registration code:<br><input type="password" style="width:200px" id="registration_code" name="registration_code" class="text ui-widget-content ui-corner-all" placeholder="Optional"/><br><br><br>
-			CAPTCHA<br><div style="width:201px"><input type="text" style="width:200px" id="numberReal" name="numberReal" class="text ui-widget-content ui-corner-all" /><br></div>
+			Enter the following fields to register as a patient portal user.  It is important that your answers are exactly what is provided to your practice such as the spelling of your name and date of birth.<br>
+			Last name *:<br><input type="text" style="width:200px" id="lastname" name="lastname" class="text ui-widget-content ui-corner-all" /><br>
+			First name *:<br><input type="text" style="width:200px" id="firstname" name="firstname" class="text ui-widget-content ui-corner-all" /><br>
+			Date of birth *:<br><input type="text" style="width:200px" id="dob" name="dob" class="text ui-widget-content ui-corner-all" /><br>
+			E-mail address *:<br><input type="text" style="width:200px" id="email" name="email" class="text ui-widget-content ui-corner-all" /><br>
+			Desired username *:<br><input type="text" style="width:200px" id="username1" name="username" class="text ui-widget-content ui-corner-all" /><br>
+			Registration code:<br><input type="password" style="width:200px" id="registration_code" name="registration_code" class="text ui-widget-content ui-corner-all" placeholder="Optional"/><br>
 			If you don't have a registration code, a registration request will be sent to the practice administrator.<br>
 			You will then receive a registration code sent to your e-mail address before you proceed further.<br>
-			Keep in mind that this may take some time depending on the response time of the practice administrator.
-			<hr/>
+			Keep in mind that this may take some time depending on the response time of the practice administrator.<br><br>
+			CAPTCHA code *:<br><div style="width:201px"><input type="text" style="width:200px" id="numberReal" name="numberReal" class="text ui-widget-content ui-corner-all" placeholder="Enter CAPTCHA code here." /><br></div>
+			<hr class="ui-state-default"/>
+			* = required.
 			<button type="button" id="submit1">Register</button>
 		</form>
 	</div>
@@ -309,13 +311,13 @@ $(document).ready(function() {
 			<input type="hidden" name="count" id="count" value="" />
 			Secret Question:<br><div id="secret_question"></div><br>
 			Secret Answer:<br><input type="text" style="width:200px" id="secret_answer" name="secret_answer" class="text ui-widget-content ui-corner-all" /><br>
-			<hr/>
+			<hr class="ui-state-default"/>
 			<button type="button" id="submit2">OK</button>
 		</form>
 		<form id="forgot_password_form1">
 			New Password:<br><input type="password" style="width:200px" id="new_password" name="new_password" class="text ui-widget-content ui-corner-all" /><br>
 			Confirm New Password:<br><input type="password" style="width:200px" id="new_password_confirm" name="new_password_confirm" class="text ui-widget-content ui-corner-all" /><br>
-			<hr/>
+			<hr class="ui-state-default"/>
 			<button type="button" id="submit3">OK</button>
 		</form>
 	</div>
@@ -324,7 +326,7 @@ $(document).ready(function() {
 			<input type="hidden" name="id" id="new_password_id" value="" />
 			Password:<br><input type="password" style="width:200px" id="new_password1" name="new_password1" class="text ui-widget-content ui-corner-all" /><br>
 			Confirm Password:<br><input type="password" style="width:200px" id="new_password_confirm1" name="new_password_confirm1" class="text ui-widget-content ui-corner-all" /><br>
-			<hr/>
+			<hr class="ui-state-default"/>
 			<button type="button" id="submit4">OK</button>
 		</form>
 	</div>

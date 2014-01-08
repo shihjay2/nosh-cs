@@ -392,19 +392,24 @@ class Users extends Application
 			'practice_id' => $this->session->userdata('practice_id')
 		);
 		$action = $this->input->post('oper');
+		$this->db->where('pid', $this->input->post('pid'));
+		$this->db->where('practice_id', $this->session->userdata('practice_id'));
+		$demographics_relate_row = $this->db->get('demographics_relate')->row_array();
 		if ($action == 'edit') {
 			$this->users_model->update($this->input->post('id'), $data1);
 			$data2 = array(
 				'id' => $this->input->post('id')
 			);
-			$this->demographics_model->update($this->input->post('pid'), $data2);
+			$this->db->where('demographics_relate_id', $demographics_relate_row['demographics_relate_id']);
+			$this->db->update('demographics_relate', $data2);
 		}
 		if ($action == 'add') {
 			$id = $this->users_model->add($data1);
 			$data2 = array(
 				'id' => $id
 			);
-			$this->demographics_model->update($this->input->post('pid'), $data2);
+			$this->db->where('demographics_relate_id', $demographics_relate_row['demographics_relate_id']);
+			$this->db->update('demographics_relate', $data2);
 			$arr['id'] = $id;
 			echo json_encode($arr);
 		}

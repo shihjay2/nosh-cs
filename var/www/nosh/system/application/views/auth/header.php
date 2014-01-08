@@ -67,6 +67,7 @@
 <script type="text/javascript" src="<?php echo base_url().'js/tagit-themeroller.js';?>"></script>
 <script type="text/javascript" src="<?php echo base_url().'js/jquery.jstree.js';?>"></script>
 <script type="text/javascript" src="<?php echo base_url().'js/jquery.populate.js';?>"></script>
+<script type="text/javascript" src="<?php echo base_url().'js/jquery.caret-1.5.1.js';?>"></script>
 <!--<script type="text/javascript" src="<?php echo base_url().'js/pdf.js';?>"></script>-->
 <!--<script type="text/javascript" src="<?php echo base_url().'js/jquery-pdfdoc.js';?>"></script>-->
 <script type="text/javascript">

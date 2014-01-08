@@ -389,6 +389,14 @@ $(document).ready(function() {
 	<div id="maincontent_full">
 		<h4>NOSH ChartingSystem Personal Chart</h4>
 		<div id="documents_list_dialog">
+			<fieldset class="ui-corner-all" style="width:750px">
+				<legend>Instructions</legend>
+				<ol>
+					<li>Click on each header to expand the grid.</li>
+					<li>Click on an item in the grid to view the document.</li>
+				</ol>
+			</fieldset>
+			<br>
 			<table id="encounters" class="scroll" cellpadding="0" cellspacing="0"></table>
 			<div id="encounters_pager" class="scroll" style="text-align:center;"></div>
 			<br>
@@ -419,8 +427,6 @@ $(document).ready(function() {
 			<table id="letters" class="scroll" cellpadding="0" cellspacing="0"></table>
 			<div id="pager15" class="scroll" style="text-align:center;"></div> 
 			<br>
-			
-			
 		</div>
 	</div>
 </div>

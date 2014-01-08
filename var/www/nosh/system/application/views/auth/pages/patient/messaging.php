@@ -158,6 +158,20 @@ $(document).ready(function() {
 	 	onCellSelect: function(id,iCol) {
 	 		if (iCol > 0) {
 		 		jQuery("#internal_draft").GridToForm(id,"#internal_messages_form_id");
+		 		var a = jQuery("#internal_draft").getCell(id,"message_to");
+				var a_array = String(a).split(";");
+				var a_length = a_array.length;
+				for (var i = 0; i < a_length; i++) {
+					$("#messages_to").selectOptions(a_array[i]);
+				}
+				$("#messages_to").trigger("liszt:updated");
+				var b = jQuery("#internal_draft").getCell(id,"cc");
+				var b_array = String(b).split(";");
+				var b_length = b_array.length;
+				for (var j = 0; j < b_length; j++) {
+					$("#messages_cc").selectOptions(b_array[j]);
+				}
+				$("#messages_cc").trigger("liszt:updated");
 		 		$("#internal_messages_dialog").dialog('open');
 		 		$("#internal_messages_form_id").show('fast');
 		 		$("#messages_subject").focus();
@@ -239,68 +253,15 @@ $(document).ready(function() {
 	function extractLast( term ) {
 		return split( term ).pop();
 	}
-	$("#messages_to").autocomplete({
-		source: function (req, add){
-			$.ajax({
-				url: "<?php echo site_url('search/all_users1');?>",
-				dataType: "json",
-				type: "POST",
-				data: "term=" + extractLast(req.term),
-				success: function(data){
-					if(data.response =='true'){
-						add(data.message);
-					}				
-				}
-			});
-		},
-		search: function() {
-			var term = extractLast( this.value );
-			if ( term.length < 2 ) {
-				return false;
-			}
-		},
-		focus: function() {
-			return false;
-		},
-		select: function(event, ui){
-			var terms = split( this.value );
-			terms.pop();
-			terms.push( ui.item.value );
-			terms.push( "" );
-			this.value = terms.join( ";" );
-			return false;
-		}
-	});
-	$("#messages_cc").autocomplete({
-		source: function (req, add){
-			$.ajax({
-				url: "<?php echo site_url('search/all_users1');?>",
-				dataType: "json",
-				type: "POST",
-				data: "term=" + extractLast(req.term),
-				success: function(data){
-					if(data.response =='true'){
-						add(data.message);
-					}				
-				}
-			});
-		},
-		search: function() {
-			var term = extractLast( this.value );
-			if ( term.length < 2 ) {
-				return false;
-			}
-		},
-		focus: function() {
-			return false;
-		},
-		select: function(event, ui){
-			var terms = split( this.value );
-			terms.pop();
-			terms.push( ui.item.value );
-			terms.push( "" );
-			this.value = terms.join( ";" );
-			return false;
+	$("#messages_to").chosen();
+	$("#messages_cc").chosen();
+	$.ajax({
+		type: "POST",
+		url: "<?php echo site_url('search/all_users2');?>",
+		dataType: "json",
+		success: function(data){
+			$("#messages_to").addOption(data, false).trigger("liszt:updated");
+			$("#messages_cc").addOption(data, false).trigger("liszt:updated");
 		}
 	});
 	$("#send_message").button({
@@ -326,6 +287,8 @@ $(document).ready(function() {
 					success: function(data){
 						$.jGrowl(data);
 						$("#internal_messages_form_id").clearForm();
+						$("#messages_to").trigger("liszt:updated");
+						$("#messages_cc").trigger("liszt:updated");
 						$("#internal_messages_form_id").hide('fast');
 						$("#internal_messages_dialog").dialog('close');
 						jQuery("#internal_outbox").trigger("reloadGrid");
@@ -351,6 +314,8 @@ $(document).ready(function() {
 				success: function(data){
 					$.jGrowl(data);
 					$("#internal_messages_form_id").clearForm();
+					$("#messages_to").trigger("liszt:updated");
+					$("#messages_cc").trigger("liszt:updated");
 					$("#internal_messages_form_id").hide('fast');
 					$("#internal_messages_dialog").dialog('close');
 					jQuery("#internal_draft").trigger("reloadGrid");
@@ -370,6 +335,7 @@ $(document).ready(function() {
 		if (message_id == '') {
 			$("#internal_messages_form_id").clearForm();
 			$("#internal_messages_form_id").hide('fast');
+			$("#internal_messages_dialog").dialog('close');
 		} else {
 			$.ajax({
 				type: "POST",
@@ -399,6 +365,7 @@ $(document).ready(function() {
 			data: "id=" + to,
 			success: function(data){
 				$("#messages_to").val(data);
+				$("#messages_to").trigger("liszt:updated");
 			}
 		});
 		var from = $("#message_view_from").val();
@@ -410,7 +377,7 @@ $(document).ready(function() {
 				var date = $("#message_view_date").val();
 				var body = $("#message_view_body").val();
 				var newbody = '\n\n' + 'On ' + date + ', ' + data + ' wrote:\n---------------------------------\n' + body;
-				$("#messages_body").val(newbody);
+				$("#messages_body").val(newbody).caret(0);
 			}
 		});
 		var subject = 'Re: ' + $("#message_view_subject").val();
@@ -443,16 +410,22 @@ $(document).ready(function() {
 				data: "id=" + to,
 				success: function(data){
 					$("#messages_to").val(data);
+					$("#messages_to").trigger("liszt:updated");
 				}
 			});
 		} else {
-			var to1 = to + ',' + cc;
+			var to1 = to + ';' + cc;
 			$.ajax({
 				type: "POST",
 				url: "<?php echo site_url('patient/messaging/get_displayname1');?>",
-				data: "id=" + to,
+				data: "id=" + to1,
 				success: function(data){
-					$("#messages_to").val(data);
+					var a_array = String(data).split(";");
+					var a_length = a_array.length;
+					for (var i = 0; i < a_length; i++) {
+						$("#messages_to").selectOptions(a_array[i]);
+					}
+					$("#messages_to").trigger("liszt:updated");
 				}
 			});
 		}
@@ -465,7 +438,7 @@ $(document).ready(function() {
 				var date = $("#message_view_date").val();
 				var body = $("#message_view_body").val();
 				var newbody = '\n\n' + 'On ' + date + ', ' + data + ' wrote:\n---------------------------------\n' + body;
-				$("messages_body").val(newbody);
+				$("#messages_body").val(newbody).caret(0);
 			}
 		});
 		var subject = 'Re: ' + $("#message_view_subject").val();
@@ -528,11 +501,11 @@ $(document).ready(function() {
 						</tr>
 						<tr>
 							<td>To:<br>
-							<input type="text" id="messages_to" name="message_to" style="width:400px"class="text ui-widget-content ui-corner-all"/></td>
+							<select name="message_to[]" id="messages_to" multiple="multiple" style="width:400px" class="multiselect"></select>
 						</tr>
 						<tr>
 							<td>CC:<br>
-							<input type="text" id="messages_cc" name="cc" style="width:400px"class="text ui-widget-content ui-corner-all"/></td>
+							<select name="cc[]" id="messages_cc" multiple="multiple" style="width:400px" class="multiselect"></select>
 						</tr>
 						<tr>
 							<td>Message:<br>

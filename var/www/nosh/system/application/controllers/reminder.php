@@ -169,7 +169,6 @@ class Reminder extends Application
 				rename($filePath1, $filePath);
 			}
 		}
-		echo $count;
 	}
 	
 	function rcopia_sync($practice_id)
@@ -261,7 +260,7 @@ class Reminder extends Application
 							'mailbox' => $provider_row['id'],
 							'practice_id' => $practice_id
 						);
-						$this->db->insert('messages', $data_message);
+						$this->db->insert('messaging', $data_message);
 					}
 				}
 			}
@@ -393,11 +392,28 @@ class Reminder extends Application
 					$form = $medication_parts1[1];
 					$strength = $row3['rxl_dosage'] . " " . $row3['rxl_dosage_unit'];
 				}
-				$sig_parts1 = explode(" ", $row3['rxl_sig']);
+				if ($row3['rxl_sig'] != '') {
+					if(strpos($row3['rxl_sig'], ' ') !== false) {
+						$sig_parts1 = explode(" ", $row3['rxl_sig']);
+						$dose = $sig_parts1[0];
+						$dose_unit = $sig_parts1[1];
+					} else {
+						$dose = $row3['rxl_sig'];
+						$dose_unit = '';
+					}
+				} else {
+					$dose = '';
+					$dose_unit = '';
+				}
 				if ($row3['rxl_quantity'] != '') {
-					$quantity_parts1 =explode(" ", $row3['rxl_quantity']);
-					$quantity = $quantity_parts1[0];
-					$quantity_unit = $quantity_parts1[1];
+					if(strpos($row3['rxl_quantity'], ' ') !== false) {
+						$quantity_parts1 = explode(" ", $row3['rxl_quantity']);
+						$quantity = $quantity_parts1[0];
+						$quantity_unit = $quantity_parts1[1];
+					} else {
+						$quantity = $row3['rxl_quantity'];
+						$quantity_unit = '';
+					}
 				} else {
 					$quantity = '';
 					$quantity_unit = '';
@@ -416,8 +432,8 @@ class Reminder extends Application
 				$xml3 .= "<GenericName>" . $generic_name . "</GenericName>";
 				$xml3 .= "<Form>" . $form . "</Form>";
 				$xml3 .= "<Strength>" . $strength . "</Strength></Drug>";
-				$xml3 .= "<Dose>" . $sig_parts1[0] . "</Dose>";
-				$xml3 .= "<DoseUnit>" . $sig_parts1[1] . "</DoseUnit>";
+				$xml3 .= "<Dose>" . $dose . "</Dose>";
+				$xml3 .= "<DoseUnit>" . $dose_unit . "</DoseUnit>";
 				$xml3 .= "<Route>" . $row3['rxl_route'] . "</Route>";
 				$xml3 .= "<DoseTiming>" . $row3['rxl_frequency'] . "</DoseTiming>";
 				$xml3 .= "<DoseOther>" . $row3['rxl_instructions'] . "</DoseOther>";
@@ -711,13 +727,13 @@ class Reminder extends Application
 			$line = $files[$i];
 			$file = $dir . $line;
 			$hl7 = file_get_contents($file);
-			$hl7_lines = explode("\n", $hl7);
+			$hl7_lines = explode("\r", $hl7);
 			$results = array();
 			$j = 0;
 			foreach ($hl7_lines as $line) {
 				$line_section = explode("|", $line);
 				if ($line_section[0] == "MSH") {
-					if (strpos($line_section[4], "LAB") !== FALSE) {
+					if (strpos($line_section[3], "LAB") !== FALSE) {
 						$test_type = "Laboratory";
 					} else {
 						$test_type = "Imaging";
@@ -763,12 +779,12 @@ class Reminder extends Application
 			$this->db->where('peacehealth_id', $practice_lab_id);
 			$practice_query = $this->db->get('practiceinfo');
 			if ($practice_query->num_rows() > 0) {
+				$practice_row = $practice_query->row_array();
+				$practice_id = $practice_row['practice_id'];
+			} else {
 				$cmd = 'rm ' . $file;
 				exec($cmd);
 				exit (0);
-			} else {
-				$practice_row = $practice_query->row_array();
-				$practice_id = $practice_row['practice_id'];
 			}
 			$this->db->select('users.lastname, users.firstname, users.title, users.id');
 			$this->db->from('users');
@@ -897,7 +913,7 @@ class Reminder extends Application
 					'practice_id' => $practice_id,
 					'documents_id' => $documents_id
 				);
-				$this->db->insert('messages', $data_message);
+				$this->db->insert('messaging', $data_message);
 			}
 			$cmd = 'rm ' . $file;
 			exec($cmd);

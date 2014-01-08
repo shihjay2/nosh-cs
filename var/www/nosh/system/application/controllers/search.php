@@ -424,6 +424,7 @@ class Search extends Application
 		$this->db->like('displayname', $q);
 		$this->db->or_like('id', $q);
 		$this->db->where('group_id !=', '100');
+		$this->db->where('group_id !=', '1');
 		$this->db->where('practice_id', $this->session->userdata('practice_id'));
 		$this->db->select('id, displayname');
 		$query = $this->db->get('users');
@@ -437,6 +438,24 @@ class Search extends Application
 					'label' => $records,
 					'value' => $records
 				);
+			}
+		}
+		echo json_encode($data);
+		exit( 0 );
+	}
+	
+	function all_users2()
+	{
+		$data = array();
+		$this->db->where('group_id !=', '100');
+		$this->db->where('group_id !=', '1');
+		$this->db->where('practice_id', $this->session->userdata('practice_id'));
+		$this->db->select('id, displayname');
+		$query = $this->db->get('users');
+		if ($query->num_rows() > 0) {
+			foreach ($query->result_array() as $row) {
+				$records = $row['displayname'] . ' (' . $row['id'] . ')';
+				$data[$records] = $records;
 			}
 		}
 		echo json_encode($data);

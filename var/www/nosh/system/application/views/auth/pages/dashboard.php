@@ -1762,6 +1762,7 @@ $(document).ready(function() {
 			}
 		});
 	}
+	$(".dash_tip").tooltip();
 });
 </script>
 <?php if(user_group('admin') || user_group('provider') || user_group('assistant') || user_group('billing')) { echo '<div id ="heading2"></div>';}?>
@@ -1801,9 +1802,9 @@ $(document).ready(function() {
 						<?php if(user_group('billing')) { echo '<tr><td><img src="' . base_url().'images/billing.png' . '" height="40" width="40" border="0"></td><td>You have ' . $number_bills . ' ' . anchor('billing/billing', 'new bills to process and send') . '.</td></tr>';}?>
 						<?php if(user_group('patient')) { echo '<tr><td><img src="' . base_url().'images/personal.png' . '" height="40" width="40" border="0"></td><td><a href="#" id="patient_demographics">Update your demographic and insurance information</a>.</td></tr>';}?>
 						<?php if(user_group('patient')) { echo '<tr><td><img src="' . base_url().'images/schedule.png' . '" height="40" width="40" border="0"></td><td>' . anchor('patient/schedule', 'Schedule an appointment') . '.</td></tr>';}?>
-						<?php if(user_group('patient')) { echo '<tr><td><img src="' . base_url().'images/email.png' . '" height="40" width="40" border="0"></td><td>' . anchor('patient/messaging', 'View your messages') . '.</td></tr>';}?>
-						<?php if(user_group('patient')) { echo '<tr><td><img src="' . base_url().'images/chart1.png' . '" height="40" width="40" border="0"></td><td>' . anchor('patient/chartmenu', 'View your personal health record') . '.</td></tr>';}?>
-						<?php if(user_group('patient')) { echo '<tr><td><img src="' . base_url().'images/chart.png' . '" height="40" width="40" border="0"></td><td>' . anchor('patient/chartmenu/forms', 'Fill out forms') . '.</td></tr>';}?>
+						<?php if(user_group('patient')) { echo '<tr><td><img src="' . base_url().'images/email.png' . '" height="40" width="40" border="0"></td><td class="dash_tip" title="Send a message to your provider here too!">' . anchor('patient/messaging', 'View your messages') . '.</td></tr>';}?>
+						<?php if(user_group('patient')) { echo '<tr><td><img src="' . base_url().'images/chart1.png' . '" height="40" width="40" border="0"></td><td class="dash_tip" title="View your lab results and patient instructions here!">' . anchor('patient/chartmenu', 'View your personal health record') . '.</td></tr>';}?>
+						<?php if(user_group('patient')) { echo '<tr><td><img src="' . base_url().'images/chart.png' . '" height="40" width="40" border="0"></td><td class="dash_tip" title="Your provider may want you to fill out forms for the practice.  Do this here!">' . anchor('patient/chartmenu/forms', 'Fill out forms') . '.</td></tr>';}?>
 					</table>
 				</td>
 				<td valign="top">

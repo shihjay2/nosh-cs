@@ -97,7 +97,7 @@ class Messaging extends Application
 	
 	function get_displayname1()
 	{
-		$to = explode(',', $this->input->post('id'));
+		$to = explode(';', $this->input->post('id'));
 		$records = '';
 		foreach ($to as $id) {
 			$this->db->where('id', $id);
@@ -106,7 +106,7 @@ class Messaging extends Application
 			if ($records == '') {
 				$records = $row['displayname'] . ' (' . $row['id'] . ')';
 			} else {
-				$records .= ', ' . $row['displayname'] . ' (' . $row['id'] . ')';
+				$records .= ';' . $row['displayname'] . ' (' . $row['id'] . ')';
 			}
 		}
 		echo $records;

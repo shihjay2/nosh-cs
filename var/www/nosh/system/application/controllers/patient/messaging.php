@@ -84,7 +84,7 @@ class Messaging extends Application
 	
 	function get_displayname1()
 	{
-		$to = explode(',', $this->input->post('id'));
+		$to = explode(';', $this->input->post('id'));
 		$records = '';
 		foreach ($to as $id) {
 			$this->db->where('id', $id);
@@ -93,7 +93,7 @@ class Messaging extends Application
 			if ($records == '') {
 				$records = $row['displayname'] . ' (' . $row['id'] . ')';
 			} else {
-				$records .= ', ' . $row['displayname'] . ' (' . $row['id'] . ')';
+				$records .= ';' . $row['displayname'] . ' (' . $row['id'] . ')';
 			}
 		}
 		echo $records;
@@ -130,20 +130,34 @@ class Messaging extends Application
 			$subject = $this->input->post('subject') . ' [RE: ' . $this->input->post('patient_name') . ']'; 
 		}
 		$mailbox = array();
-		$to = explode(';', $this->input->post('message_to'));
-		foreach ($to as $to_row) {
+		$messages_to = "";
+		$i = 0;
+		foreach ($this->input->post('message_to') as $key => $to_row) {
 			$to_pos = strpos($to_row, "(");
 			$to_pos = $to_pos + 1;
 			$to_id = substr($to_row, $to_pos);
 			$mailbox[] = str_replace(")", "", $to_id);
+			if ($i > 0) {
+				$messages_to .= ";" . $to_row;
+			} else {
+				$messages_to .= $to_row;
+			}
+			$i++;
 		}
+		$messages_cc = "";
 		if ($this->input->post('cc') != '') {
-			$cc = explode(';', $this->input->post('cc'));
-			foreach ($cc as $cc_row) {
+			$j = 0;
+			foreach ($this->input->post('cc') as $key1 => $cc_row) {
 				$cc_pos = strpos($cc_row, "(");
 				$cc_pos = $cc_pos + 1;
 				$cc_id = substr($cc_row, $cc_pos);
 				$mailbox[] = str_replace(")", "", $cc_id);
+				if ($j > 0) {
+					$messages_cc .= ";" . $cc_row;
+				} else {
+					$messages_cc .= $cc_row;
+				}
+				$j++;
 			}
 		}
 		foreach ($mailbox as $mailbox_row) {
@@ -151,8 +165,8 @@ class Messaging extends Application
 				$data = array(
 					'pid' => $this->input->post('pid'),
 					'patient_name' => $this->input->post('patient_name'),
-					'message_to' => $this->input->post('message_to'),
-					'cc' => $this->input->post('cc'),
+					'message_to' => $messages_to,
+					'cc' => $messages_cc,
 					'message_from' => $from,
 					'subject' => $subject,
 					'body' => $this->input->post('body'),
@@ -168,8 +182,8 @@ class Messaging extends Application
 		$data1a = array(
 			'pid' => $this->input->post('pid'),
 			'patient_name' => $this->input->post('patient_name'),
-			'message_to' => $this->input->post('message_to'),
-			'cc' => $this->input->post('cc'),
+			'message_to' => $messages_to,
+			'cc' => $messages_cc,
 			'message_from' => $from,
 			'subject' => $subject,
 			'body' => $this->input->post('body'),
@@ -208,11 +222,33 @@ class Messaging extends Application
 	{
 		$message_id = $this->input->post('message_id');
 		$from = $this->session->userdata('user_id');
+		$messages_to = "";
+		$i = 0;
+		foreach ($this->input->post('message_to') as $key => $to_row) {
+			if ($i > 0) {
+				$messages_to .= ";" . $to_row;
+			} else {
+				$messages_to .= $to_row;
+			}
+			$i++;
+		}
+		$messages_cc = "";
+		if ($this->input->post('cc') != '') {
+			$j = 0;
+			foreach ($this->input->post('cc') as $key1 => $cc_row) {
+				if ($j > 0) {
+					$messages_cc .= ";" . $cc_row;
+				} else {
+					$messages_cc .= $cc_row;
+				}
+				$j++;
+			}
+		}
 		$data = array(
 			'pid' => $this->input->post('pid'),
 			'patient_name' => $this->input->post('patient_name'),
-			'message_to' => $this->input->post('message_to'),
-			'cc' => $this->input->post('cc'),
+			'message_to' => $messages_to,
+			'cc' => $messages_cc,
 			'message_from' => $from,
 			'subject' => $this->input->post('subject'),
 			'body' => $this->input->post('body'),

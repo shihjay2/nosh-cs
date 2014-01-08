@@ -4967,11 +4967,11 @@ class Chartmenu extends Application
 				$dob = date('Ymd', human_to_unix($row2['DOB']));
 				$middle = substr($row3['middle'], 0, 1);
 				$pname = substr($row3['lastname'], 0, 5) . substr($row3['firstname'], 0, 1) . substr($row3['middle'], 0, 1);
-				$hl7 = "MSH|^~\&|OML|LAB|||" . $date . "00||ORU^R01|R10063131003.1|P|2.3||^" . strtoupper($pname);
-				$hl7 .= "\n";
+				$hl7 = "MSH|^~\&|OML|LAB|||" . $date . "00||ORM^R01|R10063131003.1|P|2.3||^" . strtoupper($pname);
+				$hl7 .= "\r";
 				$hl7 .= "PID|1|" . $pid . "|||" . strtoupper($row2['lastname']) . "^" . strtoupper($row2['firstname']) . "||" . $dob ."|" . strtoupper($row2['sex']) . "|||||||||||";
-				$hl7 .= "\n";
-				$hl7 .= "ORC|RE||" . $orders_id . "||CM||^^^" . $date . "||" . $date . "|||" . strtoupper($row4['peacehealth_id']) . "^" . strtoupper($row3['lastname']) ."^" . strtoupper($row3['firstname']) . "^" . strtoupper($middle) . "^^^" . strtoupper($row3['title']) . "||||^|" . strtoupper($row4['peacehealth_id']) . "^" . strtoupper($row3['lastname']) ."^" . strtoupper($row3['firstname']) . "^" . strtoupper($middle) . "^^^" . strtoupper($row3['title']) . "||||100^QA-Central Laboratory|QA-Central Laboratory|QA-Central Laboratory^123 International Way^Springfield^OR^97477|1-800-826-3616";
+				$hl7 .= "\r";
+				$hl7 .= "ORC|NW|" . $orders_id . "|||CM||^^^" . $date . "||" . $date . "|||" . strtoupper($row4['peacehealth_id']) . "^" . strtoupper($row3['lastname']) ."^" . strtoupper($row3['firstname']) . "^" . strtoupper($middle) . "^^^" . strtoupper($row3['title']) . "||||^|" . strtoupper($row4['peacehealth_id']) . "^" . strtoupper($row3['lastname']) ."^" . strtoupper($row3['firstname']) . "^" . strtoupper($middle) . "^^^" . strtoupper($row3['title']) . "||||100^QA-Central Laboratory|QA-Central Laboratory|QA-Central Laboratory^123 International Way^Springfield^OR^97477|1-800-826-3616";
 				$orders_array = explode("\n", $row['orders_labs']);
 				$j = 1;
 				foreach ($orders_array as $orders_row) {
@@ -4989,13 +4989,12 @@ class Chartmenu extends Application
 							echo "Laboratory order code is missing for the electronic order entry.  Be sure you are choosing an order from an Electronic Order Entry list";
 							exit (0);
 						}
-						$hl7 .= "\n";
+						$hl7 .= "\r";
 						$hl7 .= "OBR|" . $j . "||" . $orders_id . "|" . strtoupper($testcode) . "^" . strtoupper($testname) . "^^|S|" . $date . "|" .$date . "|||||||" . $date . "|SST^BLD|96666|||||PHL^PeaceHealth Laboratories^123 International Way^Springfield^OR^97477|" . $date . "||GEN|F||^^^" . $date . "^^S^^^|||||||||" . $date;
 						$j++;
 					}
 				}
 				if ($row['orders_insurance'] != 'Bill Client') {
-					$hl7 .= "\n";
 					$in1_array = explode("\n", $row['orders_insurance']);
 					$k = 1;
 					foreach ($in1_array as $in1_row) {
@@ -5012,6 +5011,7 @@ class Chartmenu extends Application
 							$group_id = "";
 							$name_array = explode(", ", $in1_array1[3]);
 						}
+						$hl7 .= "\r";
 						$hl7 .= "IN1|" . $k . "|UNK.|" . strtoupper($payor_id) . "|" . strtoupper($in1_array1[0]) . "||||" . strtoupper($group_id) . "||||||||" . strtoupper($name_array[0]) . "^" . strtoupper($name_array[1]) . "^^^||||||||||||||||||||" . strtoupper($plan_id) . "|||||||||";
 						$k++;
 					}
