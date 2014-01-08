@@ -1,3 +1,9 @@
+nosh-cs (1.7.3-0ubuntu7) precise; urgency=low
+
+  * Fixed - Issue with special characters truncating messasges to patients with lab results. 
+
+ -- Michael Shihjay Chen <shihjay2@gmail.com>  Wed, 08 Jan 2014 10:58:27 -0800
+
 nosh-cs (1.7.3-0ubuntu6) precise; urgency=low
 
   * New Feature - Instructions added to patient portal.

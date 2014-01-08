@@ -2152,10 +2152,11 @@
 			}
 		}
 		$("#t_messages_message").val(old1+a1+b1+c1);
+		var body = encodeURIComponent(a1+b1+c1);
 		$.ajax({
 			type: "POST",
 			url: "<?php echo site_url('provider/chartmenu/internal_message_reply');?>",
-			data: "body=" + a1 + b1 + c1,
+			data: "body=" + body,
 			success: function(data){
 				$.jGrowl(data);
 			}
