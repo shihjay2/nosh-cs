@@ -345,7 +345,7 @@
 			}
 			$('.ros_buttonset').buttonset();
 			$('.ros_detail_text').hide();
-			$('input[type="checkbox"]').change(function() {
+			$('.ros_template_div input[type="checkbox"]').change(function() {
 				var parent_id = $(this).attr("id");
 				var parts = parent_id.split('_');
 				if (parts[1] == 'wccage') {
@@ -369,10 +369,10 @@
 					$("#" + parent_id_entry).val(c); 
 				}
 			});
-			$('input[type="text"]').focusin(function() {
+			$('.ros_template_div input[type="text"]').focusin(function() {
 				old_text = $(this).val();
 			});
-			$('input[type="text"]').focusout(function() {
+			$('.ros_template_div input[type="text"]').focusout(function() {
 				var a = $(this).val();
 				if (a != '') {
 					var parent_id = $(this).attr("id");
