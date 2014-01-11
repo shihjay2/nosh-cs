@@ -4098,7 +4098,8 @@ class Search extends Application
 	{
 		$pid = $this->session->userdata('pid');
 		$this->db->where('pid', $pid);
-		$row = $this->db->get('demographics')->row_array();
+		$this->db->where('practice_id', $this->session->userdata('practice_id'));
+		$row = $this->db->get('demographics_relate')->row_array();
 		$data = array();
 		$data['message'] = 'no';
 		if ($row['id'] != '') {

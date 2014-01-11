@@ -1,3 +1,9 @@
+nosh-cs (1.7.3-0ubuntu10) precise; urgency=low
+
+  * Fixed - Sending a message to patient from chart directly was not working correctly. 
+
+ -- Michael Shihjay Chen <shihjay2@gmail.com>  Fri, 10 Jan 2014 17:19:42 -0800
+
 nosh-cs (1.7.3-0ubuntu9) precise; urgency=low
 
   * Fixed - Duplication of input text for assistant user levels when opening encounter. 
