@@ -1,3 +1,9 @@
+nosh-cs (1.7.3-0ubuntu11) precise; urgency=low
+
+  * Fixed - PHP Error when database is not detected during install. 
+
+ -- Michael Shihjay Chen <shihjay2@gmail.com>  Tue, 14 Jan 2014 14:45:38 -0800
+
 nosh-cs (1.7.3-0ubuntu10) precise; urgency=low
 
   * Fixed - Sending a message to patient from chart directly was not working correctly. 

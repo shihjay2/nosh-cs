@@ -18,7 +18,7 @@ class Front extends Controller {
 		if (!$link) {
 			redirect('install/fix_db_conn');
 		}
-		$db_selected = mysqli_connect('localhost', $db['default']['username'], $db['default']['password'], 'nosh');
+		$db_selected = mysqli_select_db($link, 'nosh');
 		if (!$db_selected) {
 			redirect('install');
 		} else {

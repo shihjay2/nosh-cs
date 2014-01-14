@@ -19,7 +19,8 @@ class Install extends Controller {
 	{
 		include(APPPATH.'config/database'.EXT);
 		if ($db['default']['username'] != "") {
-			$db_selected = mysqli_connect('localhost', $db['default']['username'], $db['default']['password'], 'nosh');
+			$db_con = mysqli_connect('localhost', $db['default']['username'], $db['default']['password']);
+			$db_selected = mysqli_select_db($db_con, 'nosh');
 			if ($db_selected) {
 				echo "NOSH ChartingSystem is already installed.";
 				exit (0);
