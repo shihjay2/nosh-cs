@@ -16,20 +16,18 @@ class Backup extends Application
 	function index()
 	{
 		include(APPPATH.'config/database'.EXT);
-		$query2 = $this->db->query("SELECT * FROM practiceinfo");
-		foreach ($query2->result_array() as $row2) {
-			$dir = $row2['documents_dir'];
-			$file = $dir . "noshbackup_" . now() . ".sql";
-			$command = "mysqldump -u " . $db['default']['username']. " -p". $db['default']['password'] . " nosh > " . $file;
-			system($command);
-			$files = glob($dir . "*.sql");
-			foreach ($files as $file_row) {
-				$explode = explode("_", $file_row);
-				$time = intval(str_replace(".sql","",$explode[1]));
-				$month = now() - 604800;
-				if ($time < $month) {
-					unlink($file_row);
-				}
+		$row2 = $this->db->query("SELECT * FROM practiceinfo WHERE practice_id='1'")->row_array();
+		$dir = $row2['documents_dir'];
+		$file = $dir . "noshbackup_" . now() . ".sql";
+		$command = "mysqldump -u " . $db['default']['username']. " -p". $db['default']['password'] . " nosh > " . $file;
+		system($command);
+		$files = glob($dir . "*.sql");
+		foreach ($files as $file_row) {
+			$explode = explode("_", $file_row);
+			$time = intval(str_replace(".sql","",$explode[1]));
+			$month = now() - 604800;
+			if ($time < $month) {
+				unlink($file_row);
 			}
 		}
 		$extensions_prune = $this->db->query("DELETE FROM extensions_log WHERE DATE_SUB(CURDATE(), INTERVAL 30 DAY) >= timestamp");
@@ -38,11 +36,8 @@ class Backup extends Application
 	
 	function find_backups()
 	{
-		$practice_id = $this->session->userdata('practice_id');
-		$query2 = $this->db->query("SELECT * FROM practiceinfo WHERE practice_id=$practice_id");
-		foreach ($query2->result_array() as $row2) {
-			$dir = $row2['documents_dir'];
-		}
+		$row2 = $this->db->query("SELECT * FROM practiceinfo WHERE practice_id='1'");
+		$dir = $row2['documents_dir'];
 		$files = glob($dir . "*.sql");
 		$data['options'] = array();
 		arsort($files);

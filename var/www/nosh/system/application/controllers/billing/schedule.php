@@ -672,29 +672,31 @@ class Schedule extends Application
 		$to = $row['reminder_to'];
 		$phone = $row2['phone'];
 		$startdate = date("F j, Y, g:i a", $row1['start']);
-		if ($to != '') {
-			if ($row['reminder_method'] == 'Cellular Phone') {
-				$message = 'Reminder - medical appt with ' . $displayname . ' on ' . $startdate . '.';
-				$message .= ' To cancel/reschedule, call ' . $phone . '.';
-			} else {
-				$message = 'This message is a courtesy reminder of your medical appointment with ' . $displayname . ' on ' . $startdate . '.';
-				$message .= ' If you need to cancel or reschedule your appointment, please contact us at ' . $phone . ' or reply to this e-mail at ' . $row2['email'] . '.';
-				$message .= $row2['additional_message'];
+		if ($row1['start'] < now()) {
+			if ($to != '') {
+				if ($row['reminder_method'] == 'Cellular Phone') {
+					$message = 'Reminder - medical appt with ' . $displayname . ' on ' . $startdate . '.';
+					$message .= ' To cancel/reschedule, call ' . $phone . '.';
+				} else {
+					$message = 'This message is a courtesy reminder of your medical appointment with ' . $displayname . ' on ' . $startdate . '.';
+					$message .= ' If you need to cancel or reschedule your appointment, please contact us at ' . $phone . ' or reply to this e-mail at ' . $row2['email'] . '.';
+					$message .= $row2['additional_message'];
+				}
+				$config['protocol']='smtp';
+				$config['smtp_host']='ssl://smtp.googlemail.com';
+				$config['smtp_port']='465';
+				$config['smtp_timeout']='30';
+				$config['smtp_user']=$row2['smtp_user'];
+				$config['smtp_pass']=$row2['smtp_pass'];
+				$config['charset']='utf-8';
+				$config['newline']="\r\n";
+				$this->email->initialize($config);
+				$this->email->from($row2['email'], $row2['practice_name']);
+				$this->email->to($to);
+				$this->email->subject('Appointment Reminder');
+				$this->email->message($message);
+				$this->email->send();
 			}
-			$config['protocol']='smtp';
-			$config['smtp_host']='ssl://smtp.googlemail.com';
-			$config['smtp_port']='465';
-			$config['smtp_timeout']='30';
-			$config['smtp_user']=$row2['smtp_user'];
-			$config['smtp_pass']=$row2['smtp_pass'];
-			$config['charset']='utf-8';
-			$config['newline']="\r\n";
-			$this->email->initialize($config);
-			$this->email->from($row2['email'], $row2['practice_name']);
-			$this->email->to($to);
-			$this->email->subject('Appointment Reminder');
-			$this->email->message($message);
-			$this->email->send();
 		}
 	}
 } 

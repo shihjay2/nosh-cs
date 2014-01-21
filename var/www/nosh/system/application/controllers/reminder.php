@@ -774,6 +774,10 @@ class Reminder extends Application
 				}
 				if ($line_section[0] == "NTE") {
 					$from = $line_section[3];
+					$keys = array_keys($results);
+					foreach ($keys as $key) {
+						$results[$key]['test_from'] = $line_section[3];
+					}
 				}
 			}
 			$this->db->where('peacehealth_id', $practice_lab_id);
@@ -804,10 +808,7 @@ class Reminder extends Application
 			$patient_query = $this->db->get('demographics');
 			if ($patient_query->num_rows() > 0) {
 				$patient_row = $patient_query->row_array();
-				$messages_pid = $patient_row['pid'];
-				$this->db->select('firstname, lastname, DOB');
-				$this->db->where('pid', $messages_pid);
-				$patient_row = $this->db->get('demographics')->row_array();
+				$pid = $patient_row['pid'];
 				$dob_message = mdate("%m/%d/%Y", strtotime($patient_row['DOB']));
 				$patient_name =  $patient_row['lastname'] . ', ' . $patient_row['firstname'] . ' (DOB: ' . $dob_message . ') (ID: ' . $pid . ')';
 				$tests = 'y';
@@ -815,7 +816,7 @@ class Reminder extends Application
 				$k = 0;
 				foreach ($results as $results_row) {
 					$test_data = array(
-						'pid' => $patient_row['pid'],
+						'pid' => $pid,
 						'test_name' => $results_row['test_name'],
 						'test_result' => $results_row['test_result'],
 						'test_units' => $results_row['test_units'],
@@ -839,7 +840,7 @@ class Reminder extends Application
 				$practice_row = $this->practiceinfo_model->get($practice_id)->row_array();
 				$directory = $practice_row['documents_dir'] . $pid;
 				$file_path = $directory . '/tests_' . now() . '.pdf';
-				$html = $this->page_intro('Test Results');
+				$html = $this->page_intro('Test Results', $practice_id);
 				$html .= $this->page_results($pid, $results, $patient_name);
 				$this->load->library('mpdf');
 				$this->mpdf=new mpdf('','Letter',0,'',26,26,26,26,9,9,'P');

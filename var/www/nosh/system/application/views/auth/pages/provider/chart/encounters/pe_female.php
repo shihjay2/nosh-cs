@@ -79,7 +79,7 @@
 			<div style="display:block;float:left;width:310px">
 				Preview:<br><textarea style="width:290px" rows="16" name="pe_gen1" id="pe_gen1" class="pe_entry ui-widget-content text ui-corner-all"></textarea><input type="hidden" id="pe_gen1_old"/>
 			</div>
-			<div style="display:block;float:left">
+			<div style="display:block;float:left;width:350px">
 				Choose Template: <select id="pe_gen1_template" class="pe_template_choose text ui-widget-content ui-corner-all"></select><br>
 				<br><input type="checkbox" id="pe_gen1_normal" class="all_normal" value=""><label for="pe_gen1_normal">All Normal</label><button type="button" id="pe_gen1_reset" class="reset">Clear</button>
 				<div class="pe_template_div">
@@ -101,7 +101,7 @@
 			<div style="display:block;float:left;width:310px">
 				Preview:<br><textarea style="width:290px" rows="16" name="pe_eye1" id="pe_eye1" class="pe_entry text ui-widget-content ui-corner-all"></textarea><input type="hidden" id="pe_eye1_old"/>
 			</div>
-			<div style="display:block;float:left">
+			<div style="display:block;float:left;width:350px">
 				Choose Template: <select id="pe_eye1_template" class="pe_template_choose text ui-widget-content ui-corner-all"></select><br>
 				<br><input type="checkbox" id="pe_eye1_normal" class="all_normal" value=""><label for="pe_eye1_normal">All Normal</label><button type="button" id="pe_eye1_reset" class="reset">Clear</button>
 				<div class="pe_template_div">
@@ -115,7 +115,7 @@
 			<div style="display:block;float:left;width:310px">
 				Preview:<br><textarea style="width:290px" rows="16" name="pe_eye2" id="pe_eye2" class="pe_entry text ui-widget-content ui-corner-all"></textarea><input type="hidden" id="pe_eye2_old"/>
 			</div>
-			<div style="display:block;float:left">
+			<div style="display:block;float:left;width:350px">
 				Choose Template: <select id="pe_eye2_template" class="pe_template_choose text ui-widget-content ui-corner-all"></select><br>
 				<br><input type="checkbox" id="pe_eye2_normal" class="all_normal" value=""><label for="pe_eye2_normal">All Normal</label><button type="button" id="pe_eye2_reset" class="reset">Clear</button>
 				<div class="pe_template_div">
@@ -128,7 +128,7 @@
 			<div style="display:block;float:left;width:310px">
 				Preview:<br><textarea style="width:290px" rows="16" name="pe_eye3" id="pe_eye3" class="pe_entry text ui-widget ui-corner-all"></textarea><input type="hidden" id="pe_eye3_old"/>
 			</div>
-			<div style="display:block;float:left">
+			<div style="display:block;float:left;width:350px">
 				Choose Template: <select id="pe_eye3_template" class="pe_template_choose text ui-widget-content ui-corner-all"></select><br>
 				<br><input type="checkbox" id="pe_eye3_normal" class="all_normal" value=""><label for="pe_eye3_normal">All Normal</label><button type="button" id="pe_eye3_reset" class="reset">Clear</button>
 				<div class="pe_template_div">
@@ -149,7 +149,7 @@
 			<div style="display:block;float:left;width:310px">
 				Preview:<br><textarea style="width:290px" rows="16" name="pe_ent1" id="pe_ent1" class="pe_entry text ui-widget-content ui-corner-all"></textarea><input type="hidden" id="pe_ent1_old"/>
 			</div>
-			<div style="display:block;float:left">
+			<div style="display:block;float:left;width:350px">
 				Choose Template: <select id="pe_ent1_template" class="pe_template_choose text ui-widget-content ui-corner-all"></select><br>
 				<br><input type="checkbox" id="pe_ent1_normal" class="all_normal" value=""><label for="pe_ent1_normal">All Normal</label><button type="button" id="pe_ent1_reset" class="reset">Clear</button>
 				<div class="pe_template_div">
@@ -162,7 +162,7 @@
 			<div style="display:block;float:left;width:310px">
 				Preview:<br><textarea style="width:290px" rows="16" name="pe_ent2" id="pe_ent2" class="pe_entry text ui-widget-content ui-corner-all"></textarea><input type="hidden" id="pe_ent2_old"/>
 			</div>
-			<div style="display:block;float:left">
+			<div style="display:block;float:left;width:350px">
 				Choose Template: <select id="pe_ent2_template" class="pe_template_choose text ui-widget-content ui-corner-all"></select><br>
 				<br><input type="checkbox" id="pe_ent2_normal" class="all_normal" value=""><label for="pe_ent2_normal">All Normal</label><button type="button" id="pe_ent2_reset" class="reset">Clear</button>
 				<div class="pe_template_div">
@@ -175,7 +175,7 @@
 			<div style="display:block;float:left;width:310px">
 				Preview:<br><textarea style="width:290px" rows="16" name="pe_ent3" id="pe_ent3" class="pe_entry text ui-widget-content ui-corner-all"></textarea><input type="hidden" id="pe_ent3_old"/>
 			</div>
-			<div style="display:block;float:left">
+			<div style="display:block;float:left;width:350px">
 				Choose Template: <select id="pe_ent3_template" class="pe_template_choose text ui-widget-content ui-corner-all"></select><br>
 				<br><input type="checkbox" id="pe_ent3_normal" class="all_normal" value=""><label for="pe_ent3_normal">All Normal</label><button type="button" id="pe_ent3_reset" class="reset">Clear</button>
 				<div class="pe_template_div">
@@ -188,7 +188,7 @@
 			<div style="display:block;float:left;width:310px">
 				Preview:<br><textarea style="width:290px" rows="16" name="pe_ent4" id="pe_ent4" class="pe_entry text ui-widget-content ui-corner-all"></textarea><input type="hidden" id="pe_ent4_old"/>
 			</div>
-			<div style="display:block;float:left">
+			<div style="display:block;float:left;width:350px">
 				Choose Template: <select id="pe_ent4_template" class="pe_template_choose text ui-widget-content ui-corner-all"></select><br>
 				<br><input type="checkbox" id="pe_ent4_normal" class="all_normal" value=""><label for="pe_ent4_normal">All Normal</label><button type="button" id="pe_ent4_reset" class="reset">Clear</button>
 				<div class="pe_template_div">
@@ -201,7 +201,7 @@
 			<div style="display:block;float:left;width:310px">
 				Preview:<br><textarea style="width:290px" rows="16" name="pe_ent5" id="pe_ent5" class="pe_entry text ui-widget-content ui-corner-all"></textarea><input type="hidden" id="pe_ent5_old"/>
 			</div>
-			<div style="display:block;float:left">
+			<div style="display:block;float:left;width:350px">
 				Choose Template: <select id="pe_ent5_template" class="pe_template_choose text ui-widget-content ui-corner-all"></select><br>
 				<br><input type="checkbox" id="pe_ent5_normal" class="all_normal" value=""><label for="pe_ent5_normal">All Normal</label><button type="button" id="pe_ent5_reset" class="reset">Clear</button>
 				<div class="pe_template_div">
@@ -214,7 +214,7 @@
 			<div style="display:block;float:left;width:310px">
 				Preview:<br><textarea style="width:290px" rows="16" name="pe_ent6" id="pe_ent6" class="pe_entry text ui-widget-content ui-corner-all"></textarea><input type="hidden" id="pe_ent6_old"/>
 			</div>
-			<div style="display:block;float:left">
+			<div style="display:block;float:left;width:350px">
 				Choose Template: <select id="pe_ent6_template" class="pe_template_choose text ui-widget-content ui-corner-all"></select><br>
 				<br><input type="checkbox" id="pe_ent6_normal" class="all_normal" value=""><label for="pe_ent6_normal">All Normal</label><button type="button" id="pe_ent6_reset" class="reset">Clear</button>
 				<div class="pe_template_div">
@@ -235,7 +235,7 @@
 			<div style="display:block;float:left;width:310px">
 				Preview:<br><textarea style="width:290px" rows="16" name="pe_neck1" id="pe_neck1" class="pe_entry text ui-widget-content ui-corner-all"></textarea><input type="hidden" id="pe_neck1_old"/>
 			</div>
-			<div style="display:block;float:left">
+			<div style="display:block;float:left;width:350px">
 				Choose Template: <select id="pe_neck1_template" class="pe_template_choose text ui-widget-content ui-corner-all"></select><br>
 				<br><input type="checkbox" id="pe_neck1_normal" class="all_normal" value=""><label for="pe_neck1_normal">All Normal</label><button type="button" id="pe_neck1_reset" class="reset">Clear</button>
 				<div class="pe_template_div">
@@ -248,7 +248,7 @@
 			<div style="display:block;float:left;width:310px">
 				Preview:<br><textarea style="width:290px" rows="16" name="pe_neck2" id="pe_neck2" class="pe_entry text ui-widget-content ui-corner-all"></textarea><input type="hidden" id="pe_neck2_old"/>
 			</div>
-			<div style="display:block;float:left">
+			<div style="display:block;float:left;width:350px">
 				Choose Template: <select id="pe_neck2_template" class="pe_template_choose text ui-widget-content ui-corner-all"></select><br>
 				<br><input type="checkbox" id="pe_neck2_normal" class="all_normal" value=""><label for="pe_neck2_normal">All Normal</label><button type="button" id="pe_neck2_reset" class="reset">Clear</button>
 				<div class="pe_template_div">
@@ -269,7 +269,7 @@
 			<div style="display:block;float:left;width:310px">
 				Preview:<br><textarea style="width:290px" rows="16" name="pe_resp1" id="pe_resp1" class="pe_entry text ui-widget-content ui-corner-all"></textarea><input type="hidden" id="pe_resp1_old"/>
 			</div>
-			<div style="display:block;float:left">
+			<div style="display:block;float:left;width:350px">
 				Choose Template: <select id="pe_resp1_template" class="pe_template_choose text ui-widget-content ui-corner-all"></select><br>
 				<br><input type="checkbox" id="pe_resp1_normal" class="all_normal" value=""><label for="pe_resp1_normal">All Normal</label><button type="button" id="pe_resp1_reset" class="reset">Clear</button>
 				<div class="pe_template_div">
@@ -282,7 +282,7 @@
 			<div style="display:block;float:left;width:310px">
 				Preview:<br><textarea style="width:290px" rows="16" name="pe_resp2" id="pe_resp2" class="pe_entry text ui-widget-content ui-corner-all"></textarea><input type="hidden" id="pe_resp2_old"/>
 			</div>
-			<div style="display:block;float:left">
+			<div style="display:block;float:left;width:350px">
 				Choose Template: <select id="pe_resp2_template" class="pe_template_choose text ui-widget-content ui-corner-all"></select><br>
 				<br><input type="checkbox" id="pe_resp2_normal" class="all_normal" value=""><label for="pe_resp2_normal">All Normal</label><button type="button" id="pe_resp2_reset" class="reset">Clear</button>
 				<div class="pe_template_div">
@@ -295,7 +295,7 @@
 			<div style="display:block;float:left;width:310px">
 				Preview:<br><textarea style="width:290px" rows="16" name="pe_resp3" id="pe_resp3" class="pe_entry text ui-widget-content ui-corner-all"></textarea><input type="hidden" id="pe_resp3_old"/>
 			</div>
-			<div style="display:block;float:left">
+			<div style="display:block;float:left;width:350px">
 				Choose Template: <select id="pe_resp3_template" class="pe_template_choose text ui-widget-content ui-corner-all"></select><br>
 				<br><input type="checkbox" id="pe_resp3_normal" class="all_normal" value=""><label for="pe_resp3_normal">All Normal</label><button type="button" id="pe_resp3_reset" class="reset">Clear</button>
 				<div class="pe_template_div">
@@ -308,7 +308,7 @@
 			<div style="display:block;float:left;width:310px">
 				Preview:<br><textarea style="width:290px" rows="16" name="pe_resp4" id="pe_resp4" class="pe_entry text ui-widget-content ui-corner-all"></textarea><input type="hidden" id="pe_resp4_old"/>
 			</div>
-			<div style="display:block;float:left">
+			<div style="display:block;float:left;width:350px">
 				Choose Template: <select id="pe_resp4_template" class="pe_template_choose text ui-widget-content ui-corner-all"></select><br>
 				<br><input type="checkbox" id="pe_resp4_normal" class="all_normal" value=""><label for="pe_resp4_normal">All Normal</label><button type="button" id="pe_resp4_reset" class="reset">Clear</button>
 				<div class="pe_template_div">
@@ -329,7 +329,7 @@
 			<div style="display:block;float:left;width:310px">
 				Preview:<br><textarea style="width:290px" rows="16" name="pe_cv1" id="pe_cv1" class="pe_entry text ui-widget-content ui-corner-all"></textarea><input type="hidden" id="pe_cv1_old"/>
 			</div>
-			<div style="display:block;float:left">
+			<div style="display:block;float:left;width:350px">
 				Choose Template: <select id="pe_cv1_template" class="pe_template_choose text ui-widget-content ui-corner-all"></select><br>
 				<br><input type="checkbox" id="pe_cv1_normal" class="all_normal" value=""><label for="pe_cv1_normal">All Normal</label><button type="button" id="pe_cv1_reset" class="reset">Clear</button>
 				<div class="pe_template_div">
@@ -342,7 +342,7 @@
 			<div style="display:block;float:left;width:310px">
 				Preview:<br><textarea style="width:290px" rows="16" name="pe_cv2" id="pe_cv2" class="pe_entry text ui-widget-content ui-corner-all"></textarea><input type="hidden" id="pe_cv2_old"/>
 			</div>
-			<div style="display:block;float:left">
+			<div style="display:block;float:left;width:350px">
 				Choose Template: <select id="pe_cv2_template" class="pe_template_choose text ui-widget-content ui-corner-all"></select><br>
 				<br><input type="checkbox" id="pe_cv2_normal" class="all_normal" value=""><label for="pe_cv2_normal">All Normal</label><button type="button" id="pe_cv2_reset" class="reset">Clear</button>
 				<div class="pe_template_div">
@@ -355,7 +355,7 @@
 			<div style="display:block;float:left;width:310px">
 				Preview:<br><textarea style="width:290px" rows="16" name="pe_cv3" id="pe_cv3" class="pe_entry text ui-widget-content ui-corner-all"></textarea><input type="hidden" id="pe_cv3_old"/>
 			</div>
-			<div style="display:block;float:left">
+			<div style="display:block;float:left;width:350px">
 				Choose Template: <select id="pe_cv3_template" class="pe_template_choose text ui-widget-content ui-corner-all"></select><br>
 				<br><input type="checkbox" id="pe_cv3_normal" class="all_normal" value=""><label for="pe_cv3_normal">All Normal</label><button type="button" id="pe_cv3_reset" class="reset">Clear</button>
 				<div class="pe_template_div">
@@ -368,7 +368,7 @@
 			<div style="display:block;float:left;width:310px">
 				Preview:<br><textarea style="width:290px" rows="16" name="pe_cv4" id="pe_cv4" class="pe_entry text ui-widget-content ui-corner-all"></textarea><input type="hidden" id="pe_cv4_old"/>
 			</div>
-			<div style="display:block;float:left">
+			<div style="display:block;float:left;width:350px">
 				Choose Template: <select id="pe_cv4_template" class="pe_template_choose text ui-widget-content ui-corner-all"></select><br>
 				<br><input type="checkbox" id="pe_cv4_normal" class="all_normal" value=""><label for="pe_cv4_normal">All Normal</label><button type="button" id="pe_cv4_reset" class="reset">Clear</button>
 				<div class="pe_template_div">
@@ -381,7 +381,7 @@
 			<div style="display:block;float:left;width:310px">
 				Preview:<br><textarea style="width:290px" rows="16" name="pe_cv5" id="pe_cv5" class="pe_entry text ui-widget-content ui-corner-all"></textarea><input type="hidden" id="pe_cv5_old"/>
 			</div>
-			<div style="display:block;float:left">
+			<div style="display:block;float:left;width:350px">
 				Choose Template: <select id="pe_cv5_template" class="pe_template_choose text ui-widget-content ui-corner-all"></select><br>
 				<br><input type="checkbox" id="pe_cv5_normal" class="all_normal" value=""><label for="pe_cv5_normal">All Normal</label><button type="button" id="pe_cv5_reset" class="reset">Clear</button>
 				<div class="pe_template_div">
@@ -394,7 +394,7 @@
 			<div style="display:block;float:left;width:310px">
 				Preview:<br><textarea style="width:290px" rows="16" name="pe_cv6" id="pe_cv6" class="pe_entry text ui-widget-content ui-corner-all"></textarea><input type="hidden" id="pe_cv6_old"/>
 			</div>
-			<div style="display:block;float:left">
+			<div style="display:block;float:left;width:350px">
 				Choose Template: <select id="pe_cv6_template" class="pe_template_choose text ui-widget-content ui-corner-all"></select><br>
 				<br><input type="checkbox" id="pe_cv6_normal" class="all_normal" value=""><label for="pe_cv6_normal">All Normal</label><button type="button" id="pe_cv6_reset" class="reset">Clear</button>
 				<div class="pe_template_div">
@@ -416,7 +416,7 @@
 			<div style="display:block;float:left;width:310px">
 				Preview:<br><textarea style="width:290px" rows="16" name="pe_ch1" id="pe_ch1" class="pe_entry text ui-widget-content ui-corner-all"></textarea><input type="hidden" id="pe_ch1_old"/>
 			</div>
-			<div style="display:block;float:left">
+			<div style="display:block;float:left;width:350px">
 				Choose Template: <select id="pe_ch1_template" class="pe_template_choose text ui-widget-content ui-corner-all"></select><br>
 				<br><input type="checkbox" id="pe_ch1_normal" class="all_normal" value=""><label for="pe_ch1_normal">All Normal</label><button type="button" id="pe_ch1_reset" class="reset">Clear</button>
 				<div class="pe_template_div">
@@ -429,7 +429,7 @@
 			<div style="display:block;float:left;width:310px">
 				Preview:<br><textarea style="width:290px" rows="16" name="pe_ch2" id="pe_ch2" class="pe_entry text ui-widget-content ui-corner-all"></textarea><input type="hidden" id="pe_ch2_old"/>
 			</div>
-			<div style="display:block;float:left">
+			<div style="display:block;float:left;width:350px">
 				Choose Template: <select id="pe_ch2_template" class="pe_template_choose text ui-widget-content ui-corner-all"></select><br>
 				<br><input type="checkbox" id="pe_ch2_normal" class="all_normal" value=""><label for="pe_ch2_normal">All Normal</label><button type="button" id="pe_ch2_reset" class="reset">Clear</button>
 				<div class="pe_template_div">
@@ -450,7 +450,7 @@
 			<div style="display:block;float:left;width:310px">
 				Preview:<br><textarea style="width:290px" rows="16" name="pe_gi1" id="pe_gi1" class="pe_entry text ui-widget-content ui-corner-all"></textarea><input type="hidden" id="pe_gi1_old"/>
 			</div>
-			<div style="display:block;float:left">
+			<div style="display:block;float:left;width:350px">
 				Choose Template: <select id="pe_gi1_template" class="pe_template_choose text ui-widget-content ui-corner-all"></select><br>
 				<br><input type="checkbox" id="pe_gi1_normal" class="all_normal" value=""><label for="pe_gi1_normal">All Normal</label><button type="button" id="pe_gi1_reset" class="reset">Clear</button>
 				<div class="pe_template_div">
@@ -463,7 +463,7 @@
 			<div style="display:block;float:left;width:310px">
 				Preview:<br><textarea style="width:290px" rows="16" name="pe_gi2" id="pe_gi2" class="pe_entry text ui-widget-content ui-corner-all"></textarea><input type="hidden" id="pe_gi2_old"/>
 			</div>
-			<div style="display:block;float:left">
+			<div style="display:block;float:left;width:350px">
 				Choose Template: <select id="pe_gi2_template" class="pe_template_choose text ui-widget-content ui-corner-all"></select><br>
 				<br><input type="checkbox" id="pe_gi2_normal" class="all_normal" value=""><label for="pe_gi2_normal">All Normal</label><button type="button" id="pe_gi2_reset" class="reset">Clear</button>
 				<div class="pe_template_div">
@@ -476,7 +476,7 @@
 			<div style="display:block;float:left;width:310px">
 				Preview:<br><textarea style="width:290px" rows="16" name="pe_gi3" id="pe_gi3" class="pe_entry text ui-widget-content ui-corner-all"></textarea><input type="hidden" id="pe_gi3_old"/>
 			</div>
-			<div style="display:block;float:left">
+			<div style="display:block;float:left;width:350px">
 				Choose Template: <select id="pe_gi3_template" class="pe_template_choose text ui-widget-content ui-corner-all"></select><br>
 				<br><input type="checkbox" id="pe_gi3_normal" class="all_normal" value=""><label for="pe_gi3_normal">All Normal</label><button type="button" id="pe_gi3_reset" class="reset">Clear</button>
 				<div class="pe_template_div">
@@ -489,7 +489,7 @@
 			<div style="display:block;float:left;width:310px">
 				Preview:<br><textarea style="width:290px" rows="16" name="pe_gi4" id="pe_gi4" class="pe_entry text ui-widget-content ui-corner-all"></textarea><input type="hidden" id="pe_gi4_old"/>
 			</div>
-			<div style="display:block;float:left">
+			<div style="display:block;float:left;width:350px">
 				Choose Template: <select id="pe_gi4_template" class="pe_template_choose text ui-widget-content ui-corner-all"></select><br>
 				<br><input type="checkbox" id="pe_gi4_normal" class="all_normal" value=""><label for="pe_gi4_normal">All Normal</label><button type="button" id="pe_gi4_reset" class="reset">Clear</button>
 				<div class="pe_template_div">
@@ -510,7 +510,7 @@
 			<div style="display:block;float:left;width:310px">
 				Preview:<br><textarea style="width:290px" rows="16" name="pe_gu1" id="pe_gu1" class="pe_entry text ui-widget-content ui-corner-all"></textarea><input type="hidden" id="pe_gu1_old"/>
 			</div>
-			<div style="display:block;float:left">
+			<div style="display:block;float:left;width:350px">
 				Choose Template: <select id="pe_gu1_template" class="pe_template_choose text ui-widget-content ui-corner-all"></select><br>
 				<br><input type="checkbox" id="pe_gu1_normal" class="all_normal" value=""><label for="pe_gu1_normal">All Normal</label><button type="button" id="pe_gu1_reset" class="reset">Clear</button>
 				<div class="pe_template_div">
@@ -523,7 +523,7 @@
 			<div style="display:block;float:left;width:310px">
 				Preview:<br><textarea style="width:290px" rows="16" name="pe_gu2" id="pe_gu2" class="pe_entry text ui-widget-content ui-corner-all"></textarea><input type="hidden" id="pe_gu2_old"/>
 			</div>
-			<div style="display:block;float:left">
+			<div style="display:block;float:left;width:350px">
 				Choose Template: <select id="pe_gu2_template" class="pe_template_choose text ui-widget-content ui-corner-all"></select><br>
 				<br><input type="checkbox" id="pe_gu2_normal" class="all_normal" value=""><label for="pe_gu2_normal">All Normal</label><button type="button" id="pe_gu2_reset" class="reset">Clear</button>
 				<div class="pe_template_div">
@@ -536,7 +536,7 @@
 			<div style="display:block;float:left;width:310px">
 				Preview:<br><textarea style="width:290px" rows="16" name="pe_gu3" id="pe_gu3" class="pe_entry text ui-widget-content ui-corner-all"></textarea><input type="hidden" id="pe_gu3_old"/>
 			</div>
-			<div style="display:block;float:left">
+			<div style="display:block;float:left;width:350px">
 				Choose Template: <select id="pe_gu3_template" class="pe_template_choose text ui-widget-content ui-corner-all"></select><br>
 				<br><input type="checkbox" id="pe_gu3_normal" class="all_normal" value=""><label for="pe_gu3_normal">All Normal</label><button type="button" id="pe_gu3_reset" class="reset">Clear</button>
 				<div class="pe_template_div">
@@ -549,7 +549,7 @@
 			<div style="display:block;float:left;width:310px">
 				Preview:<br><textarea style="width:290px" rows="16" name="pe_gu4" id="pe_gu4" class="pe_entry text ui-widget-content ui-corner-all"></textarea><input type="hidden" id="pe_gu4_old"/>
 			</div>
-			<div style="display:block;float:left">
+			<div style="display:block;float:left;width:350px">
 				Choose Template: <select id="pe_gu4_template" class="pe_template_choose text ui-widget-content ui-corner-all"></select><br>
 				<br><input type="checkbox" id="pe_gu4_normal" class="all_normal" value=""><label for="pe_gu4_normal">All Normal</label><button type="button" id="pe_gu4_reset" class="reset">Clear</button>
 				<div class="pe_template_div">
@@ -562,7 +562,7 @@
 			<div style="display:block;float:left;width:310px">
 				Preview:<br><textarea style="width:290px" rows="16" name="pe_gu5" id="pe_gu5" class="pe_entry text ui-widget-content ui-corner-all"></textarea><input type="hidden" id="pe_gu5_old"/>
 			</div>
-			<div style="display:block;float:left">
+			<div style="display:block;float:left;width:350px">
 				Choose Template: <select id="pe_gu5_template" class="pe_template_choose text ui-widget-content ui-corner-all"></select><br>
 				<br><input type="checkbox" id="pe_gu5_normal" class="all_normal" value=""><label for="pe_gu5_normal">All Normal</label><button type="button" id="pe_gu5_reset" class="reset">Clear</button>
 				<div class="pe_template_div">
@@ -575,7 +575,7 @@
 			<div style="display:block;float:left;width:310px">
 				Preview:<br><textarea style="width:290px" rows="16" name="pe_gu6" id="pe_gu6" class="pe_entry text ui-widget-content ui-corner-all"></textarea><input type="hidden" id="pe_gu6_old"/>
 			</div>
-			<div style="display:block;float:left">
+			<div style="display:block;float:left;width:350px">
 				Choose Template: <select id="pe_gu6_template" class="pe_template_choose text ui-widget-content ui-corner-all"></select><br>
 				<br><input type="checkbox" id="pe_gu6_normal" class="all_normal" value=""><label for="pe_gu6_normal">All Normal</label><button type="button" id="pe_gu6_reset" class="reset">Clear</button>
 				<div class="pe_template_div">
@@ -596,7 +596,7 @@
 			<div style="display:block;float:left;width:310px">
 				Preview:<br><textarea style="width:290px" rows="16" name="pe_lymph1" id="pe_lymph1" class="pe_entry text ui-widget-content ui-corner-all"></textarea><input type="hidden" id="pe_lymph1_old"/>
 			</div>
-			<div style="display:block;float:left">
+			<div style="display:block;float:left;width:350px">
 				Choose Template: <select id="pe_lymph1_template" class="pe_template_choose text ui-widget-content ui-corner-all"></select><br>
 				<br><input type="checkbox" id="pe_lymph1_normal" class="all_normal" value=""><label for="pe_lymph1_normal">All Normal</label><button type="button" id="pe_lymph1_reset" class="reset">Clear</button>
 				<div class="pe_template_div">
@@ -609,7 +609,7 @@
 			<div style="display:block;float:left;width:310px">
 				Preview:<br><textarea style="width:290px" rows="16" name="pe_lymph2" id="pe_lymph2" class="pe_entry text ui-widget-content ui-corner-all"></textarea><input type="hidden" id="pe_lymph2_old"/>
 			</div>
-			<div style="display:block;float:left">
+			<div style="display:block;float:left;width:350px">
 				Choose Template: <select id="pe_lymph2_template" class="pe_template_choose text ui-widget-content ui-corner-all"></select><br>
 				<br><input type="checkbox" id="pe_lymph2_normal" class="all_normal" value=""><label for="pe_lymph2_normal">All Normal</label><button type="button" id="pe_lymph2_reset" class="reset">Clear</button>
 				<div class="pe_template_div">
@@ -622,7 +622,7 @@
 			<div style="display:block;float:left;width:310px">
 				Preview:<br><textarea style="width:290px" rows="16" name="pe_lymph3" id="pe_lymph3" class="pe_entry text ui-widget-content ui-corner-all"></textarea><input type="hidden" id="pe_lymph3_old"/>
 			</div>
-			<div style="display:block;float:left">
+			<div style="display:block;float:left;width:350px">
 				Choose Template: <select id="pe_lymph3_template" class="pe_template_choose text ui-widget-content ui-corner-all"></select><br>
 				<br><input type="checkbox" id="pe_lymph3_normal" class="all_normal" value=""><label for="pe_lymph3_normal">All Normal</label><button type="button" id="pe_lymph3_reset" class="reset">Clear</button>
 				<div class="pe_template_div">
@@ -643,7 +643,7 @@
 			<div style="display:block;float:left;width:310px">
 				Preview:<br><textarea style="width:290px" rows="16" name="pe_ms1" id="pe_ms1" class="pe_entry text ui-widget-content ui-corner-all"></textarea><input type="hidden" id="pe_ms1_old"/>
 			</div>
-			<div style="display:block;float:left">
+			<div style="display:block;float:left;width:350px">
 				Choose Template: <select id="pe_ms1_template" class="pe_template_choose text ui-widget-content ui-corner-all"></select><br>
 				<br><input type="checkbox" id="pe_ms1_normal" class="all_normal" value=""><label for="pe_ms1_normal">All Normal</label><button type="button" id="pe_ms1_reset" class="reset">Clear</button>
 				<div class="pe_template_div">
@@ -656,7 +656,7 @@
 			<div style="display:block;float:left;width:310px">
 				Preview:<br><textarea style="width:290px" rows="16" name="pe_ms2" id="pe_ms2" class="pe_entry text ui-widget-content ui-corner-all"></textarea><input type="hidden" id="pe_ms2_old"/>
 			</div>
-			<div style="display:block;float:left">
+			<div style="display:block;float:left;width:350px">
 				Choose Template: <select id="pe_ms2_template" class="pe_template_choose text ui-widget-content ui-corner-all"></select><br>
 				<br><input type="checkbox" id="pe_ms2_normal" class="all_normal" value=""><label for="pe_ms2_normal">All Normal</label><button type="button" id="pe_ms2_reset" class="reset">Clear</button>
 				<div class="pe_template_div">
@@ -669,7 +669,7 @@
 			<div style="display:block;float:left;width:310px">
 				Preview:<br><textarea style="width:290px" rows="16" name="pe_ms3" id="pe_ms3" class="pe_entry text ui-widget-content ui-corner-all"></textarea><input type="hidden" id="pe_ms3_old"/>
 			</div>
-			<div style="display:block;float:left">
+			<div style="display:block;float:left;width:350px">
 				Choose Template: <select id="pe_ms3_template" class="pe_template_choose text ui-widget-content ui-corner-all"></select><br>
 				<br><input type="checkbox" id="pe_ms3_normal" class="all_normal" value=""><label for="pe_ms3_normal">All Normal</label><input type="checkbox" id="pe_ms3_normal1" class="all_normal2" value="Full range of motion of the shoulders bilaterally."><label for="pe_ms3_normal1">All Normal Range of Motion</label><button type="button" id="pe_ms3_reset" class="reset">Clear</button>
 				<div class="pe_template_div">
@@ -682,7 +682,7 @@
 			<div style="display:block;float:left;width:310px">
 				Preview:<br><textarea style="width:290px" rows="16" name="pe_ms4" id="pe_ms4" class="pe_entry text ui-widget-content ui-corner-all"></textarea><input type="hidden" id="pe_ms4_old"/>
 			</div>
-			<div style="display:block;float:left">
+			<div style="display:block;float:left;width:350px">
 				Choose Template: <select id="pe_ms4_template" class="pe_template_choose text ui-widget-content ui-corner-all"></select><br>
 				<br><input type="checkbox" id="pe_ms4_normal" class="all_normal" value=""><label for="pe_ms4_normal">All Normal</label><input type="checkbox" id="pe_ms4_normal1" class="all_normal2" value="Full range of motion of the elbows bilaterally."><label for="pe_ms4_normal1">All Normal Range of Motion</label><button type="button" id="pe_ms4_reset" class="reset">Clear</button>
 				<div class="pe_template_div">
@@ -695,7 +695,7 @@
 			<div style="display:block;float:left;width:310px">
 				Preview:<br><textarea style="width:290px" rows="16" name="pe_ms5" id="pe_ms5" class="pe_entry text ui-widget-content ui-corner-all"></textarea><input type="hidden" id="pe_ms5_old"/>
 			</div>
-			<div style="display:block;float:left">
+			<div style="display:block;float:left;width:350px">
 				Choose Template: <select id="pe_ms5_template" class="pe_template_choose text ui-widget-content ui-corner-all"></select><br>
 				<br><input type="checkbox" id="pe_ms5_normal" class="all_normal" value=""><label for="pe_ms5_normal">All Normal</label><input type="checkbox" id="pe_ms5_normal1" class="all_normal2" value="Full range of motion of the wrists bilaterally."><label for="pe_ms5_normal1">All Normal Range of Motion</label><button type="button" id="pe_ms5_reset" class="reset">Clear</button>
 				<div class="pe_template_div">
@@ -708,7 +708,7 @@
 			<div style="display:block;float:left;width:310px">
 				Preview:<br><textarea style="width:290px" rows="16" name="pe_ms6" id="pe_ms6" class="pe_entry text ui-widget-content ui-corner-all"></textarea><input type="hidden" id="pe_ms6_old"/>
 			</div>
-			<div style="display:block;float:left">
+			<div style="display:block;float:left;width:350px">
 				Choose Template: <select id="pe_ms6_template" class="pe_template_choose text ui-widget-content ui-corner-all"></select><br>
 				<br><input type="checkbox" id="pe_ms6_normal" class="all_normal" value=""><label for="pe_ms6_normal">All Normal</label><input type="checkbox" id="pe_ms6_normal1" class="all_normal2" value="Full range of motion of the fingers and hands bilaterally."><label for="pe_ms6_normal1">All Normal Range of Motion</label><button type="button" id="pe_ms6_reset" class="reset">Clear</button>
 				<div class="pe_template_div">
@@ -721,7 +721,7 @@
 			<div style="display:block;float:left;width:310px">
 				Preview:<br><textarea style="width:290px" rows="16" name="pe_ms7" id="pe_ms7" class="pe_entry text ui-widget-content ui-corner-all"></textarea><input type="hidden" id="pe_ms7_old"/>
 			</div>
-			<div style="display:block;float:left">
+			<div style="display:block;float:left;width:350px">
 				Choose Template: <select id="pe_ms7_template" class="pe_template_choose text ui-widget-content ui-corner-all"></select><br>
 				<br><input type="checkbox" id="pe_ms7_normal" class="all_normal" value=""><label for="pe_ms7_normal">All Normal</label><input type="checkbox" id="pe_ms7_normal1" class="all_normal2" value="Full range of motion of the hips bilaterally."><label for="pe_ms7_normal1">All Normal Range of Motion</label><button type="button" id="pe_ms7_reset" class="reset">Clear</button>
 				<div class="pe_template_div">
@@ -734,7 +734,7 @@
 			<div style="display:block;float:left;width:310px">
 				Preview:<br><textarea style="width:290px" rows="16" name="pe_ms8" id="pe_ms8" class="pe_entry text ui-widget-content ui-corner-all"></textarea><input type="hidden" id="pe_ms8_old"/>
 			</div>
-			<div style="display:block;float:left">
+			<div style="display:block;float:left;width:350px">
 				Choose Template: <select id="pe_ms8_template" class="pe_template_choose text ui-widget-content ui-corner-all"></select><br>
 				<br><input type="checkbox" id="pe_ms8_normal" class="all_normal" value=""><label for="pe_ms8_normal">All Normal</label><input type="checkbox" id="pe_ms8_normal1" class="all_normal2" value="Full range of motion of the knees bilaterally."><label for="pe_ms8_normal1">All Normal Range of Motion</label><button type="button" id="pe_ms8_reset" class="reset">Clear</button>
 				<div class="pe_template_div">
@@ -747,7 +747,7 @@
 			<div style="display:block;float:left;width:310px">
 				Preview:<br><textarea style="width:290px" rows="16" name="pe_ms9" id="pe_ms9" class="pe_entry text ui-widget-content ui-corner-all"></textarea><input type="hidden" id="pe_ms9_old"/>
 			</div>
-			<div style="display:block;float:left">
+			<div style="display:block;float:left;width:350px">
 				Choose Template: <select id="pe_ms9_template" class="pe_template_choose text ui-widget-content ui-corner-all"></select><br>
 				<br><input type="checkbox" id="pe_ms9_normal" class="all_normal" value=""><label for="pe_ms9_normal">All Normal</label><input type="checkbox" id="pe_ms9_normal1" class="all_normal2" value="Full range of motion of the ankles bilaterally."><label for="pe_ms9_normal1">All Normal Range of Motion</label><button type="button" id="pe_ms9_reset" class="reset">Clear</button>
 				<div class="pe_template_div">
@@ -760,7 +760,7 @@
 			<div style="display:block;float:left;width:310px">
 				Preview:<br><textarea style="width:290px" rows="16" name="pe_ms10" id="pe_ms10" class="pe_entry text ui-widget-content ui-corner-all"></textarea><input type="hidden" id="pe_ms10_old"/>
 			</div>
-			<div style="display:block;float:left">
+			<div style="display:block;float:left;width:350px">
 				Choose Template: <select id="pe_ms10_template" class="pe_template_choose text ui-widget-content ui-corner-all"></select><br>
 				<br><input type="checkbox" id="pe_ms10_normal" class="all_normal" value=""><label for="pe_ms10_normal">All Normal</label><input type="checkbox" id="pe_ms10_normal1" class="all_normal2" value="Full range of motion of the toes and feet bilaterally."><label for="pe_ms10_normal1">All Normal Range of Motion</label><button type="button" id="pe_ms10_reset" class="reset">Clear</button>
 				<div class="pe_template_div">
@@ -773,7 +773,7 @@
 			<div style="display:block;float:left;width:310px">
 				Preview:<br><textarea style="width:290px" rows="16" name="pe_ms11" id="pe_ms11" class="pe_entry text ui-widget-content ui-corner-all"></textarea><input type="hidden" id="pe_ms11_old"/>
 			</div>
-			<div style="display:block;float:left">
+			<div style="display:block;float:left;width:350px">
 				Choose Template: <select id="pe_ms11_template" class="pe_template_choose text ui-widget-content ui-corner-all"></select><br>
 				<br><input type="checkbox" id="pe_ms11_normal" class="all_normal" value=""><label for="pe_ms11_normal">All Normal</label><input type="checkbox" id="pe_ms11_normal1" class="all_normal2" value="Full range of motion of the cervical spine."><label for="pe_ms11_normal1">All Normal Range of Motion</label><button type="button" id="pe_ms11_reset" class="reset">Clear</button>
 				<div class="pe_template_div">
@@ -786,7 +786,7 @@
 			<div style="display:block;float:left;width:310px">
 				Preview:<br><textarea style="width:290px" rows="16" name="pe_ms12" id="pe_ms12" class="pe_entry text ui-widget-content ui-corner-all"></textarea><input type="hidden" id="pe_ms12_old"/>
 			</div>
-			<div style="display:block;float:left">
+			<div style="display:block;float:left;width:350px">
 				Choose Template: <select id="pe_ms12_template" class="pe_template_choose text ui-widget-content ui-corner-all"></select><br>
 				<br><input type="checkbox" id="pe_ms12_normal" class="all_normal" value=""><label for="pe_ms12_normal">All Normal</label><input type="checkbox" id="pe_ms12_normal1" class="all_normal2" value="Full range of motion of the thoracic and lumbar spine."><label for="pe_ms12_normal1">All Normal Range of Motion</label><button type="button" id="pe_ms12_reset" class="reset">Clear</button>
 				<div class="pe_template_div">
@@ -807,7 +807,7 @@
 			<div style="display:block;float:left;width:310px">
 				Preview:<br><textarea style="width:290px" rows="16" name="pe_neuro1" id="pe_neuro1" class="pe_entry text ui-widget-content ui-corner-all"></textarea><input type="hidden" id="pe_neuro1_old"/>
 			</div>
-			<div style="display:block;float:left">
+			<div style="display:block;float:left;width:350px">
 				Choose Template: <select id="pe_neuro1_template" class="pe_template_choose text ui-widget-content ui-corner-all"></select><br>
 				<br><input type="checkbox" id="pe_neuro1_normal" class="all_normal" value=""><label for="pe_neuro1_normal">All Normal</label><button type="button" id="pe_neuro1_reset" class="reset">Clear</button>
 				<div class="pe_template_div">
@@ -820,7 +820,7 @@
 			<div style="display:block;float:left;width:310px">
 				Preview:<br><textarea style="width:290px" rows="16" name="pe_neuro2" id="pe_neuro2" class="pe_entry text ui-widget-content ui-corner-all"></textarea><input type="hidden" id="pe_neuro2_old"/>
 			</div>
-			<div style="display:block;float:left">
+			<div style="display:block;float:left;width:350px">
 				Choose Template: <select id="pe_neuro2_template" class="pe_template_choose text ui-widget-content ui-corner-all"></select><br>
 				<br><input type="checkbox" id="pe_neuro2_normal" class="all_normal" value=""><label for="pe_neuro2_normal">All Normal</label><input type="checkbox" id="pe_neuro2_normal1" class="all_normal2" value="Biceps, Patellar, and Achillies deep tendon reflexes are equal bilaterally."><label for="pe_neuro2_normal1">Equal and Bilateral</label><button type="button" id="pe_neuro2_reset" class="reset">Clear</button>
 				<div class="pe_template_div">
@@ -833,7 +833,7 @@
 			<div style="display:block;float:left;width:310px">
 				Preview:<br><textarea style="width:290px" rows="16" name="pe_neuro3" id="pe_neuro3" class="pe_entry text ui-widget-content ui-corner-all"></textarea><input type="hidden" id="pe_neuro3_old"/>
 			</div>
-			<div style="display:block;float:left">
+			<div style="display:block;float:left;width:350px">
 				Choose Template: <select id="pe_neuro3_template" class="pe_template_choose text ui-widget-content ui-corner-all"></select><br>
 				<br><input type="checkbox" id="pe_neuro3_normal" class="all_normal" value=""><label for="pe_neuro3_normal">All Normal</label><button type="button" id="pe_neuro3_reset" class="reset">Clear</button>
 				<div class="pe_template_div">
@@ -854,7 +854,7 @@
 			<div style="display:block;float:left;width:310px">
 				Preview:<br><textarea style="width:290px" rows="16" name="pe_psych1" id="pe_psych1" class="pe_entry text ui-widget-content ui-corner-all"></textarea><input type="hidden" id="pe_psych1_old"/>
 			</div>
-			<div style="display:block;float:left">
+			<div style="display:block;float:left;width:350px">
 				Choose Template: <select id="pe_psych1_template" class="pe_template_choose text ui-widget-content ui-corner-all"></select><br>
 				<br><input type="checkbox" id="pe_psych1_normal" class="all_normal" value=""><label for="pe_psych1_normal">All Normal</label><button type="button" id="pe_psych1_reset" class="reset">Clear</button>
 				<div class="pe_template_div">
@@ -867,7 +867,7 @@
 			<div style="display:block;float:left;width:310px">
 				Preview:<br><textarea style="width:290px" rows="16" name="pe_psych2" id="pe_psych2" class="pe_entry text ui-widget-content ui-corner-all"></textarea><input type="hidden" id="pe_psych2_old"/>
 			</div>
-			<div style="display:block;float:left">
+			<div style="display:block;float:left;width:350px">
 				Choose Template: <select id="pe_psych2_template" class="pe_template_choose text ui-widget-content ui-corner-all"></select><br>
 				<br><input type="checkbox" id="pe_psych2_normal" class="all_normal" value=""><label for="pe_psych2_normal">All Normal</label><button type="button" id="pe_psych2_reset" class="reset">Clear</button>
 				<div class="pe_template_div">
@@ -880,7 +880,7 @@
 			<div style="display:block;float:left;width:310px">
 				Preview:<br><textarea style="width:290px" rows="16" name="pe_psych3" id="pe_psych3" class="pe_entry text ui-widget-content ui-corner-all"></textarea><input type="hidden" id="pe_psych3_old"/>
 			</div>
-			<div style="display:block;float:left">
+			<div style="display:block;float:left;width:350px">
 				Choose Template: <select id="pe_psych3_template" class="pe_template_choose text ui-widget-content ui-corner-all"></select><br>
 				<br><input type="checkbox" id="pe_psych3_normal" class="all_normal" value=""><label for="pe_psych3_normal">All Normal</label><button type="button" id="pe_psych3_reset" class="reset">Clear</button>
 				<div class="pe_template_div">
@@ -893,7 +893,7 @@
 			<div style="display:block;float:left;width:310px">
 				Preview:<br><textarea style="width:290px" rows="16" name="pe_psych4" id="pe_psych4" class="pe_entry text ui-widget-content ui-corner-all"></textarea><input type="hidden" id="pe_psych4_old"/>
 			</div>
-			<div style="display:block;float:left">
+			<div style="display:block;float:left;width:350px">
 				Choose Template: <select id="pe_psych4_template" class="pe_template_choose text ui-widget-content ui-corner-all"></select><br>
 				<br><input type="checkbox" id="pe_psych4_normal" class="all_normal" value=""><label for="pe_psych4_normal">All Normal</label><button type="button" id="pe_psych4_reset" class="reset">Clear</button>
 				<div class="pe_template_div">
@@ -914,7 +914,7 @@
 			<div style="display:block;float:left;width:310px">
 				Preview:<br><textarea style="width:290px" rows="16" name="pe_skin1" id="pe_skin1" class="pe_entry text ui-widget-content ui-corner-all"></textarea><input type="hidden" id="pe_skin1_old"/>
 			</div>
-			<div style="display:block;float:left">
+			<div style="display:block;float:left;width:350px">
 				Choose Template: <select id="pe_skin1_template" class="pe_template_choose text ui-widget-content ui-corner-all"></select><br>
 				<br><input type="checkbox" id="pe_skin1_normal" class="all_normal" value=""><label for="pe_skin1_normal">All Normal</label><button type="button" id="pe_skin1_reset" class="reset">Clear</button>
 				<div class="pe_template_div">
@@ -927,7 +927,7 @@
 			<div style="display:block;float:left;width:310px">
 				Preview:<br><textarea style="width:290px" rows="16" name="pe_skin2" id="pe_skin2" class="pe_entry text ui-widget-content ui-corner-all"></textarea><input type="hidden" id="pe_skin2_old"/>
 			</div>
-			<div style="display:block;float:left">
+			<div style="display:block;float:left;width:350px">
 				Choose Template: <select id="pe_skin2_template" class="pe_template_choose text ui-widget-content ui-corner-all"></select><br>
 				<br><input type="checkbox" id="pe_skin2_normal" class="all_normal" value=""><label for="pe_skin2_normal">All Normal</label><button type="button" id="pe_skin2_reset" class="reset">Clear</button>
 				<div class="pe_template_div">

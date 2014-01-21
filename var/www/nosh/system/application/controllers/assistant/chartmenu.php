@@ -4967,11 +4967,12 @@ class Chartmenu extends Application
 				$dob = date('Ymd', human_to_unix($row2['DOB']));
 				$middle = substr($row3['middle'], 0, 1);
 				$pname = substr($row3['lastname'], 0, 5) . substr($row3['firstname'], 0, 1) . substr($row3['middle'], 0, 1);
-				$hl7 = "MSH|^~\&|OML|LAB|||" . $date . "00||ORM^R01|R10063131003.1|P|2.3||^" . strtoupper($pname);
+				$hl7 = "MSH|^~\&|QDX|" . strtoupper($pname) . "|||" . $date . "00||ORM^O01|R10063131003.1|P|2.3||^" . strtoupper($pname);
 				$hl7 .= "\r";
 				$hl7 .= "PID|1|" . $pid . "|||" . strtoupper($row2['lastname']) . "^" . strtoupper($row2['firstname']) . "||" . $dob ."|" . strtoupper($row2['sex']) . "|||||||||||";
 				$hl7 .= "\r";
-				$hl7 .= "ORC|NW|" . $orders_id . "|||CM||^^^" . $date . "||" . $date . "|||" . strtoupper($row4['peacehealth_id']) . "^" . strtoupper($row3['lastname']) ."^" . strtoupper($row3['firstname']) . "^" . strtoupper($middle) . "^^^" . strtoupper($row3['title']) . "||||^|" . strtoupper($row4['peacehealth_id']) . "^" . strtoupper($row3['lastname']) ."^" . strtoupper($row3['firstname']) . "^" . strtoupper($middle) . "^^^" . strtoupper($row3['title']) . "||||100^QA-Central Laboratory|QA-Central Laboratory|QA-Central Laboratory^123 International Way^Springfield^OR^97477|1-800-826-3616";
+				$hl7 .= "ORC|NW|" . $orders_id . "|||A||^^^" . $date . "00||" . $date . "00|||" . strtoupper($row4['peacehealth_id']) . "^" . strtoupper($row3['lastname']) ."^" . strtoupper($row3['firstname']) . "^" . strtoupper($middle) . "^^^" . strtoupper($row3['title']) . "||||^|" . strtoupper($row4['peacehealth_id']) . "^" . strtoupper($row3['lastname']) ."^" . strtoupper($row3['firstname']) . "^" . strtoupper($middle) . "^^^" . strtoupper($row3['title']) . "||||100^QA-Central Laboratory|QA-Central Laboratory|QA-Central Laboratory^123 International Way^Springfield^OR^97477|1-800-826-3616";
+				//$hl7 .= "ORC|NW|" . $orders_id . "|||CM||^^^" . $date . "||" . $date . "|||" . strtoupper($row4['peacehealth_id']) . "^" . strtoupper($row3['lastname']) ."^" . strtoupper($row3['firstname']) . "^" . strtoupper($middle) . "^^^" . strtoupper($row3['title']) . "||||^|" . strtoupper($row4['peacehealth_id']) . "^" . strtoupper($row3['lastname']) ."^" . strtoupper($row3['firstname']) . "^" . strtoupper($middle) . "^^^" . strtoupper($row3['title']) . "||||100^QA-Central Laboratory|QA-Central Laboratory|QA-Central Laboratory^123 International Way^Springfield^OR^97477|1-800-826-3616";
 				$orders_array = explode("\n", $row['orders_labs']);
 				$j = 1;
 				foreach ($orders_array as $orders_row) {
@@ -4990,7 +4991,9 @@ class Chartmenu extends Application
 							exit (0);
 						}
 						$hl7 .= "\r";
-						$hl7 .= "OBR|" . $j . "||" . $orders_id . "|" . strtoupper($testcode) . "^" . strtoupper($testname) . "^^|S|" . $date . "|" .$date . "|||||||" . $date . "|SST^BLD|96666|||||PHL^PeaceHealth Laboratories^123 International Way^Springfield^OR^97477|" . $date . "||GEN|F||^^^" . $date . "^^S^^^|||||||||" . $date;
+						$hl7 .= "OBR|" . $j . "|" . $orders_id . "||" . strtoupper($testcode) . "^" . strtoupper($testname) . "^^|R|" . $date . "00|" .$date . "|||||||" . $date . "00|SST^BLD|96666|||||PHL^PeaceHealth Laboratories^123 International Way^Springfield^OR^97477|";
+						//$hl7 .= "OBR|" . $j . "||" . $orders_id . "|" . strtoupper($testcode) . "^" . strtoupper($testname) . "^^|R|" . $date . "00|" .$date . "|||||||" . $date . "00|SST^BLD|96666|||||PHL^PeaceHealth Laboratories^123 International Way^Springfield^OR^97477|";
+						//$hl7 .= "OBR|" . $j . "||" . $orders_id . "|" . strtoupper($testcode) . "^" . strtoupper($testname) . "^^|S|" . $date . "|" .$date . "|||||||" . $date . "|SST^BLD|96666|||||PHL^PeaceHealth Laboratories^123 International Way^Springfield^OR^97477|" . $date . "||GEN|F||^^^" . $date . "^^S^^^|||||||||" . $date;
 						$j++;
 					}
 				}
@@ -11333,7 +11336,7 @@ class Chartmenu extends Application
 			$other_history_row = $other_history_query->row_array();
 			if ($other_history_row['oh_tobacco'] != '') {
 				$other_history_table .= "<td>Smoking Status</td>";
-				$other_history_table .= "<td><content ID='other_history" . $o . "'>" . $other_history_row['oh_tobacco'] . "</td>";
+				$other_history_table .= "<td><content ID='other_history1'>" . $other_history_row['oh_tobacco'] . "</td>";
 				$other_history_table .= "<td>" . date('m-d-Y', human_to_unix($other_history_row['oh_date'])) . "</td>";
 				$other_history_table .= "</tr>";
 				$other_history_table .= "<tr>";
@@ -11368,7 +11371,7 @@ class Chartmenu extends Application
 				$vitals_table .= '</content></td></tr>';
 				$vitals_code1 = "8302-2";
 				$vitals_description1 = "Body height";
-				$vitals_file_ = file_get_contents('/var/www/nosh/vitals.xml');
+				$vitals_file = file_get_contents('/var/www/nosh/vitals.xml');
 				$vitals_file = str_replace('?vitals_code?', $vitals_code1, $vitals_file);
 				$vitals_file = str_replace('?vitals_description?', $vitals_description1, $vitals_file);
 				$vitals_file = str_replace('?vitals_date?', date('Ymd', human_to_unix($vitals_row['vitals_date'])), $vitals_file);
@@ -11451,14 +11454,14 @@ class Chartmenu extends Application
 			$orders_file2 = str_replace('?orders_code?', $items[1], $orders_file2);
 			$orders_file2 = str_replace('?orders_code_description?', $term_row['term'], $orders_file2);
 			$orders_random_id2 = $this->gen_uuid();
-			$orders_file = str_replace('?orders_random_id1?', $orders_random_id1, $orders_file2);
+			$orders_file = str_replace('?orders_random_id1?', $orders_random_id2, $orders_file2);
 		} else {
 			$orders_file3 = file_get_contents('/var/www/nosh/orders_generic.xml');
 			$orders_file3 = str_replace('?orders_date?', date('Ymd', human_to_unix($date)), $orders_file3);
 			$orders_file3 = str_replace('?orders_description?', $item, $orders_file3);
 			$orders_file3 = str_replace('?orders_reference_id?', $id, $orders_file3);
 			$orders_random_id3 = $this->gen_uuid();
-			$orders_file = str_replace('?orders_random_id1?', $orders_random_id1, $orders_file3);
+			$orders_file = str_replace('?orders_random_id1?', $orders_random_id3, $orders_file3);
 		}
 		return $orders_file;
 	}
