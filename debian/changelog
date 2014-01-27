@@ -1,3 +1,12 @@
+nosh-cs (1.7.3-0ubuntu13) precise; urgency=low
+
+  * Updated - MetroFax fax recognition changed.
+  * Updated - Added delete test reconciliation script.
+  * Fixed - PHP error on Billing user chart account.
+  * Fixed - Portal accounts referrence incorrect in dashboard.
+
+ -- Michael Shihjay Chen <shihjay2@gmail.com>  Mon, 27 Jan 2014 10:01:42 -0800
+
 nosh-cs (1.7.3-0ubuntu12) precise; urgency=low
 
   * Fixed - CSS issues with physical examination.

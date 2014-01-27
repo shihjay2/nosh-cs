@@ -578,56 +578,12 @@ $(document).ready(function() {
 				url: "<?php echo site_url('patient/chartmenu/demographics');?>",
 				dataType: "json",
 				success: function(data){
-					$("#menu_lastname").val(data.lastname);
-					$("#menu_firstname").val(data.firstname);
-					$("#menu_middle").val(data.middle);
-					$("#menu_title").val(data.title);
-					$("#menu_nickname").val(data.nickname);
-					var dob = editDate1(data.DOB);
-					$("#menu_DOB").val(dob);
-					$("#menu_gender").val(data.sex);
-					$("#menu_ss").val(data.ss);
-					$("#menu_race").val(data.race);
-					$("#menu_ethnicity").val(data.ethnicity);
-					$("#menu_language").val(data.language);
-					$("#menu_address").val(data.address);
-					$("#menu_city").val(data.city);
-					$("#menu_state").val(data.state);
-					$("#menu_zip").val(data.zip);
-					$("#menu_phone_home").val(data.phone_home);
-					$("#menu_phone_work").val(data.phone_work);
-					$("#menu_phone_cell").val(data.phone_cell);
-					$("#menu_email").val(data.email);
-					$("#menu_marital_status").val(data.marital_status);
-					$("#menu_partner_name").val(data.partner_name);
-					$("#menu_employer").val(data.employer);
-					$("#menu_emergency_contact").val(data.emergency_contact);
-					$("#menu_emergency_phone").val(data.emergency_phone);
-					$("#menu_reminder_method").val(data.reminder_method);
-					$("#menu_cell_carrier").val(data.cell_carrier);
-					$("#menu_preferred_provider").val(data.preferred_provider);
-					$("#menu_preferred_pharmacy").val(data.preferred_pharmacy);
-					$("#menu_other1").val(data.other1);
-					$("#menu_other2").val(data.other2);
-					$("#menu_comments").val(data.comments);
-					$("#menu_caregiver").val(data.caregiver);
-					$("#menu_active").val(data.active);
-					$("#menu_referred_by").val(data.referred_by);
-					$("#menu_race_code").val(data.race_code);
-					$("#menu_ethnicity_code").val(data.ethnicity_code);
-					$("#menu_guardian_lastname").val(data.guardian_lastname);
-					$("#menu_guardian_firstname").val(data.guardian_firstname);
-					$("#menu_guardian_relationship").val(data.guardian_relationship);
-					$("#menu_guardian_code").val(data.guardian_code);
-					$("#menu_guardian_address").val(data.guardian_address);
-					$("#menu_guardian_city").val(data.guardian_city);
-					$("#menu_guardian_state").val(data.guardian_state);
-					$("#menu_guardian_zip").val(data.guardian_zip);
-					$("#menu_guardian_phone_home").val(data.guardian_phone_home);
-					$("#menu_guardian_phone_work").val(data.guardian_phone_work);
-					$("#menu_guardian_phone_cell").val(data.guardian_phone_cell);
-					$("#menu_guardian_email").val(data.guardian_email);
-					$("#menu_lang_code").val(data.lang_code);
+					$.each(data, function(key, value){
+						if (key == 'DOB') {
+							var value = editDate1(data.DOB);
+						}
+						$("#edit_demographics_form :input[name='" + key + "']").val(value);
+					});
 					$("#menu_lastname").focus();
 				}
 			});

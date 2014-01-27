@@ -13,7 +13,7 @@ mysql, imap, mcrypt, imagick, gd, cli, curl, soap, pear
 ##### 5. PERL
 ##### 6. Imagemagick
 ##### 7. PDF ToolKit (pdftk)
-```
+
 ## Install the package:
 
 ##### 1. Unzip the installation file in a directory of your choice.  Go to the "nosh-cs" directory.
@@ -26,12 +26,12 @@ installation.
 ##### 7. Login to NOSH ChartingSystem as admin and configure your users and clinic parameters.
 It's important to do this first before any other users use NOSH ChartingSystem; otherwise, 
 some features such as scheduling will not work correctly!
-```
+
 ## Uninstall the package:
 ##### 1. Open a terminal window and go to the "nosh-cs" directory where you ran the installation
 script.
 ##### 2. Type "sh uninstall.sh" to run the uninstallation script.
-```
+
 # How the files are organized.
 
 NOSH is built around the Codeigniter PHP Framework, which is a models/controllers/views (MCV) framework.

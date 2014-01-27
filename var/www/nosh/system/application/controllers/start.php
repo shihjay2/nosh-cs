@@ -1146,6 +1146,15 @@ class Start extends Application
 			);
 			$this->db->insert('messaging', $data_message);
 		}
+		echo $i;
+	}
+	
+	function delete_tests()
+	{
+		$this->db->where('tests_id', $this->input->post('tests_id'));
+		$this->db->delete('tests');
+		echo "OK";
+		exit (0);
 	}
 	
 	function page_intro($title, $practice_id)

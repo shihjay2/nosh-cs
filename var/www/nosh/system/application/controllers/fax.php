@@ -27,8 +27,8 @@ class Fax extends Application
 					$email_subject = 'eFax from';
 				}
 				if ($fax_type === "metrofax.com") {
-					$email_sender = "faxbounce@fax.metrohispeed.com";
-					$email_subject = 'A fax has arrived from';
+					$email_sender = "noreply@metrofax.com";
+					$email_subject = 'MetroFax message from';
 				}
 				if ($fax_type === "rcfax.com") {
 					$email_sender = "notify@ringcentral.com";
@@ -53,14 +53,16 @@ class Fax extends Application
 									$subject = explode(" - ", $info->subject);
 									$from = str_replace("eFax from ", "", $subject[0]);
 									$pages = strstr($subject[1], ' ', true);
+								} elseif ($fax_type === "metrofax.com") {
+									$subject = explode(" ", $info->subject);
+									$from = str_replace('"', '', $subject[3]);
+									$pages = $subject[5];
 								} else {
 									if($part->subtype === "PLAIN") {
 										$message = $this->getPart($connection, $messageNumber, $partNumber, $part->encoding);
 										$from_pos_s = strpos($message, "From:");
 										$from_substr = substr($message, $from_pos_s);
-										if ($fax_type === "metrofax.com") {
-											$from_substr1 = strstr($from_substr, 'To:', true);
-										} elseif ($fax_type === "rcfax.com") {
+										if ($fax_type === "rcfax.com") {
 											$from_substr1 = strstr($from_substr, 'Received:', true);
 										} else {
 											$from_substr1 = strstr($from_substr, '=', true);

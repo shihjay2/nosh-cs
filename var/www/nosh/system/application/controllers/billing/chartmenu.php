@@ -455,9 +455,11 @@ class Chartmenu extends Application
 		$practice_id = $this->session->userdata('practice_id');
 		$pid = $this->session->userdata('pid');
 		$query = $this->db->query("SELECT * FROM demographics WHERE pid=$pid");
+		$query_relate = $this->db->query("SELECT * FROM demographics_relate WHERE pid=$pid AND practice_id=$practice_id");
 		$result = '<strong>Demographics:</strong>';
 		if ($query->num_rows() > 0) {
 			$row = $query->row_array();
+			$row_relate = $query_relate->row_array();
 			$result .= '<p class="tips"><strong>Address:</strong><br>' . $row['address'] . '<br>' . $row['city'] . ', ' . $row['state'] . ' ' . $row['zip'] . '</p>';
 			$result .= '<p class="tips"><strong>Phone Numbers:</strong><br>Home: ' . $row['phone_home'] . '<br>Work: ' . $row['phone_work'] . '<br>Cell: ' . $row['phone_cell'] . '<br>Email: ' . $row['email'] . '</p>';
 			$result .= '<p class="tips"><strong>Emergency Contact:</strong><br>Contact: ' . $row['emergency_contact'] . ', ' . $row['emergency_phone'] . '</p>';
@@ -473,7 +475,7 @@ class Chartmenu extends Application
 				$result .= '<p class="tips"><strong>Other:</strong><br>Sexually Active: ' . ucfirst($row['sexuallyactive']) . '<br>Tobacco Use: ' . ucfirst($row['tobacco']) . '</p>';
 			}
 			$result .= '<p class="tips">Active since ' . $row['date'] . '</p>';
-			if ($row['id'] != '') {
+			if ($row_relate['id'] != '') {
 				$result .= '<p class="tips">Online account is active.</p>';
 			} else {
 				$result .= '<p class="tips">No online account.</p>';
@@ -8802,7 +8804,7 @@ class Chartmenu extends Application
 			$orders_file2 = str_replace('?orders_code?', $items[1], $orders_file2);
 			$orders_file2 = str_replace('?orders_code_description?', $term_row['term'], $orders_file2);
 			$orders_random_id2 = $this->gen_uuid();
-			$orders_file = str_replace('?orders_random_id1?', $orders_random_id2 $orders_file2);
+			$orders_file = str_replace('?orders_random_id1?', $orders_random_id2, $orders_file2);
 		} else {
 			$orders_file3 = file_get_contents('/var/www/nosh/orders_generic.xml');
 			$orders_file3 = str_replace('?orders_date?', date('Ymd', human_to_unix($date)), $orders_file3);
