@@ -19,6 +19,20 @@ db_version 2.0
 
 LOGDIR=/var/log/nosh
 LOG=$LOGDIR/installation_log
+WEB=/var/www
+NOSH=$WEB/nosh
+OLDNOSH=$WEB/oldnosh
+CONFIGDATABASEBACKUP=$OLDNOSH/system/application/config/database_backup.php
+CONFIGDATABASE=$OLDNOSH/system/application/config/database.php
+OLDNOSHREMINDER=/usr/bin/noshreminder.php
+OLDNOSHFAX=/usr/bin/fax.php
+NOSHBACKUP=/usr/bin/noshbackup
+NOSHREMINDER=/usr/bin/noshreminder
+NOSHFAX=/usr/bin/noshfax
+NOSHCRON=/etc/cron.d/nosh-cs
+
+LOGDIR=/var/log/nosh
+LOG=$LOGDIR/installation_log
 NOSH=/var/www/nosh
 CONFIGDATABASEBACKUP=$NOSH/system/application/config/database_backup.php
 CONFIGDATABASE=$NOSH/system/application/config/database.php
@@ -44,13 +58,18 @@ case "$1" in
 
 	upgrade)
 		log_only "Updating NOSH ChartingSystem"
-		rm -rf $NOSHFAX
-		rm -rf $NOSHREMINDER
-		rm -rf /var/www/nosh/extensions/ssh
-		if [ -d "$NOSH" ]; then
+		if [ -d $NOSH ]; then
+			mv $NOSH $OLDNOSH
+			log_only "Backup of previous NOSH files to /var/www/oldnosh."
+			rm -rf $OLDNOSHFAX
+			rm -rf $OLDNOSHREMINDER
+			rm -rf $NOSHFAX
+			rm -rf $NOSHREMINDER
+			rm -rf $NOSHBACKUP
+			log_only "Removed old scripts for NOSH."
 			if [ -e "$CONFIGDATABASE" ]; then
 				cp -fr $CONFIGDATABASE $CONFIGDATABASEBACKUP
-				log_only "Backup of Codeigniter database configuration file"
+				log_only "Backup of Codeigniter database configuration file created."
 			fi
 		fi
 		exit 0

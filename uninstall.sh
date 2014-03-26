@@ -2,15 +2,14 @@
 # uninstall script for nosh-cs
 
 set -e
-read -e -p "Enter the MySQL user: " -i "root" DEFAULTUSERNAME
-read -e -p "Enter the MySQL password:" -i "" DEFAULTPASSWORD
 
 #constants and paths
 LOGDIR=/var/log/nosh
 LOG=$LOGDIR/installation_log
 WEB=/var/www
 NOSH=$WEB/nosh
-CONFIGDATABASE=$NOSH/system/application/config/database.php
+LARAVEL=/var/laravel
+CONFIGDATABASE=/var/laravel/.env.php
 NOSHREMINDER=/usr/bin/noshreminder.php
 NOSHREMINDER1=/usr/bin/noshreminder
 NOSHFAX=/usr/bin/fax.php
@@ -32,13 +31,13 @@ unable_exit () {
 }
 
 get_settings () {
-	echo `grep -i "^[[:space:]]*$1[[:space:]=]" $2 | cut -d \= -f 2 | cut -d \; -f 1 | sed "s/[ 	'\"]//gi"`
+	echo `grep -i "^[[:space:]]*$1[[:space:]=>]" $2 | cut -d \> -f 2 | cut -d \, -f 1 | sed "s/[ 	'\"]//gi"`
 }
 
 if [ -d "/var/lib/mysql/nosh" ]; then
 	# Collect database variables
-	DEFAULTUSERNAME=$(get_settings \$default_db_username $CONFIGDATABASE)
-	DEFAULTPASSWORD=$(get_settings \$default_db_password $CONFIGDATABASE)
+	DEFAULTUSERNAME=$(get_settings \'mysql_username\' $CONFIGDATABASE)
+	DEFAULTPASSWORD=$(get_settings \'mysql_password\' $CONFIGDATABASE)
 	NOSH_DIR=$(mysql -u$DEFAULTUSERNAME -p$DEFAULTPASSWORD "nosh" -sN -e "select documents_dir from practiceinfo where practice_id = '1'")
 	# Remove mysql database
 	mysqladmin -f -u$DEFAULTUSERNAME -p$DEFAULTPASSWORD drop "nosh" >> $LOG 2>&1
@@ -46,7 +45,8 @@ if [ -d "/var/lib/mysql/nosh" ]; then
 fi
 # Remove web directory
 rm -rf $NOSH
-log_only "Removed NOSH ChartingSystem web directory."
+rm -rf $LARAVEL
+log_only "Removed NOSH ChartingSystem web directory and Larvel framework files."
 # Remove rest of supporting files
 rm -rf $NOSHREMINDER
 rm -rf $NOSHREMINDER1

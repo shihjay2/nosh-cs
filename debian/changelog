@@ -1,3 +1,27 @@
+nosh-cs (1.8.0-0ubuntu1) precise; urgency=low
+
+  * MAJOR UPDATE - Switched to Laravel PHP framework for built-in security and easy future development.
+  * Updated - Consolidation of code to reduce redundnacy and errors for future updates.
+  * Updated - Modular PHP and javascript framework easy plug-and-play of elements.
+  * Updated - Automatic updating of the NOSH application files through GitHub when commits are pushed.
+  * New Feature - User defined HPI, ROS, and PE templates.
+  * New Feature - Assistant users can now create and sign clinical support visit notes.
+  * New Feature - Now with encounter templates.
+  * New Feature - Clinical support added as an encounter template.
+  * New Feature - Ability to bring up messaging and scheduling features without opening up a new window/tab.
+  * New Feature - Import and view C-CDA's with code from bluebutton.js.
+  * New Feature - Ability to reconcile imported C-CDA's into patient's chart.
+  * New Feature - Visit types are now able to be individualized to provider.
+  * New Feature - Ability to print flattened HCFA-1500 pdf file.
+  * New Feature - Ability to set up future orders and to process these orders in a a clinical support visit note. 
+  * New Feature - Ability to view growth charts form the main chart instead of just in an encounter.
+  * Fixed - Numerous bug fixes and javascript errors.
+  * Updated - Updated ICD9 and Medication database files.
+  * Updated - User interface updated with the use purecss.io.
+  * Updated - User interface updated to allow better use of tablet/touchscreen capbilities.
+
+ -- Michael Shihjay Chen <shihjay2@gmail.com>  Wed, 26 Mar 2014 09:37:33 -0700
+
 nosh-cs (1.7.3-0ubuntu13) precise; urgency=low
 
   * Updated - MetroFax fax recognition changed.

@@ -1,8 +1,9 @@
-# NOSH ChartingSystem Installation Instructions for Linux
+# NOSH ChartingSystem Installation Instructions
 
 ## Preparation:
-You'll need to have the following programs installed on your system prior to installation
-of NOSH ChartingSystem
+You'll need to have the following applications/packages installed on your system prior to installation
+of NOSH ChartingSystem.  If you have a LAMP (Linux-Apache-mySQL-PHP) or MAMP (Mac-Apache-mySQL-PHP) server
+already set up, you are golden!
 
 ##### 1. Apache web server (needs to be running)
 ##### 2. MySQL database.  Make sure you remember the root password.  This will be asked during the
@@ -13,50 +14,54 @@ mysql, imap, mcrypt, imagick, gd, cli, curl, soap, pear
 ##### 5. PERL
 ##### 6. Imagemagick
 ##### 7. PDF ToolKit (pdftk)
+##### 8. cURL
 
-## Install the package:
+## Installation
+Installing NOSH ChartingSystem is very easy to install.  If you use Ubuntu, it is even easier as NOSH can be installed from its own 
+Personal Package Archive (PPA).  With the [PPA method](https://github.com/shihjay2/nosh-cs/wiki/Installation#ubuntu-ppa), you do not 
+have to worry about installing dependencies.  If you have access to a terminal shell for your server (any distro for Linux or 
+Mac OS-X), you can install NOSH with the [Manual Method](https://github.com/shihjay2/nosh-cs/wiki/Installation#manual-method).  
+The installation script automatically adds scheduled task commands (cron files) and web server configuration files to make NOSH 
+work seamlessly the first time.  The script also determines if your system meets all the package dependencies before installation.
+For detailed information, go to the [Wiki link](https://github.com/shihjay2/nosh-cs/wiki/Installation#ubuntu-ppa).
 
-##### 1. Unzip the installation file in a directory of your choice.  Go to the "nosh-cs" directory.
-##### 2. Open a terminal window and go to the "nosh-cs" directory.
-##### 3. Type "sh install.sh" to run the installation script.
-##### 4. Follow the instructions on the prompt.
-##### 5. Go to your web browser and type, "http://localhost/nosh" to begin the second stage of
-installation.
-##### 6. Wait for installation to complete.
-##### 7. Login to NOSH ChartingSystem as admin and configure your users and clinic parameters.
-It's important to do this first before any other users use NOSH ChartingSystem; otherwise, 
+If this is the first time using NOSH, make sure you login to NOSH ChartingSystem as admin and configure your users and clinic 
+parameters.  It's important to do this first before any other users use NOSH ChartingSystem; otherwise, 
 some features such as scheduling will not work correctly!
 
+## Updates
+Like Laravel, NOSH now utilizes [Composer](http://getcomposer.org) to manage its PHP dependencies.  
+Composer is automatically installed when you use the installation script (it is located in /usr/local/bin/composer).
+Because the [core NOSH files](https://github.com/shihjay2/nosh-core/) are now served on GitHub, NOSH is self-updating daily
+whenever a new commit (updated files) is uploaded.  There is no more user intervention anymore, and you get the latest and greatest 
+NOSH version at your fingertips!
+
 ## Uninstall the package:
-##### 1. Open a terminal window and go to the "nosh-cs" directory where you ran the installation
-script.
-##### 2. Type "sh uninstall.sh" to run the uninstallation script.
+##### 1. Open a terminal window and go to the NOSH installation directory (the default in the script
+is /usr/share/nosh).
+##### 2. As a root user (sudo in Ubuntu/Debian), type "sh uninstall.sh" to run the uninstallation script.
 
 # How the files are organized.
 
-NOSH is built around the Codeigniter PHP Framework, which is a models/controllers/views (MCV) framework.
-Please look at the Codeigniter website and their documentation to review how this framework operates (http://codeigniter.com).
-Those familiar with it, will note that the main, configurable files are placed in the ../nosh/system/applications directory.
-Inside this directory are the following subdirectories and their contents:
+NOSH is built around the Laravel PHP Framework, which is a models/controllers/views (MCV) framework.
+Documentation for the entire framework can be found on the [Laravel website](http://laravel.com/docs).
 
-## controllers
-	This directory containes files that are the main guts of the application.  There are several user types that are 
-	subcategorized within this directory.  These user types are: provider, assistant, billing, admin, and patient.
+## Routes
+The routes.php file dictate where the URL command goes to.  Looking at the file, you'll notice that the controllers are
+categorized by an access control list (ACL) based on the type of user priviledges a user has when he/she is logged in to NOSH.
 
-## Within each user type, these are the common main files and their descriptions:
-##### chartmenu.php - This is the main page when a chart is opened.  A large majority of functions appear in this file.
-##### encounters.php - This is where functions pertaining to a patient encounter within a chart reside.
-##### billing.php - This is where functions pertaining to patient billing reside.
-##### messaging.php - This is where functions pertaining to messaging (intra-office messaging, fax, scanning, address book) 
-##### reside.
+## Controllers
+As is standard with the Laravel framework, main guts of the system lie in the ../app/controllers directory.  Looking at the
+routes.php file, you'll notice that the type of controllers are categorized between AJAX and non-AJAX functions (hence they 
+are named with a prefix of Ajax).
 
-## views
-	This directory contains files that the user "sees" when information is passed onto the browser.  All the Javascript codes 
-	are placed here.  In the first directory within views, these are the installation view files that require no authorization to 
-	access.  There is a subdirectory "auth" that contains the header and footer of all pages.
+## Views
+The view files, PDF, and email template files are in the ../app/views directory.  The view files are essentially "modules" that
+are added on depending on the needs of the view layout.
+The corresponding javascript files (named the same as the view file, but with a .js extension) are in the ../public/js directory.
 
-	If you see the javascript, you will notice that jQuery is used heavily here.  There are numerous plugins for jQuery that are 
-	referenced in the header file.  Below is a list of the major jQuery plugins that are used:
+If you see the javascript, you will notice that jQuery is used heavily here.  There are numerous plugins for jQuery that are 
+referenced in the header file.  Below is a list of the major jQuery plugins that are used:
 ##### Javascript user interface: JQuery UI (dialog, tabs, accordion, autocomplete)
 ##### Calendar system: FullCalendar
 ##### Tables and grids: jqGrid
@@ -66,23 +71,17 @@ Inside this directory are the following subdirectories and their contents:
 ##### Form input masking: Masked Input
 ##### Date/time input: Time entry
 
-	The header file points to all above javascript files placed in the /nosh/js directory.  The header file also points to all css 
-	files that are placed in the ../nosh/css directory.
+## Models
+This is where php code pertaining to MySQL database functions reside.  The controllers frequently point to code in this 
+directory.
 
-## model
-	This is where php code pertaining to MySQL database functions reside.  The controllers frequently point to code in this 
-	directory.
-
-## config
-	This is where configuration options for Codeigniter exist.  In general, all settings should remain unchanged unless any 
-	new feature requires a system-wide configuration change.
-
-	Images indicated in the view files reside in the ../nosh/images directory.
-	Imported files are usually downloaded via script in the /nosh/import directory.
+## Assets
+Images indicated in the view files reside in the ../public/images directory.
+Imported files are usually downloaded via script in the ../import directory.
 
 ## Database schema
-	Below are the list of database tables that are installed for NOSH.  Some table names are self explainatory, but those that are not
-	will be explained here.
+Below are the list of database tables that are installed for NOSH.  Some table names are self explainatory, but those that are not
+will be explained here.
 	addressbook
 	alerts
 	allergies
@@ -140,3 +139,11 @@ Inside this directory are the following subdirectories and their contents:
 	vaccine_inventory
 	vaccine_temp - Vaccine temperature log
 	vitals - List of vital signs in a patient encounter.
+
+### Contributing To NOSH ChartingSystem
+
+**All issues and pull requests should be filed on the [shihjay2/nosh-core](http://github.com/shihjay2/nosh-core) repository.**
+
+### License
+
+NOSH ChartingSystem is open-sourced software licensed under the [GNU Affero General Public License](http://www.gnu.org/licenses/)

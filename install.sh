@@ -2,26 +2,22 @@
 # install script for nosh-cs
 
 set -e
-cp -a usr/ /usr/
-read -e -p "Enter the directory where NOSH ChartingSystem patient files will be stored:" -i "/noshdocuments" NOSH_DIR
+read -e -p "Enter the directory where NOSH ChartingSystem patient files will be stored: " -i "/noshdocuments" NOSH_DIR
 
 # Constants and paths
 LOGDIR=/var/log/nosh
 LOG=$LOGDIR/installation_log
 WEB=/var/www
 NOSH=$WEB/nosh
-CONFIGDATABASEBACKUP=$NOSH/system/application/config/database_backup.php
-CONFIGDATABASE=$NOSH/system/application/config/database.php
-WEB_GROUP=www-data
-WEB_USER=www-data
-PHP=/etc/php5/apache2/php.ini
+OLDNOSH=$WEB/oldnosh
+CONFIGDATABASEBACKUP=$OLDNOSH/system/application/config/database_backup.php
+CONFIGDATABASE=$OLDNOSH/system/application/config/database.php
 OLDNOSHREMINDER=/usr/bin/noshreminder.php
 OLDNOSHFAX=/usr/bin/fax.php
 NOSHBACKUP=/usr/bin/noshbackup
-NOSHCRON=/etc/cron.d/nosh-cs
 NOSHREMINDER=/usr/bin/noshreminder
 NOSHFAX=/usr/bin/noshfax
-INSTALL_VIEW=$NOSH/system/application/views/install.php
+NOSHCRON=/etc/cron.d/nosh-cs
 
 log_only () {
 	echo "$1"
@@ -44,6 +40,96 @@ insert_settings () {
 	sed -i 's%^[ 	]*'"$1"'[ 	=].*$%'"$1"' = '"$2"'%' "$3"
 }
 
+# Check if running as root user
+if [[ $EUID -ne 0 ]]; then
+	echo "This script must be run as root.  Aborting." 1>&2
+	exit 1
+fi
+
+if [ "$NOSH_DIR" = "" ]; then
+	echo "The NOSH ChartingSystem documents directory cannot be blank.  Aborting." 1>&2
+	exit 1
+else
+	NEWNOSH=$NOSH_DIR/nosh-cs
+	NEWNOSHTEST=$NEWNOSH/artisan
+	TEMPCONFIGDATABASE=$NOSH_DIR/nosh-cs/.codeigniter.php
+	NEWCONFIGDATABASE=$NOSH_DIR/nosh-cs/.env.php
+	NOSHDIRFILE=$NEWNOSH/.noshdir
+fi
+
+# Check os and distro
+if [[ "$OSTYPE" == "linux-gnu" ]]; then
+	if [ -f /etc/debian_version ]; then
+		# Ubuntu or Debian
+		WEB_GROUP=www-data
+		WEB_GROUP=www-data
+		WEB_CONF=/etc/apache2/conf-enabled
+		APACHE="/etc/init.d/apache2 restart"
+		SSH="/etc/init.d/ssh stop"
+		SSH1="/etc/init.d/ssh start"
+	elif [ -f /etc/redhat-release ]; then
+		# CentOS or RHEL
+		WEB_GROUP=apache
+		WEB_GROUP=apache
+		WEB_CONF=/etc/httpd/conf.d
+		APACHE="/etc/init.d/httpd restart"
+		SSH="/etc/init.d/sshd stop"
+		SSH1="/etc/init.d/sshd start"
+	elif [ -f /etc/arch-release ]; then
+		# ARCH
+		WEB_GROUP=http
+		WEB_GROUP=http
+		WEB_CONF= /etc/httpd/conf/extra
+		APACHE="systemctl restart httpd.service"
+		SSH="systemctl stop sshd"
+		SSH1="systemctl start sshd"
+	elif [ -f /etc/gentoo-release ]; then
+		# Gentoo
+		WEB_GROUP=apache
+		WEB_GROUP=apache
+		WEB_CONF=/etc/apache2/modules.d
+		APACHE=/etc/init.d/apache2
+		SSH="/etc/init.d/sshd stop"
+		SSH1="/etc/init.d/sshd start"
+	elif [ -f /etc/fedora-release ]; then
+		# Fedora
+		WEB_GROUP=apache
+		WEB_GROUP=apache
+		WEB_CONF=/etc/httpd/conf.d
+		APACHE="/etc/init.d/httpd restart"
+		SSH="/etc/init.d/sshd stop"
+		SSH1="/etc/init.d/sshd start"
+	fi
+elif [[ "$OSTYPE" == "darwin"* ]]; then
+	# Mac
+	WEB_GROUP=_www
+	WEB_GROUP=_www
+	WEB_CONF=/etc/httpd/conf.d
+	APACHE="/usr/sbin/apachectl restart"
+	SSH="launchctl unload com.openssh.sshd"
+	SSH1="launchctl load com.openssh.sshd"
+elif [[ "$OSTYPE" == "cygwin" ]]; then
+	echo "This operating system is not supported by this install script at this time.  Aborting." 1>&2
+	exit 1
+elif [[ "$OSTYPE" == "win32" ]]; then
+	echo "This operating system is not supported by this install script at this time.  Aborting." 1>&2
+	exit 1
+elif [[ "$OSTYPE" == "freebsd"* ]]; then
+	WEB_GROUP=www
+	WEB_GROUP=www
+	WEB_CONF=/etc/httpd/conf.d
+	if [ -e /usr/local/etc/rc.d/apache22.sh ]; then
+		APACHE="/usr/local/etc/rc.d/apache22.sh restart"
+	else
+		APACHE="/usr/local/etc/rc.d/apache24.sh restart"
+	fi
+	SSH="/etc/rc.d/sshd stop"
+	SSH1="/etc/rc.d/sshd start"
+else
+	echo "This operating system is not supported by this install script at this time.  Aborting." 1>&2
+	exit 1
+fi
+
 # Check prerequisites
 type apache2 >/dev/null 2>&1 || { echo >&2 "Apache Web Server is required, but it's not installed.  Aborting."; exit 1; }
 type mysql >/dev/null 2>&1 || { echo >&2 "MySQL is required, but it's not installed.  Aborting."; exit 1; }
@@ -52,26 +138,24 @@ type perl >/dev/null 2>&1 || { echo >&2 "Perl is required, but it's not installe
 type pdftk >/dev/null 2>&1 || { echo >&2 "PDFTK is required, but it's not installed.  Aborting."; exit 1; }
 type convert >/dev/null 2>&1 || { echo >&2 "ImageMagick is required, but it's not installed.  Aborting."; exit 1; }
 type sshd >/dev/null 2>&1 || { echo >&2 "SSH Server is required, but it's not installed.  Aborting."; exit 1; }
-
-# Secure NOSH ChartingSystem
-chown -R $WEB_GROUP.$WEB_USER $NOSH
-chmod -R 755 $NOSH
-chown root.root $NOSHREMINDER
-chmod 777 $NOSHREMINDER
-chown root.root $NOSHFAX
-chmod 777 $NOSHFAX
+type curl >/dev/null 2>&1 || { echo >&2 "cURL is required, but it's not installed.  Aborting."; exit 1; }
+log_only "All prerequisites for installation are met."
+# Create cron scripts
 if [ -f $NOSHCRON ]; then
 	rm -rf $NOSHCRON
 fi
 if [ ! -f $LOG ]; then
+	mkdir $LOGDIR
 	touch $LOG
 fi
 touch $NOSHCRON
-echo "*/10 *  * * *   root    /usr/bin/noshfax" >> $NOSHCRON
-echo "*/1 *   * * *   root    /usr/bin/noshreminder" >> $NOSHCRON
-echo "0 0     * * *   root    /usr/bin/noshbackup" >> $NOSHCRON
+echo "*/10 *  * * *   root    $NEWNOSH/noshfax" >> $NOSHCRON
+echo "*/1 *   * * *   root    $NEWNOSH/noshreminder" >> $NOSHCRON
+echo "0 0     * * *   root    $NEWNOSH/noshbackup" >> $NOSHCRON
 chown root.root $NOSHCRON
 chmod 644 $NOSHCRON
+log_only "Created NOSH ChartingSystem cron scripts."
+# Set up SFTP
 /bin/egrep  -i "^ftpshared" /etc/group
 if [ $? -eq 0 ]; then
 	log_only "Group ftpshared already exists."
@@ -102,124 +186,145 @@ else
 	echo 'AllowTCPForwarding no' >> /etc/ssh/sshd_config
 	echo 'ForceCommand internal-sftp' >> /etc/ssh/sshd_config
 	log_only "SSH config file updated."
+	log_only "Restarting SSH server service"
+	$SSH >> $LOG 2>&1
+	$SSH1 >> $LOG 2>&1
 fi
-# Check to ensure the php configuration file exists
-if [ -f $PHP ]; then
-	# Collect php variables from php.ini
- 	collect_php () {
-		echo `grep -i "^[;[:space:]]*$1[[:space:]=]" $PHP | cut -d \= -f 2 | cut -d \; -f 1 | sed 's%[ 	M]%%gi'`
-	}
-	ARRAYS_TEXT="register_long_arrays"
-	TAG=$(collect_php "$ARRAYS_TEXT")
-	MAGIC_TEXT="magic_quotes_gpc"
-	MAGIC=$(collect_php "$MAGIC_TEXT")
-	FILESIZE_TEXT="upload_max_filesize"
-	FILESIZE=$(collect_php "$FILESIZE_TEXT")
-	POSTSIZE_TEXT="post_max_size"
-	POSTSIZE=$(collect_php "$POSTSIZE_TEXT")
-	
-	# Backup the php.ini file before modification
-	cp $PHP $PHP.BAK
-	log_only "A backup of your php configuration has been created at $PHP.BAK."
+# Check if there was a previous installation of NOSH ChartingSystem before 1.8.0
+if ! [ -e $NEWNOSHTEST ]; then
+	# Version before 1.8.0 only - need to migrate to Laravel
+	if [ -d $NOSH ]; then
+		mv $NOSH $OLDNOSH
+		log_only "Backup of previous NOSH files to /var/www/oldnosh."
+		rm -rf $OLDNOSHFAX
+		rm -rf $OLDNOSHREMINDER
+		rm -rf $NOSHFAX
+		rm -rf $NOSHREMINDER
+		rm -rf $NOSHBACKUP
+		log_only "Removed old scripts for NOSH."
+		if [ -e "$CONFIGDATABASE" ]; then
+			cp -fr $CONFIGDATABASE $CONFIGDATABASEBACKUP
+			log_only "Backup of Codeigniter database configuration file created."
+		fi
+	fi
+fi
 
-	# Modify pertinent php.ini variables
-	FLAG_ON=0
-	process_php () {
-		if [ "$3" -eq "1" ]; then
-			# Make recommendations to php.ini
-			if [ "$FLAG_ON" -eq "0" ]; then
-				log_only "The following setting(s) have been modified in your php configuration file at $PHP :"
-			fi      
-			FLAG_ON=1
-		else
-			# Modify php.ini
-			sed -i "s%^[; 	]*$1[ 	=].*$%$1 = $2%" $PHP
-			log_only "Successfully set $1 = $2"  
-		fi
-	}
-	for i in `seq 1 2`; do
-		if [ "$TAG" != "Off" ]; then
-			process_php "$ARRAYS_TEXT" "Off" $i
-		fi
-		if [ "$MAGIC" != "Off" ]; then
-			process_php "$MAGIC_TEXT" "Off" $i
-		fi
-		if [ "$FILESIZE" != "100M" ]; then
-			process_php "$FILESIZE_TEXT" "100M" $i
-		fi
-		if [ "$POSTSIZE" != "100M" ]; then
-			process_php "$POSTSIZE_TEXT" "100M" $i
-		fi
-		if [ "$FLAG_ON" -eq "0" ]; then
-			log_only "Your PHP configuration is set for using for NOSH ChartingSystem."
-			break
-		fi
-	done
+# Install
+if [ -e $NEWCONFIGDATABASE ]; then
+	log_only "NOSH ChartingSystem already installed."
+	exit 0
 else
-	# php configuration file cannot be found, so we just echo the instructions
-	log_only "We recommend ensuring you have these settings in your php configuration file:"
-	log_only "register_long_arrays = Off"
-	log_only "magic_quotes_gpc = Off"
-	log_only "upload_max_filesize = 100M"
-	log_only "post_max_size = 100M"
-fi
-# Check if there was a previous installation of NOSH ChartingSystem
-if [ -d $NOSH ]; then
-	rm -rf $OLDNOSHFAX
-	rm -rf $OLDNOSHREMINDER
-	if [ -e "$CONFIGDATABASE" ]; then
-		cp -fr $CONFIGDATABASE $CONFIGDATABASEBACKUP
-		log_only "Backup of Codeigniter database configuration file"
-	fi
-	cp -a var/ /var/
-fi
-if [ -e $CONFIGDATABASEBACKUP ]; then
-	DEFAULTUSERNAME=$(get_settings \$default_db_username $CONFIGDATABASEBACKUP)
-	DEFAULTPASSWORD=$(get_settings \$default_db_password $CONFIGDATABASEBACKUP)
-	insert_settings "\$default_db_username" "\'$DEFAULTUSERNAME\';" $CONFIGDATABASE
-	insert_settings "\$default_db_password" "\'$DEFAULTPASSWORD\';" $CONFIGDATABASE
-	log_only "Imported previous settings in the Codeigniter database configuartion file."
-	NOSH_DIR=$(mysql -u$DEFAULTUSERNAME --password=$DEFAULTPASSWORD "nosh" -sN -e "select documents_dir from practiceinfo where practice_id = '1'")
-	log_only "The NOSH ChartingSystem documents directory has been referenced from your previous installation."
-	chown -R $WEB_GROUP.$WEB_USER $NOSH_DIR
-	chmod -R 755 $NOSH_DIR
-	if [ -d "$NOSH_DIR"scans ]; then
-		chmod -R 777 "$NOSH_DIR"scans
-	fi
-	log_only "The NOSH ChartingSystem documents directory is secured."
-	rm -rf $TMPDIR
-	log_only "Temporary files have been removed"
-	log_only "You can now use your newly updated NOSH ChartingSystem!"
-else
-	if [ "$NOSH_DIR_PRE" = "" ]; then
-		log_only "The NOSH ChartingSystem documents directory will need to be created and secured manually."
+	# New installation script
+	if [ -f /etc/debian_version ]; then
+		if [ -d /etc/php5/mods-available ]; then
+			if ! [ -L /etc/php5/mods-available/mcrypt.ini ]; then
+				ln -s /etc/php5/conf.d/mcrypt.ini /etc/php5/mods-available
+				php5enmod mcrypt
+				log_only "Enabled mycrpt module for PHP."
+			fi
+		fi
 	else
-		NOSH_DIR=$NOSH_DIR_PRE
-		if [ -d $NOSH_DIR ]; then
-			log_only "The NOSH ChartingSystem documents directory already exists."
-		else
-			mkdir $NOSH_DIR
-			log_only "The NOSH ChartingSystem documents directory has been created."
-		fi
-		chown -R $WEB_GROUP.$WEB_USER "$NOSH_DIR"
-		chmod -R 755 $NOSH_DIR
-		if [ -d "$NOSH_DIR"scans ]; then
-			chmod -R 777 "$NOSH_DIR"scans
-		fi
-		log_only "The NOSH ChartingSystem documents directory is secured."
+		log_only "Ensure you have enabled the mcrypt module for PHP.  Check you distribution help pages to do this."
 	fi
-	# Set up SSL for Apache server
-	if ! [ -L /etc/apache2/sites-enabled/default-ssl ]; then
-		log_only "Setting up Apache to use SSL"
-		ln -s /etc/apache2/sites-available/default-ssl /etc/apache2/sites-enabled/default-ssl
+	if [ ! -f /usr/local/bin/composer ]; then
+		curl -sS https://getcomposer.org/installer | php
+		sudo mv composer.phar /usr/local/bin/composer
 	fi
-	a2enmod ssl
+	log_only "Installed composer.phar."
+	if [ -d $NOSH_DIR ]; then
+		log_only "The NOSH ChartingSystem documents directory already exists."
+	else
+		mkdir $NOSH_DIR
+		log_only "The NOSH ChartingSystem documents directory has been created."
+	fi
+	chown -R $WEB_GROUP.$WEB_USER "$NOSH_DIR"
+	chmod -R 755 $NOSH_DIR
+	if ! [ -d "$NOSH_DIR"/scans ]; then
+		mkdir "$NOSH_DIR"/scans
+		chown -R $WEB_GROUP.$WEB_USER "$NOSH_DIR"/scans
+		chmod -R 777 "$NOSH_DIR"/scans
+	fi
+	if ! [ -d "$NOSH_DIR"/received ]; then
+		mkdir "$NOSH_DIR"/received
+		chown -R $WEB_GROUP.$WEB_USER "$NOSH_DIR"/received
+	fi
+	if ! [ -d "$NOSH_DIR"/sentfax ]; then
+		mkdir "$NOSH_DIR"/sentfax
+		chown -R $WEB_GROUP.$WEB_USER "$NOSH_DIR"/sentfax
+	fi
+	log_only "The NOSH ChartingSystem scan and fax directories are secured."
+	log_only "The NOSH ChartingSystem documents directory is secured."
+	cd $NOSH_DIR
+	composer create-project nosh-cs/nosh-cs --prefer-dist --stability dev 
+	chown -R $WEB_GROUP.$WEB_USER $NEWNOSH
+	chmod -R 755 $NEWNOSH
+	chmod -R 777 $NEWNOSH/app/storage
+	chmod -R 777 $NEWNOSH/public
+	chmod 777 $NEWNOSH/noshfax
+	chmod 777 $NEWNOSH/noshreminder
+	chmod 777 $NEWNOSH/noshbackup
+	touch $NOSHDIRFILE
+	echo "$NOSH_DIR"/ >> $NOSHDIRFILE
+	log_only "Installed NOSH ChartingSystem core files."
+	# If coming from old NOSH...
+	if [ -e $CONFIGDATABASEBACKUP ]; then
+		mv $CONFIGDATABASEBACKUP $TEMPCONFIGDATABASE
+		sed -i "s/if ( ! defined('BASEPATH')) exit('No direct script access allowed');//" $TEMPCONFIGDATABASE
+	fi
+	if [ -d $OLDNOSH ]; then
+		cp -nr /var/www/oldnosh/images/* $NEWNOSH/public/images/
+		log_only "Copied previously created image files into new installation."
+		cp -nr /var/www/oldnosh/received/* "$NOSH_DIR"/received/
+		rm -rf "$NOSH_DIR"/received/thumbnails
+		if [ "$(ls -A /var/www/oldnosh/sentfax)" ]; then
+			cp -nr /var/www/oldnosh/sentfax/* "$NOSH_DIR"/sentfax/
+		fi
+		if [ "$(ls -A /var/www/oldnosh/scans)" ]; then
+			cp -nr /var/www/oldnosh/scans/* "$NOSH_DIR"/scans/
+		fi
+		log_only "Copied previously created fax and scan files into new installation."
+		log_only "The previous installation of NOSH is in the directory /var/www/oldnosh as a precaution.  You can delete it manually at a later time."
+	fi
+	# Set up SSL and configuration file for Apache server
+	if [ -f /etc/debian_version ]; then
+		if ! [ -L /etc/apache2/sites-enabled/default-ssl ]; then
+			log_only "Setting up Apache to use SSL using the default-ssl virtual host for Ubuntu/Debian."
+			ln -s /etc/apache2/sites-available/default-ssl /etc/apache2/sites-enabled/default-ssl
+		fi
+		a2enmod ssl
+	else
+		log_only "You will need to enable/create a virtual host and the SSL module for Apache before NOSH ChartingSystem will work securely."
+	fi
+	if [ -e "$WEB_CONF"/nosh.conf ]; then
+		rm "$WEB_CONF"/nosh.conf
+	fi
+	touch "$WEB_CONF"/nosh.conf
+	echo "Alias /nosh $NEWNOSH/public
+<Directory $NEWNOSH/public>
+	Options Indexes FollowSymLinks MultiViews
+	AllowOverride All
+	Require all granted
+	RewriteEngine On
+	RewriteBase /nosh/
+	# Redirect Trailing Slashes...
+	RewriteRule ^(.*)/$ /$1 [L,R=301]
+
+	# Handle Front Controller...
+	RewriteCond %{REQUEST_FILENAME} !-d
+	RewriteCond %{REQUEST_FILENAME} !-f
+	RewriteRule ^ index.php [L]
+	<IfModule mod_php5.c>
+		php_value upload_max_filesize 512M
+		php_value post_max_size 512M
+		php_flag magic_quotes_gpc off
+		php_flag register_long_arrays off
+	</IfModule>
+</Directory>" > "$WEB_CONF"/nosh.conf
+	log_only "NOSH ChartingSystem Apache configuration file set."
+	log_only "Restarting Apache service."
+	$APACHE >> $LOG 2>&1
 	# Installation completed
 	log_only "You can now complete your new installation of NOSH ChartingSystem by browsing to:"
 	log_only "https://localhost/nosh"
 fi
-log_only "Restarting Apache service"
-invoke-rc.d apache2 restart >> $LOG 2>&1
-log_only "Restarting SSH server service"
-invoke-rc.d ssh restart >> $LOG 2>&1
 exit 0
