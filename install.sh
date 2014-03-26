@@ -63,7 +63,11 @@ if [[ "$OSTYPE" == "linux-gnu" ]]; then
 		# Ubuntu or Debian
 		WEB_GROUP=www-data
 		WEB_GROUP=www-data
-		WEB_CONF=/etc/apache2/conf-enabled
+		if [ -d /etc/apache2/conf-enabled ]; then
+			WEB_CONF=/etc/apache2/conf-enabled
+		else
+			WEB_CONF=/etc/apache2/conf.d
+		fi
 		APACHE="/etc/init.d/apache2 restart"
 		SSH="/etc/init.d/ssh stop"
 		SSH1="/etc/init.d/ssh start"

@@ -32,7 +32,11 @@ CONFIGDATABASE=$OLDNOSH/system/application/config/database.php
 NOSHCRON=/etc/cron.d/nosh-cs
 WEB_GROUP=www-data
 WEB_USER=www-data
-
+if [ -d /etc/apache2/conf-enabled ]; then
+	WEB_CONF=/etc/apache2/conf-enabled
+else
+	WEB_CONF=/etc/apache2/conf.d
+fi
 
 log_only () {
 	echo "$1"
