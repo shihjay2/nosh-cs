@@ -1,3 +1,9 @@
+nosh-cs (1.8.0-0ubuntu2) precise; urgency=low
+
+  * Updated - Removed old entries in uninstall script.
+
+ -- Michael Shihjay Chen <shihjay2@gmail.com>  Wed, 26 Mar 2014 10:46:05 -0700
+
 nosh-cs (1.8.0-0ubuntu1) precise; urgency=low
 
   * MAJOR UPDATE - Switched to Laravel PHP framework for built-in security and easy future development.
