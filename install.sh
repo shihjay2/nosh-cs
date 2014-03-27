@@ -218,8 +218,8 @@ if ! [ -e $NEWNOSHTEST ]; then
 fi
 
 # Install
-if [ -e $NEWCONFIGDATABASE ]; then
-	log_only "NOSH ChartingSystem already installed."
+if [ -d $NEWNOSH ]; then
+	log_only "NOSH ChartingSystem already installed.  If this is an error, make sure that the $NEWNOSH directory does not exist."
 	exit 0
 else
 	# New installation script
@@ -311,12 +311,12 @@ else
 	echo "Alias /nosh $NEWNOSH/public
 <Directory $NEWNOSH/public>
 	Options Indexes FollowSymLinks MultiViews
-	AllowOverride All" > "$WEB_CONF"/nosh.conf
+	AllowOverride All" >> "$WEB_CONF"/nosh.conf
 	if [ "$APACHE_VER" = "4" ]; then
-		echo "	Require all granted" > "$WEB_CONF"/nosh.conf
+		echo "	Require all granted" >> "$WEB_CONF"/nosh.conf
 	else
 		echo "	Order allow,deny
-	allow from all" > "$WEB_CONF"/nosh.conf
+	allow from all" >> "$WEB_CONF"/nosh.conf
 	fi
 	echo "	RewriteEngine On
 	RewriteBase /nosh/
@@ -333,7 +333,7 @@ else
 		php_flag magic_quotes_gpc off
 		php_flag register_long_arrays off
 	</IfModule>
-</Directory>" > "$WEB_CONF"/nosh.conf
+</Directory>" >> "$WEB_CONF"/nosh.conf
 	log_only "NOSH ChartingSystem Apache configuration file set."
 	log_only "Restarting Apache service."
 	$APACHE >> $LOG 2>&1

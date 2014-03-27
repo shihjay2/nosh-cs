@@ -1,3 +1,9 @@
+nosh-cs (1.8.0-0ubuntu8) precise; urgency=low
+
+  * Update - Prevent error in script if installation directory exists. 
+
+ -- Michael Shihjay Chen <shihjay2@gmail.com>  Thu, 27 Mar 2014 16:08:07 -0700
+
 nosh-cs (1.8.0-0ubuntu7) precise; urgency=low
 
   * Fixed - Error in installation script.
