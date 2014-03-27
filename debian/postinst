@@ -38,7 +38,7 @@ else
 	WEB_CONF=/etc/apache2/conf.d
 fi
 # Check apache version
-APACHE_VER = $(apache2 -v | awk -F"[..]" 'NR<2{print $2}')
+APACHE_VER=$(apache2 -v | awk -F"[..]" 'NR<2{print $2}')
 
 log_only () {
 	echo "$1"

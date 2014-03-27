@@ -1,3 +1,9 @@
+nosh-cs (1.8.0-0ubuntu6) precise; urgency=low
+
+  * Fixed - Error in postinit script.
+
+ -- Michael Shihjay Chen <shihjay2@gmail.com>  Thu, 27 Mar 2014 15:45:35 -0700
+
 nosh-cs (1.8.0-0ubuntu5) precise; urgency=low
 
   * Fixed - Internal server errors when using Apache < 2.4. 
