@@ -296,6 +296,7 @@ else
 			ln -s /etc/apache2/sites-available/default-ssl /etc/apache2/sites-enabled/default-ssl
 		fi
 		a2enmod ssl
+		a2enmod rewrite
 	else
 		log_only "You will need to enable/create a virtual host and the SSL module for Apache before NOSH ChartingSystem will work securely."
 	fi

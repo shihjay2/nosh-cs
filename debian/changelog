@@ -1,3 +1,9 @@
+nosh-cs (1.8.0-0ubuntu4) precise; urgency=low
+
+  * Updated - Enable rewrite module for apache in installation scripts. 
+
+ -- Michael Shihjay Chen <shihjay2@gmail.com>  Wed, 26 Mar 2014 22:50:53 -0700
+
 nosh-cs (1.8.0-0ubuntu3) precise; urgency=low
 
   * Updated - Older distributions (i.e. precise) not getting apache conf file. 

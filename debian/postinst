@@ -198,6 +198,7 @@ configure)
 			ln -s /etc/apache2/sites-available/default-ssl /etc/apache2/sites-enabled/default-ssl
 		fi
 		a2enmod ssl
+		a2enmod rewrite
 		if [ -e "$WEB_CONF"/nosh.conf ]; then
 			rm "$WEB_CONF"/nosh.conf
 		fi
