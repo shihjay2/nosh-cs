@@ -1,3 +1,9 @@
+nosh-cs (1.8.0-0ubuntu7) precise; urgency=low
+
+  * Fixed - Error in installation script.
+
+ -- Michael Shihjay Chen <shihjay2@gmail.com>  Thu, 27 Mar 2014 15:47:04 -0700
+
 nosh-cs (1.8.0-0ubuntu6) precise; urgency=low
 
   * Fixed - Error in postinit script.
