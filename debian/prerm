@@ -58,7 +58,15 @@ case "$1" in
 		rm -rf $NOSHFAX
 		rm -rf $NOSHFAX1
 		rm -rf $NOSHBACKUP
+		if [ -d /etc/apache2/conf-enabled ]; then
+			WEB_CONF=/etc/apache2/conf-enabled
+		else
+			WEB_CONF=/etc/apache2/conf.d
+		fi
+		rm -rf "$WEB_CONF"/nosh.conf
 		log_only "Removed NOSH ChartingSystem supplemental files."
+		invoke-rc.d apache2 restart >> $LOG 2>&1
+		log_only "Restarting Apache service"
 		log_only "You will need to remove the directory $NOSH_DIR on your own based on your clinic patient confidentiality practices."
 		log_only "You may want to save this directory since all database backups are also stored here for future re-installation."
 		# Stop db

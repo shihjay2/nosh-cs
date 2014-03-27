@@ -144,6 +144,10 @@ type convert >/dev/null 2>&1 || { echo >&2 "ImageMagick is required, but it's no
 type sshd >/dev/null 2>&1 || { echo >&2 "SSH Server is required, but it's not installed.  Aborting."; exit 1; }
 type curl >/dev/null 2>&1 || { echo >&2 "cURL is required, but it's not installed.  Aborting."; exit 1; }
 log_only "All prerequisites for installation are met."
+
+# Check apache version
+APACHE_VER = $(apache2 -v | awk -F"[..]" 'NR<2{print $2}')
+
 # Create cron scripts
 if [ -f $NOSHCRON ]; then
 	rm -rf $NOSHCRON
@@ -307,9 +311,14 @@ else
 	echo "Alias /nosh $NEWNOSH/public
 <Directory $NEWNOSH/public>
 	Options Indexes FollowSymLinks MultiViews
-	AllowOverride All
-	Require all granted
-	RewriteEngine On
+	AllowOverride All" > "$WEB_CONF"/nosh.conf
+	if [ "$APACHE_VER" = "4" ]; then
+		echo "	Require all granted" > "$WEB_CONF"/nosh.conf
+	else
+		echo "	Order allow,deny
+	allow from all" > "$WEB_CONF"/nosh.conf
+	fi
+	echo "	RewriteEngine On
 	RewriteBase /nosh/
 	# Redirect Trailing Slashes...
 	RewriteRule ^(.*)/$ /$1 [L,R=301]
