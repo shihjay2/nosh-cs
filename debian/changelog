@@ -1,3 +1,9 @@
+nosh-cs (1.8.0-0ubuntu9) precise; urgency=low
+
+  * Update - Ability to personalize visit types and CPT codes.
+
+ -- Michael Shihjay Chen <shihjay2@gmail.com>  Sat, 29 Mar 2014 15:41:57 -0700
+
 nosh-cs (1.8.0-0ubuntu8) precise; urgency=low
 
   * Update - Prevent error in script if installation directory exists. 
