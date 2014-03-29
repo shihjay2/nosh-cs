@@ -60,7 +60,7 @@ case "$1" in
 		log_only "Updating NOSH ChartingSystem"
 		if [ -d $NOSH ]; then
 			mv $NOSH $OLDNOSH
-			log_only "Backup of previous NOSH files to /var/www/oldnosh."
+			log_only "Previous version of NOSH detected.  Backup of previous NOSH files to /var/www/oldnosh."
 			rm -rf $OLDNOSHFAX
 			rm -rf $OLDNOSHREMINDER
 			rm -rf $NOSHFAX

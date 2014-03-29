@@ -2,7 +2,6 @@
 # install script for nosh-cs
 
 set -e
-read -e -p "Enter the directory where NOSH ChartingSystem patient files will be stored: " -i "/noshdocuments" NOSH_DIR
 
 # Constants and paths
 LOGDIR=/var/log/nosh
@@ -44,6 +43,34 @@ insert_settings () {
 if [[ $EUID -ne 0 ]]; then
 	echo "This script must be run as root.  Aborting." 1>&2
 	exit 1
+fi
+
+# Check if previous NOSH installation.  If so, get database parameters.  If not, ask questions.
+if [ -d $NOSH ]; then
+	mv $NOSH $OLDNOSH
+	log_only "Previous version of NOSH detected.  Backup of previous NOSH files to /var/www/oldnosh."
+	rm -rf $OLDNOSHFAX
+	rm -rf $OLDNOSHREMINDER
+	rm -rf $NOSHFAX
+	rm -rf $NOSHREMINDER
+	rm -rf $NOSHBACKUP
+	log_only "Removed old scripts for NOSH."
+	if [ -e "$CONFIGDATABASE" ]; then
+		cp -fr $CONFIGDATABASE $CONFIGDATABASEBACKUP
+		log_only "Backup of Codeigniter database configuration file created."
+	fi
+fi
+if [ -e $CONFIGDATABASE ]; then
+	MYSQL_USERNAME=$(get_settings \$default_db_username $CONFIGDATABASE)
+	MYSQL_PASSWORD=$(get_settings \$default_db_password $CONFIGDATABASE)
+	MYSQL_DATABASE=nosh
+	NOSH_DIR_PRE=$(mysql -u$MYSQL_USERNAME --password=$MYSQL_PASSWORD "nosh" -sN -e "select documents_dir from practiceinfo where practice_id = '1'")
+	NOSH_DIR=${NOSH_DIR_PRE%?}
+else
+	read -e -p "Enter the directory where NOSH ChartingSystem patient files will be stored: " -i "/noshdocuments" NOSH_DIR
+	read -e -p "Enter the name of the MySQL database that NOSH ChartingSystem will use: " -i "nosh" MYSQL_DATABASE
+	read -e -p "Enter your MySQL username: " -i "" MYSQL_USERNAME
+	read -e -p "Enter your MySQL password: " -i "" MYSQL_PASSWORD
 fi
 
 if [ "$NOSH_DIR" = "" ]; then
@@ -198,24 +225,6 @@ else
 	$SSH >> $LOG 2>&1
 	$SSH1 >> $LOG 2>&1
 fi
-# Check if there was a previous installation of NOSH ChartingSystem before 1.8.0
-if ! [ -e $NEWNOSHTEST ]; then
-	# Version before 1.8.0 only - need to migrate to Laravel
-	if [ -d $NOSH ]; then
-		mv $NOSH $OLDNOSH
-		log_only "Backup of previous NOSH files to /var/www/oldnosh."
-		rm -rf $OLDNOSHFAX
-		rm -rf $OLDNOSHREMINDER
-		rm -rf $NOSHFAX
-		rm -rf $NOSHREMINDER
-		rm -rf $NOSHBACKUP
-		log_only "Removed old scripts for NOSH."
-		if [ -e "$CONFIGDATABASE" ]; then
-			cp -fr $CONFIGDATABASE $CONFIGDATABASEBACKUP
-			log_only "Backup of Codeigniter database configuration file created."
-		fi
-	fi
-fi
 
 # Install
 if [ -d $NEWNOSH ]; then
@@ -263,7 +272,18 @@ else
 	log_only "The NOSH ChartingSystem scan and fax directories are secured."
 	log_only "The NOSH ChartingSystem documents directory is secured."
 	cd $NOSH_DIR
-	composer create-project nosh-cs/nosh-cs --prefer-dist --stability dev 
+	composer create-project nosh-cs/nosh-cs --prefer-dist --stability dev
+	# Create directory file
+	touch $NOSHDIRFILE
+	echo "$NOSH_DIR"/ >> $NOSHDIRFILE
+	# Create .env file
+	touch $NEWCONFIGDATABASE
+	echo "<?php
+	return array(
+		'mysql_database' => '$MYSQL_DATABASE',
+		'mysql_username' => '$MYSQL_USERNAME',
+		'mysql_password' => '$MYSQL_PASSWORD'
+	);" >> $NEWCONFIGDATABASE
 	chown -R $WEB_GROUP.$WEB_USER $NEWNOSH
 	chmod -R 755 $NEWNOSH
 	chmod -R 777 $NEWNOSH/app/storage
@@ -271,14 +291,8 @@ else
 	chmod 777 $NEWNOSH/noshfax
 	chmod 777 $NEWNOSH/noshreminder
 	chmod 777 $NEWNOSH/noshbackup
-	touch $NOSHDIRFILE
-	echo "$NOSH_DIR"/ >> $NOSHDIRFILE
 	log_only "Installed NOSH ChartingSystem core files."
 	# If coming from old NOSH...
-	if [ -e $CONFIGDATABASEBACKUP ]; then
-		mv $CONFIGDATABASEBACKUP $TEMPCONFIGDATABASE
-		sed -i "s/if ( ! defined('BASEPATH')) exit('No direct script access allowed');//" $TEMPCONFIGDATABASE
-	fi
 	if [ -d $OLDNOSH ]; then
 		cp -nr /var/www/oldnosh/images/* $NEWNOSH/public/images/
 		log_only "Copied previously created image files into new installation."
@@ -291,7 +305,38 @@ else
 			cp -nr /var/www/oldnosh/scans/* "$NOSH_DIR"/scans/
 		fi
 		log_only "Copied previously created fax and scan files into new installation."
-		log_only "The previous installation of NOSH is in the directory /var/www/oldnosh as a precaution.  You can delete it manually at a later time."
+		log_only "The previous installation of NOSH is in Sthe directory /var/www/oldnosh as a precaution.  You can delete it manually at a later time."
+	else
+		echo "create database $MYSQL_DATABASE" | mysql -u $MYSQL_USERNAME -p$MYSQL_PASSWORD
+		cd $NEWNOSH
+		php artisan migrate:install
+		php artisan migrate
+		log_only "Installed NOSH ChartingSystem database schema."
+		mysql -u $MYSQL_USERNAME -p$MYSQL_PASSWORD $MYSQL_DATABASE < $NEWNOSH/import/templates.sql
+		log_only "Installed NOSH ChartingSystem templates."
+		mysql -u $MYSQL_USERNAME -p$MYSQL_PASSWORD $MYSQL_DATABASE < $NEWNOSH/import/orderslist1.sql
+		log_only "Installed NOSH ChartingSystem order templates."
+		mysql -u $MYSQL_USERNAME -p$MYSQL_PASSWORD $MYSQL_DATABASE < $NEWNOSH/import/meds_full.sql
+		mysql -u $MYSQL_USERNAME -p$MYSQL_PASSWORD $MYSQL_DATABASE < $NEWNOSH/import/meds_full_package.sql
+		log_only "Installed NOSH ChartingSystem medication database."
+		mysql -u $MYSQL_USERNAME -p$MYSQL_PASSWORD $MYSQL_DATABASE < $NEWNOSH/import/supplements_list.sql
+		log_only "Installed NOSH ChartingSystem supplements database."
+		mysql -u $MYSQL_USERNAME -p$MYSQL_PASSWORD $MYSQL_DATABASE < $NEWNOSH/import/icd9.sql
+		log_only "Installed NOSH ChartingSystem ICD-9 database."
+		mysql -u $MYSQL_USERNAME -p$MYSQL_PASSWORD $MYSQL_DATABASE < $NEWNOSH/import/cpt.sql
+		log_only "Installed NOSH ChartingSystem CPT database."
+		mysql -u $MYSQL_USERNAME -p$MYSQL_PASSWORD $MYSQL_DATABASE < $NEWNOSH/import/cvx.sql
+		log_only "Installed NOSH ChartingSystem immunization codes database."
+		mysql -u $MYSQL_USERNAME -p$MYSQL_PASSWORD $MYSQL_DATABASE < $NEWNOSH/import/gc.sql
+		log_only "Installed NOSH ChartingSystem growth chart normalization values database."
+		mysql -u $MYSQL_USERNAME -p$MYSQL_PASSWORD $MYSQL_DATABASE < $NEWNOSH/import/lang.sql
+		log_only "Installed NOSH ChartingSystem language database."
+		mysql -u $MYSQL_USERNAME -p$MYSQL_PASSWORD $MYSQL_DATABASE < $NEWNOSH/import/npi.sql
+		log_only "Installed NOSH ChartingSystem NPI database."
+		mysql -u $MYSQL_USERNAME -p$MYSQL_PASSWORD $MYSQL_DATABASE < $NEWNOSH/import/pos.sql
+		log_only "Installed NOSH ChartingSystem place of service database."
+		mysql -u $MYSQL_USERNAME -p$MYSQL_PASSWORD $MYSQL_DATABASE < $NEWNOSH/import/guardian_roles.sql
+		log_only "Installed NOSH ChartingSystem guardian roles database."
 	fi
 	# Set up SSL and configuration file for Apache server
 	if [ -f /etc/debian_version ]; then

@@ -3,4 +3,18 @@ Type: string
 Default: /noshdocuments
 Description: Enter a name for the NOSH ChartingSystem documents directory (/dir/dir1/dir3).
  Do not enter any spaces in the directory name..
+ 
+Template: noshemr/mysql_database
+Type: string
+Default: nosh
+Description: Enter the name of the MySQL database that NOSH ChartingSystem will use.
+
+Template: noshemr/mysql_username
+Type: string
+Default: root
+Description: Enter your MySQL username.
+ 
+Template: noshemr/mysql_password
+Type: password
+Description: Enter your MySQL password.
 
