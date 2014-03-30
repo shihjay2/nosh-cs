@@ -1,3 +1,9 @@
+nosh-cs (1.8.0-0ubuntu10) precise; urgency=low
+
+  * Fixed - templates file error. 
+
+ -- Michael Shihjay Chen <shihjay2@gmail.com>  Sat, 29 Mar 2014 18:22:33 -0700
+
 nosh-cs (1.8.0-0ubuntu9) precise; urgency=low
 
   * Update - Ability to personalize visit types and CPT codes.
