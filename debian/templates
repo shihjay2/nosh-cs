@@ -13,7 +13,7 @@ Template: noshemr/mysql_username
 Type: string
 Default: root
 Description: Enter your MySQL username.
- 
+
 Template: noshemr/mysql_password
 Type: password
 Description: Enter your MySQL password.
