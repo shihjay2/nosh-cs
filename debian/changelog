@@ -1,3 +1,9 @@
+nosh-cs (1.8.0-0ubuntu11) precise; urgency=low
+
+  * Fixed - removed sudo command in installer (not needed).
+
+ -- Michael Shihjay Chen <shihjay2@gmail.com>  Tue, 01 Apr 2014 11:52:24 -0700
+
 nosh-cs (1.8.0-0ubuntu10) precise; urgency=low
 
   * Fixed - templates file error. 

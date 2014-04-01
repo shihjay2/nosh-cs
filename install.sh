@@ -245,7 +245,7 @@ else
 	fi
 	if [ ! -f /usr/local/bin/composer ]; then
 		curl -sS https://getcomposer.org/installer | php
-		sudo mv composer.phar /usr/local/bin/composer
+		mv composer.phar /usr/local/bin/composer
 	fi
 	log_only "Installed composer.phar."
 	if [ -d $NOSH_DIR ]; then
