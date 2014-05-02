@@ -1,3 +1,9 @@
+nosh-cs (1.8.1-0ubuntu1) precise; urgency=low
+
+  * Updated - ICD-10 database installation.
+
+ -- Michael Shihjay Chen <shihjay2@gmail.com>  Thu, 01 May 2014 19:22:24 -0700
+
 nosh-cs (1.8.0-0ubuntu11) precise; urgency=low
 
   * Fixed - removed sudo command in installer (not needed).

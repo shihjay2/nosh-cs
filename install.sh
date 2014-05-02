@@ -323,6 +323,8 @@ else
 		log_only "Installed NOSH ChartingSystem supplements database."
 		mysql -u $MYSQL_USERNAME -p$MYSQL_PASSWORD $MYSQL_DATABASE < $NEWNOSH/import/icd9.sql
 		log_only "Installed NOSH ChartingSystem ICD-9 database."
+		mysql -u $MYSQL_USERNAME -p$MYSQL_PASSWORD $MYSQL_DATABASE < $NEWNOSH/import/icd10.sql
+		log_only "Installed NOSH ChartingSystem ICD-10 database."
 		mysql -u $MYSQL_USERNAME -p$MYSQL_PASSWORD $MYSQL_DATABASE < $NEWNOSH/import/cpt.sql
 		log_only "Installed NOSH ChartingSystem CPT database."
 		mysql -u $MYSQL_USERNAME -p$MYSQL_PASSWORD $MYSQL_DATABASE < $NEWNOSH/import/cvx.sql
