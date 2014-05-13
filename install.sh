@@ -110,7 +110,7 @@ if [[ "$OSTYPE" == "linux-gnu" ]]; then
 		# ARCH
 		WEB_GROUP=http
 		WEB_GROUP=http
-		WEB_CONF= /etc/httpd/conf/extra
+		WEB_CONF=/etc/httpd/conf/extra
 		APACHE="systemctl restart httpd.service"
 		SSH="systemctl stop sshd"
 		SSH1="systemctl start sshd"
