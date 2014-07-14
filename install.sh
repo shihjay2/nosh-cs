@@ -237,11 +237,14 @@ else
 			if [ ! -f /etc/php5/mods-available/mcrypt.ini ]; then
 				if ! [ -L /etc/php5/mods-available/mcrypt.ini ]; then
 					ln -s /etc/php5/conf.d/mcrypt.ini /etc/php5/mods-available
+					log_only "Enabled mycrpt module for PHP."
 				fi
 			fi
 		fi
-		php5enmod mcrypt
-		log_only "Enabled mycrpt module for PHP."
+		if [ -f /usr/sbin/php5enmod ]; then
+			php5enmod mcrypt
+			log_only "Enabled mycrpt module for PHP."
+		fi
 	else
 		log_only "Ensure you have enabled the mcrypt module for PHP.  Check you distribution help pages to do this."
 	fi

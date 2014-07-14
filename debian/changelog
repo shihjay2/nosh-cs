@@ -1,3 +1,9 @@
+nosh-cs (1.8.1-0ubuntu5) precise; urgency=low
+
+  * Fixed - reference to php5enmod modified for Ubuntu versions below 14.04 
+
+ -- Michael Shihjay Chen <shihjay2@gmail.com>  Mon, 14 Jul 2014 16:34:17 -0700
+
 nosh-cs (1.8.1-0ubuntu4) precise; urgency=low
 
   * Update - manual installation scripts updated for correct mycrpt and Apache 
