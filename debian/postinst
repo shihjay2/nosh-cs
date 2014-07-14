@@ -146,10 +146,12 @@ configure)
 	else
 		# New installation script
 		if [ -d /etc/php5/mods-available ]; then
-			if ! [ -L /etc/php5/mods-available/mcrypt.ini ]; then
-				ln -s /etc/php5/conf.d/mcrypt.ini /etc/php5/mods-available
-				php5enmod mcrypt
-				log_only "Enabled mycrpt module for PHP."
+			if [ ! -f /etc/php5/mods-available/mcrypt.ini ]; then
+				if ! [ -L /etc/php5/mods-available/mcrypt.ini ]; then
+					ln -s /etc/php5/conf.d/mcrypt.ini /etc/php5/mods-available
+					php5enmod mcrypt
+					log_only "Enabled mycrpt module for PHP."
+				fi
 			fi
 		fi
 		if [ ! -f /usr/local/bin/composer ]; then

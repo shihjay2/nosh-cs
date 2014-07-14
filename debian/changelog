@@ -1,3 +1,9 @@
+nosh-cs (1.8.1-0ubuntu2) precise; urgency=low
+
+  * Fixed - error with Ubuntu 14.04 LTS installations regarding mcrypt.ini
+
+ -- Michael Shihjay Chen <shihjay2@gmail.com>  Sun, 13 Jul 2014 23:35:53 -0700
+
 nosh-cs (1.8.1-0ubuntu1) precise; urgency=low
 
   * Updated - ICD-10 database installation.
