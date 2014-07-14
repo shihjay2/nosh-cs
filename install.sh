@@ -234,12 +234,14 @@ else
 	# New installation script
 	if [ -f /etc/debian_version ]; then
 		if [ -d /etc/php5/mods-available ]; then
-			if ! [ -L /etc/php5/mods-available/mcrypt.ini ]; then
-				ln -s /etc/php5/conf.d/mcrypt.ini /etc/php5/mods-available
-				php5enmod mcrypt
-				log_only "Enabled mycrpt module for PHP."
+			if [ ! -f /etc/php5/mods-available/mcrypt.ini ]; then
+				if ! [ -L /etc/php5/mods-available/mcrypt.ini ]; then
+					ln -s /etc/php5/conf.d/mcrypt.ini /etc/php5/mods-available
+				fi
 			fi
 		fi
+		php5enmod mcrypt
+		log_only "Enabled mycrpt module for PHP."
 	else
 		log_only "Ensure you have enabled the mcrypt module for PHP.  Check you distribution help pages to do this."
 	fi
@@ -342,9 +344,16 @@ else
 	fi
 	# Set up SSL and configuration file for Apache server
 	if [ -f /etc/debian_version ]; then
-		if ! [ -L /etc/apache2/sites-enabled/default-ssl ]; then
-			log_only "Setting up Apache to use SSL using the default-ssl virtual host for Ubuntu/Debian."
-			ln -s /etc/apache2/sites-available/default-ssl /etc/apache2/sites-enabled/default-ssl
+		if [ ! -f /etc/apache2/sites-available/default-ssl.conf ]; then
+			if ! [ -L /etc/apache2/sites-enabled/default-ssl ]; then
+				log_only "Setting up Apache to use SSL using the default-ssl virtual host for Ubuntu/Debian."
+				ln -s /etc/apache2/sites-available/default-ssl /etc/apache2/sites-enabled/default-ssl
+			fi
+		else
+			if ! [ -L /etc/apache2/sites-enabled/default-ssl.conf ]; then
+				log_only "Setting up Apache to use SSL using the default-ssl virtual host for Ubuntu/Debian."
+				ln -s /etc/apache2/sites-available/default-ssl.conf /etc/apache2/sites-enabled/default-ssl.conf
+			fi
 		fi
 		a2enmod ssl
 		a2enmod rewrite

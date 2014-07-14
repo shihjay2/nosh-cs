@@ -1,3 +1,9 @@
+nosh-cs (1.8.1-0ubuntu4) precise; urgency=low
+
+  * Update - manual installation scripts updated for correct mycrpt and Apache 
+
+ -- Michael Shihjay Chen <shihjay2@gmail.com>  Mon, 14 Jul 2014 05:44:03 -0700
+
 nosh-cs (1.8.1-0ubuntu3) precise; urgency=low
 
   * Fixed - error with enabling mcrypt extension for PHP for Ubuntu 14.04 LTS 
