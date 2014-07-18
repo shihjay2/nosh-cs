@@ -1,3 +1,9 @@
+nosh-cs (1.8.1-0ubuntu7) precise; urgency=low
+
+  * Fixed - error showing for db_capb backup. 
+
+ -- Michael Shihjay Chen <shihjay2@gmail.com>  Fri, 18 Jul 2014 06:01:40 -0700
+
 nosh-cs (1.8.1-0ubuntu6) precise; urgency=low
 
   * Fixed - IMAP php module not activated for Ubuntu 14.04 

@@ -3,7 +3,7 @@
 # Source debconf library
 . /usr/share/debconf/confmodule
 db_version 2.0
-db_capb_backup
+db_capb backup
 if ! [ -f /var/www/nosh/system/application/config/database.php ]; then
 	STATE=1
 	while [ "$STATE" != 0 -a "$STATE" != 5 ]; do
