@@ -243,6 +243,7 @@ else
 		fi
 		if [ -f /usr/sbin/php5enmod ]; then
 			php5enmod mcrypt
+			php5enmod imap
 			log_only "Enabled mycrpt module for PHP."
 		fi
 	else

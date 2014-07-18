@@ -155,7 +155,8 @@ configure)
 		fi
 		if [ -f /usr/sbin/php5enmod ]; then
 			php5enmod mcrypt
-			log_only "Enabled mycrpt module for PHP."
+			php5enmod imap
+			log_only "Enabled mycrpt and imap module for PHP."
 		fi
 		if [ ! -f /usr/local/bin/composer ]; then
 			curl -sS https://getcomposer.org/installer | php

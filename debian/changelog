@@ -1,3 +1,9 @@
+nosh-cs (1.8.1-0ubuntu6) precise; urgency=low
+
+  * Fixed - IMAP php module not activated for Ubuntu 14.04 
+
+ -- Michael Shihjay Chen <shihjay2@gmail.com>  Thu, 17 Jul 2014 19:29:17 -0700
+
 nosh-cs (1.8.1-0ubuntu5) precise; urgency=low
 
   * Fixed - reference to php5enmod modified for Ubuntu versions below 14.04 
