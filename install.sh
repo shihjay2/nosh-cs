@@ -45,6 +45,11 @@ if [[ $EUID -ne 0 ]]; then
 	exit 1
 fi
 
+# Create log file if it doesn't exist
+if [ ! -d $LOGDIR ]; then
+	mkdir -p $LOGDIR
+fi
+
 # Check if previous NOSH installation.  If so, get database parameters.  If not, ask questions.
 if [ -d $NOSH ]; then
 	mv $NOSH $OLDNOSH

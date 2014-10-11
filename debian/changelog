@@ -1,3 +1,9 @@
+nosh-cs (1.8.1-0ubuntu8) precise; urgency=low
+
+  * Fixed - manual installation script error if no log directory present. 
+
+ -- Michael Shihjay Chen <shihjay2@gmail.com>  Fri, 10 Oct 2014 19:26:13 -0700
+
 nosh-cs (1.8.1-0ubuntu7) precise; urgency=low
 
   * Fixed - error showing for db_capb backup. 
