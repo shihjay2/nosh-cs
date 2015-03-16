@@ -185,7 +185,7 @@ if [ -f $NOSHCRON ]; then
 	rm -rf $NOSHCRON
 fi
 if [ ! -f $LOG ]; then
-	mkdir $LOGDIR
+	mkdir -p $LOGDIR
 	touch $LOG
 fi
 touch $NOSHCRON
@@ -262,7 +262,7 @@ else
 	if [ -d $NOSH_DIR ]; then
 		log_only "The NOSH ChartingSystem documents directory already exists."
 	else
-		mkdir $NOSH_DIR
+		mkdir -p $NOSH_DIR
 		log_only "The NOSH ChartingSystem documents directory has been created."
 	fi
 	chown -R $WEB_GROUP.$WEB_USER "$NOSH_DIR"

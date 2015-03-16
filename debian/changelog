@@ -1,3 +1,9 @@
+nosh-cs (1.8.1-0ubuntu9) trusty; urgency=medium
+
+  * Fixed - create parent directories when there is none.
+
+ -- Michael Shihjay Chen <shihjay2@gmail.com>  Mon, 16 Mar 2015 02:18:18 -0700
+
 nosh-cs (1.8.1-0ubuntu8) precise; urgency=low
 
   * Fixed - manual installation script error if no log directory present. 
