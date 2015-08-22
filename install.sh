@@ -387,7 +387,7 @@ else
 	RewriteBase /nosh/
 	# Redirect Trailing Slashes...
 	RewriteRule ^(.*)/$ /$1 [L,R=301]
-
+	RewriteRule ^ - [E=HTTP_AUTHORIZATION:%{HTTP:Authorization}]
 	# Handle Front Controller...
 	RewriteCond %{REQUEST_FILENAME} !-d
 	RewriteCond %{REQUEST_FILENAME} !-f
