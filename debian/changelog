@@ -1,3 +1,9 @@
+nosh-cs (1.8.1-0ubuntu12) trusty; urgency=medium
+
+  * Updated readme file.
+
+ -- Michael Shihjay Chen <shihjay2@gmail.com>  Tue, 03 Nov 2015 20:37:23 -0800
+ 
 nosh-cs (1.8.1-0ubuntu11) trusty; urgency=medium
 
   * Update apache config file to allow authorization headers.

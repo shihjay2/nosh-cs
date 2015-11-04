@@ -8,7 +8,7 @@ already set up, you are golden!
 ##### 1. Apache web server (needs to be running)
 ##### 2. MySQL database.  Make sure you remember the root password.  This will be asked during the
 NOSH ChartingSystem installation. (needs to be running)
-##### 3. PHP 5.2 and higher
+##### 3. PHP 5.4 and higher
 ##### 4. The following PHP modules installed and enabled: 
 mysql, imap, mcrypt, imagick, gd, cli, curl, soap, pear
 ##### 5. PERL
@@ -65,7 +65,6 @@ referenced in the header file.  Below is a list of the major jQuery plugins that
 ##### Javascript user interface: JQuery UI (dialog, tabs, accordion, autocomplete)
 ##### Calendar system: FullCalendar
 ##### Tables and grids: jqGrid
-##### Comment tips: BeautyTips
 ##### Signature capture: Signature Pad
 ##### Growth charts: Highcharts
 ##### Form input masking: Masked Input
@@ -90,13 +89,14 @@ will be explained here.
 	billing - List of all fields in a HCFA-1500 form for each patient encounter.
 	billing-core - List of all charges and payments for a patient encounter.
 	calendar - List of all visit types and their duration for the patient scheduler.
-	ci_sessions - This table keeps track of all active user sessions at a given time.
+	ci_sessions - This table keeps track of all active user sessions at a given time (depreciated with Laravel)
 	cpt - CPT codes
 	cvx - CVX (vaccine database) codes
 	demographics - List of all patients (active or inactive) in the system.
 	documents - List of all PDF documents saved in the documents folder (default is /noshdocuments) on the server that pertain to a
 		given patient.
 	encounters - List of all patient encounters for a given patient.
+	era - ERA claims table.
 	groups - List of user groups (provider, admin, assistant, billing, patient).
 	hippa - List of all release of information requests for a given patient.
 	hpi - History of Present Illness of a patient encounter.
@@ -107,34 +107,44 @@ will be explained here.
 	labs - List of all lab results for a given patient.
 	meds - List of all FDA regulated medications.
 	messaging - Intraoffice messaging.
+	migrations - Laravel migrations table.
+	mtm - Medication Therapy Management tables.
 	npi - NPI taxonomy codes.
 	orders - This table lists all physician orders for a given patient.
-	orderslists - This table lists all templates for physician orders.
+	orderslist - This table lists all templates for physician orders.
 	other_history - Past Medical History, Past Surgical History, Family History. Social History, Tobacco Use History, Alcohol Use 
 		History, and Illicit Drug Use History
 	pages - List of documents being sent by fax.
 	pe - Physical Examination of a patient encounter.
 	plan - Plan of a patient encounter.
-	pos - Place of Service codes
-	practiceinfo - Practice information
+	pos - Place of Service codes.
+	practiceinfo - Practice information.
 	procedure - Procedures done in a patient encounter.
 	procedurelist - Procedure templates.
-	providers - Provider information
+	providers - Provider information.
 	received - List of documents received by fax.
 	recepients - List of recepients of faxes sent.
+	refresh_tokens - UMA refresh tokens.
 	repeat_schedule - List of repeated calendar events.
 	ros - Review of System of a patient encounter.
 	rx - List of all medications (active or inactive) for a given patient.
 	rx_list - List of all medications prescribed by a provider.
 	scans - List of all documents scanned into the system.
-	schedule - Patient scheduling
+	schedule - Patient scheduling.
 	sendfax - List of all sent faxes.
+	sessions - Laravel sessions.
+	snomed_procedure_imaging
+	snomed_procedure_path
 	sup_list - List of all ordered supplements by physician.
 	supplements_list - List of all supplements in NIH.
-	template - List of physician templates for History of Present Illness, Review of Systems, Physical Examination (unused table for 
-		now).
-	tests - This is an unused table (for now).
+	supplements_inventory - Supplements inventory.
+	tags - Tags functionality.
+	tags_relate - Relational table for tags.
+	template - List of physician templates for History of Present Illness, Review of Systems, Physical Examination.
+	tests - Test results.
 	t_messages - List of all telephone messages for a given patient.
+	uma - List of shared resources.
+	uma_invitation - List of invitations for shared access.
 	users - List of all system users.
 	vaccine_inventory
 	vaccine_temp - Vaccine temperature log
